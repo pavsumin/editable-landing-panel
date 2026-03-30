@@ -162,14 +162,14 @@ export default function AdminPage() {
 					<button
 						disabled={loading}
 						onClick={() => save(item)}
-						className='cursor-pointer bg-black text-white px-4 py-2 rounded active:scale-95 transition-all duration-200'
+						className='cursor-pointer bg-black text-white px-4 py-2 rounded active:scale-95 transition-all duration-200 min-w-[100px]'
 					>
 						{loading ? 'Saving...' : 'Save'}
 					</button>
 
 					<button
 						onClick={() => reset(item.key)}
-						className='ml-5 cursor-pointer text-sm text-gray-500 underline active:scale-95 transition-all duration-200'
+						className='ml-5 cursor-pointer text-sm text-gray-500 underline active:scale-95 transition-all duration-200 hover:scale-102'
 					>
 						Reset to default
 					</button>
