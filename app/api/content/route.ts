@@ -14,9 +14,6 @@ export async function POST(req: Request) {
 
 		const password = req.headers.get('x-admin-password')
 
-		console.log('HEADER PASSWORD:', password)
-		console.log('ENV PASSWORD:', adminPassword)
-
 		if (!password) {
 			return new Response('No password', { status: 401 })
 		}
@@ -32,13 +29,11 @@ export async function POST(req: Request) {
 			.upsert({ key: contentKey, value }, { onConflict: 'key' })
 
 		if (error) {
-			console.error('SUPABASE ERROR:', error)
 			return new Response('DB error', { status: 500 })
 		}
 
 		return Response.json({ success: true })
 	} catch (err) {
-		console.error(err)
 		return new Response('Server error', { status: 500 })
 	}
 }
