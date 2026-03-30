@@ -35,7 +35,7 @@ function Preview({ data }: { data: Item[] }) {
 	const get = (key: ContentKey) => data.find(i => i.key === key)?.value || ''
 
 	return (
-		<div className='p-6 space-y-4 border rounded-xl bg-white h-fit'>
+		<div className='p-6 space-y-4 border rounded-xl bg-white'>
 			<h1 className='text-2xl font-bold'>{get('hero_title')}</h1>
 			<p className='text-gray-600'>{get('hero_subtitle')}</p>
 			<p>{get('about_text')}</p>
@@ -54,12 +54,13 @@ export default function AdminPage() {
 	const [loading, setLoading] = useState(false)
 	const [mounted, setMounted] = useState(false)
 
-	const [showUnsavedDialog, setShowUnsavedDialog] = useState(false)
 	const [editingKey, setEditingKey] = useState<ContentKey | null>(null)
+	const [showUnsavedDialog, setShowUnsavedDialog] = useState(false)
 
 	const [mode, setMode] = useState<'edit' | 'preview'>('edit')
 
 	const editingRef = useRef<HTMLDivElement | null>(null)
+	const pendingActionRef = useRef<(() => void) | null>(null)
 
 	useEffect(() => {
 		setMounted(true)
@@ -85,18 +86,16 @@ export default function AdminPage() {
 			if (editingRef.current?.contains(target)) return
 			if (!editingKey) return
 
-			const original = data.find(i => i.key === editingKey)?.value
+			setShowUnsavedDialog(true)
 
-			if (draftValue !== original) {
-				setShowUnsavedDialog(true)
-			} else {
+			pendingActionRef.current = () => {
 				setEditingKey(null)
 			}
 		}
 
 		document.addEventListener('mousedown', handler)
 		return () => document.removeEventListener('mousedown', handler)
-	}, [editingKey, draftValue, data])
+	}, [editingKey])
 
 	const updateValue = (key: ContentKey, value: string) => {
 		setData(prev =>
@@ -106,9 +105,6 @@ export default function AdminPage() {
 
 	const save = async (item: Item) => {
 		setLoading(true)
-		const updatedItem = { ...item, value: draftValue }
-
-		updateValue(item.key, draftValue)
 
 		try {
 			const pass = localStorage.getItem('admin-password')
@@ -136,10 +132,8 @@ export default function AdminPage() {
 	const reset = async (key: ContentKey) => {
 		const val = defaultContent[key]
 		const pass = localStorage.getItem('admin-password')
-		const defaultValue = defaultContent[key]
 
-		setDraftValue(defaultValue)
-		updateValue(key, defaultValue)
+		updateValue(key, val)
 
 		await fetch('/api/content', {
 			method: 'POST',
@@ -150,7 +144,6 @@ export default function AdminPage() {
 			body: JSON.stringify({ key, value: val }),
 		})
 
-		updateValue(key, val)
 		toast.success('Reset')
 		setEditingKey(null)
 	}
@@ -198,7 +191,7 @@ export default function AdminPage() {
 
 	return (
 		<main className='min-h-screen p-6 max-w-6xl mx-auto space-y-6'>
-			<h1 className='text-2xl font-semibold text-left md:text-center md:mb-10 md:mt-2'>
+			<h1 className='text-2xl font-semibold text-left md:text-center'>
 				Editor
 			</h1>
 
@@ -223,9 +216,8 @@ export default function AdminPage() {
 				</button>
 			</div>
 
-			{/* DESKTOP GRID */}
 			<div className='grid md:grid-cols-2 gap-8 items-start'>
-				{/* PREVIEW LEFT */}
+				{/* PREVIEW */}
 				<div className='hidden md:block'>
 					<Preview data={data} />
 				</div>
@@ -264,11 +256,7 @@ export default function AdminPage() {
 											) : (
 												<textarea
 													autoFocus
-													className='
-                            w-full min-w-0 max-w-full
-                            resize-none
-                            border p-3 rounded
-                          '
+													className='w-full resize-none border p-3 rounded'
 													value={draftValue}
 													onChange={e => setDraftValue(e.target.value)}
 													onKeyDown={e => {
@@ -282,19 +270,17 @@ export default function AdminPage() {
 											<div className='flex gap-3 text-sm'>
 												{!editing ? (
 													<button
-														onClick={() => {
-															setEditingKey(item.key)
-															setDraftValue(item.value)
-														}}
-														className='cursor-pointer underline'
+														onClick={() => setEditingKey(item.key)}
 														data-action='true'
 													>
 														Edit
 													</button>
 												) : (
 													<button
-														onClick={() => save(item)}
-														className='cursor-pointer underline'
+														onClick={() => {
+															updateValue(item.key, draftValue)
+															save({ ...item, value: draftValue })
+														}}
 														data-action='true'
 													>
 														{loading ? 'Saving...' : 'Save'}
@@ -303,8 +289,8 @@ export default function AdminPage() {
 
 												<button
 													onClick={() => reset(item.key)}
-													className='text-gray-400 cursor-pointer'
 													data-action='true'
+													className='text-gray-400'
 												>
 													Reset
 												</button>
@@ -324,40 +310,33 @@ export default function AdminPage() {
 					</div>
 				)}
 			</div>
+
+			{/* DIALOG */}
 			<Dialog open={showUnsavedDialog} onOpenChange={setShowUnsavedDialog}>
 				<DialogContent>
 					<DialogHeader>
 						<DialogTitle>Unsaved changes</DialogTitle>
 					</DialogHeader>
 
-					<p className='text-sm text-gray-500'>
-						You have unsaved changes. What do you want to do?
-					</p>
+					<p className='text-sm text-gray-500'>You have unsaved changes</p>
 
-					<DialogFooter className='flex gap-2'>
+					<DialogFooter>
 						<button
-							className='px-4 py-2 border rounded'
 							onClick={() => {
 								setShowUnsavedDialog(false)
-								setEditingKey(null)
+								pendingActionRef.current?.()
 							}}
 						>
 							Discard
 						</button>
 
 						<button
-							className='px-4 py-2 bg-black text-white rounded'
-							onClick={async () => {
-								const item = data.find(i => i.key === editingKey)
-
-								if (!item) return
-
-								await save({ ...item, value: draftValue })
-
+							className='bg-black text-white px-4 py-2 rounded'
+							onClick={() => {
 								setShowUnsavedDialog(false)
 							}}
 						>
-							Save
+							Continue editing
 						</button>
 					</DialogFooter>
 				</DialogContent>
