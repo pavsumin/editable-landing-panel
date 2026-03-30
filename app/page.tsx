@@ -1,5 +1,7 @@
 import { getContent } from '@/lib/getContent'
 
+export const revalidate = 0
+
 export default async function Home() {
 	const content = await getContent()
 
