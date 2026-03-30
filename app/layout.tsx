@@ -1,3 +1,4 @@
+import { Toaster } from '@/components/ui/toaster'
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
@@ -26,6 +27,7 @@ export default function RootLayout({
 		<html lang='en' className='h-full antialiased'>
 			<body className={`${geistSans.className} min-h-full flex flex-col`}>
 				{children}
+				<Toaster />
 			</body>
 		</html>
 	)

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
 type Item = {
 	key: string
@@ -44,7 +45,7 @@ export default function AdminPage() {
 			if (!savedPassword) {
 				localStorage.removeItem('admin-auth')
 				setIsAuthed(false)
-				alert('Session expired, login again')
+				toast.error('Session expired, login again')
 				return
 			}
 
@@ -62,13 +63,13 @@ export default function AdminPage() {
 				localStorage.removeItem('admin-password')
 				setIsAuthed(false)
 
-				alert('Wrong password, login again ❌')
+				toast.error('Wrong password, login again')
 				return
 			}
 
-			alert('Saved ✅')
+			toast.success('Saved')
 		} catch (err) {
-			alert('Error ❌')
+			toast.error('Error')
 		} finally {
 			setLoading(false)
 		}
@@ -81,7 +82,7 @@ export default function AdminPage() {
 		})
 
 		if (!res.ok) {
-			alert('Wrong password ❌')
+			toast.error('Wrong password')
 			return
 		}
 
