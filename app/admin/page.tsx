@@ -9,12 +9,27 @@ type Item = {
 	value: string
 }
 
+const sections = {
+	Hero: ['hero_title', 'hero_subtitle'],
+	About: ['about_text'],
+	CTA: ['cta_text'],
+} as const
+
+const labelMap: Record<ContentKey, string> = {
+	hero_title: 'Hero Title',
+	hero_subtitle: 'Hero Subtitle',
+	about_text: 'About Text',
+	cta_text: 'CTA Text',
+}
+
 export default function AdminPage() {
 	const [data, setData] = useState<Item[]>([])
 	const [password, setPassword] = useState('')
 	const [isAuthed, setIsAuthed] = useState(false)
 	const [loading, setLoading] = useState(false)
 	const [mounted, setMounted] = useState(false)
+
+	const [editingKey, setEditingKey] = useState<ContentKey | null>(null)
 
 	useEffect(() => {
 		setMounted(true)
@@ -31,10 +46,12 @@ export default function AdminPage() {
 			.then(setData)
 	}, [])
 
-	const updateValue = (index: number, newValue: string) => {
-		const updated = [...data]
-		updated[index].value = newValue
-		setData(updated)
+	const updateValue = (key: ContentKey, newValue: string) => {
+		setData(prev =>
+			prev.map(item =>
+				item.key === key ? { ...item, value: newValue } : item,
+			),
+		)
 	}
 
 	const save = async (item: Item) => {
@@ -44,9 +61,9 @@ export default function AdminPage() {
 			const savedPassword = localStorage.getItem('admin-password')
 
 			if (!savedPassword) {
-				localStorage.removeItem('admin-auth')
+				localStorage.clear()
 				setIsAuthed(false)
-				toast.error('Session expired, login again')
+				toast.error('Session expired')
 				return
 			}
 
@@ -60,20 +77,36 @@ export default function AdminPage() {
 			})
 
 			if (!res.ok) {
-				localStorage.removeItem('admin-auth')
-				localStorage.removeItem('admin-password')
+				localStorage.clear()
 				setIsAuthed(false)
-
-				toast.error('Wrong password, login again')
+				toast.error('Wrong password')
 				return
 			}
 
 			toast.success('Saved')
-		} catch (err) {
+			setEditingKey(null)
+		} catch {
 			toast.error('Error')
 		} finally {
 			setLoading(false)
 		}
+	}
+
+	const reset = async (key: ContentKey) => {
+		const defaultValue = defaultContent[key]
+		const savedPassword = localStorage.getItem('admin-password')
+
+		await fetch('/api/content', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-admin-password': savedPassword!,
+			},
+			body: JSON.stringify({ key, value: defaultValue }),
+		})
+
+		updateValue(key, defaultValue)
+		toast.success(`${labelMap[key]} reset`)
 	}
 
 	const login = async () => {
@@ -89,31 +122,8 @@ export default function AdminPage() {
 
 		localStorage.setItem('admin-auth', 'true')
 		localStorage.setItem('admin-password', password)
-
 		setIsAuthed(true)
-	}
-
-	const reset = async (key: ContentKey) => {
-		const defaultValue = defaultContent[key]
-
-		const savedPassword = localStorage.getItem('admin-password')
-
-		await fetch('/api/content', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'x-admin-password': savedPassword!,
-			},
-			body: JSON.stringify({ key, value: defaultValue }),
-		})
-
-		setData(prev =>
-			prev.map(item =>
-				item.key === key ? { ...item, value: defaultValue } : item,
-			),
-		)
-
-		toast.success(`${key} reset`)
+		toast.success('Welcome')
 	}
 
 	if (!mounted) return null
@@ -121,58 +131,98 @@ export default function AdminPage() {
 	// LOGIN
 	if (!isAuthed) {
 		return (
-			<main className='p-6 max-w-md mx-auto space-y-4'>
-				<h1 className='text-xl font-bold'>Admin Login</h1>
+			<main className='min-h-screen flex items-center justify-center p-6'>
+				<div className='w-full max-w-sm space-y-4'>
+					<h1 className='text-2xl font-semibold text-center'>Admin</h1>
 
-				<input
-					placeholder='Password'
-					className='border p-2 w-full'
-					value={password}
-					onChange={e => setPassword(e.target.value)}
-					onKeyDown={e => {
-						if (e.key === 'Enter') login()
-					}}
-				/>
+					<input
+						placeholder='Password'
+						className='border rounded-lg p-3 w-full'
+						value={password}
+						onChange={e => setPassword(e.target.value)}
+						onKeyDown={e => e.key === 'Enter' && login()}
+					/>
 
-				<button
-					onClick={login}
-					className='cursor-pointer bg-black text-white px-4 py-2 rounded active:scale-95 transition-all duration-200'
-				>
-					Enter
-				</button>
+					<button
+						onClick={login}
+						className='w-full bg-black text-white py-3 rounded-lg active:scale-95 transition'
+					>
+						Enter
+					</button>
+				</div>
 			</main>
 		)
 	}
 
 	// PANEL
 	return (
-		<main className='p-6 max-w-2xl mx-auto space-y-6'>
-			<h1 className='text-2xl font-bold'>Admin Panel</h1>
+		<main className='min-h-screen p-6 max-w-3xl mx-auto space-y-10'>
+			<h1 className='text-3xl font-semibold'>Editor</h1>
 
-			{data.map((item, i) => (
-				<div key={item.key} className='border rounded-xl p-4 space-y-2'>
-					<div className='text-sm text-gray-500'>{item.key}</div>
+			{Object.entries(sections).map(([section, keys]) => (
+				<div key={section} className='space-y-4'>
+					<h2 className='text-sm uppercase text-gray-400 tracking-wide'>
+						{section}
+					</h2>
 
-					<textarea
-						className='w-full border p-2 rounded'
-						value={item.value}
-						onChange={e => updateValue(i, e.target.value)}
-					/>
+					{keys.map(key => {
+						const item = data.find(i => i.key === (key as ContentKey))
+						if (!item) return null
 
-					<button
-						disabled={loading}
-						onClick={() => save(item)}
-						className='cursor-pointer bg-black text-white px-4 py-2 rounded active:scale-95 transition-all duration-200 min-w-[100px]'
-					>
-						{loading ? 'Saving...' : 'Save'}
-					</button>
+						const isEditing = editingKey === item.key
 
-					<button
-						onClick={() => reset(item.key)}
-						className='ml-5 cursor-pointer text-sm text-gray-500 underline active:scale-95 transition-all duration-200 hover:scale-102'
-					>
-						Reset to default
-					</button>
+						return (
+							<div
+								key={item.key}
+								className='w-full max-w-3xl mx-auto border rounded-xl p-4 space-y-3'
+							>
+								<div className='text-xs text-gray-400'>
+									{labelMap[item.key]}
+								</div>
+
+								{!isEditing ? (
+									<div
+										onClick={() => setEditingKey(item.key)}
+										className='cursor-pointer text-lg hover:bg-gray-100 p-2 rounded-md transition'
+									>
+										{item.value || 'Click to edit'}
+									</div>
+								) : (
+									<textarea
+										autoFocus
+										className='w-full max-w-full min-w-0 resize-none border p-3 rounded-md outline-none focus:ring-2 focus:ring-black transition box-border'
+										value={item.value}
+										onChange={e => updateValue(item.key, e.target.value)}
+									/>
+								)}
+
+								<div className='flex gap-3 text-sm'>
+									{!isEditing ? (
+										<button
+											onClick={() => setEditingKey(item.key)}
+											className='cursor-pointer underline'
+										>
+											Edit
+										</button>
+									) : (
+										<button
+											onClick={() => save(item)}
+											className='cursor-pointer text-black underline'
+										>
+											{loading ? 'Saving...' : 'Save'}
+										</button>
+									)}
+
+									<button
+										onClick={() => reset(item.key)}
+										className='cursor-pointer text-gray-400 underline'
+									>
+										Reset
+									</button>
+								</div>
+							</div>
+						)
+					})}
 				</div>
 			))}
 		</main>
