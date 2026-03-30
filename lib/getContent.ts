@@ -9,8 +9,6 @@ type ContentItem = {
 export async function getContent() {
 	const { data } = await supabase.from('content').select('*')
 
-	console.log('DATA FROM DB:', data)
-
 	const dbContent: Record<string, string> = {}
 
 	data?.forEach((item: ContentItem) => {
