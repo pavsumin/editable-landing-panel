@@ -1,7 +1,15 @@
 'use client'
 
+import {
+	Dialog,
+	DialogContent,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from '@/components/ui/dialog'
 import { ContentKey, defaultContent } from '@/lib/defaultContent'
-import { useEffect, useState } from 'react'
+import { Eye, Pencil } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 type Item = {
@@ -22,14 +30,36 @@ const labelMap: Record<ContentKey, string> = {
 	cta_text: 'CTA Text',
 }
 
+// PREVIEW
+function Preview({ data }: { data: Item[] }) {
+	const get = (key: ContentKey) => data.find(i => i.key === key)?.value || ''
+
+	return (
+		<div className='p-6 space-y-4 border rounded-xl bg-white h-fit'>
+			<h1 className='text-2xl font-bold'>{get('hero_title')}</h1>
+			<p className='text-gray-600'>{get('hero_subtitle')}</p>
+			<p>{get('about_text')}</p>
+			<button className='bg-black text-white px-4 py-2 rounded'>
+				{get('cta_text')}
+			</button>
+		</div>
+	)
+}
+
 export default function AdminPage() {
 	const [data, setData] = useState<Item[]>([])
 	const [password, setPassword] = useState('')
+	const [draftValue, setDraftValue] = useState('')
 	const [isAuthed, setIsAuthed] = useState(false)
 	const [loading, setLoading] = useState(false)
 	const [mounted, setMounted] = useState(false)
 
+	const [showUnsavedDialog, setShowUnsavedDialog] = useState(false)
 	const [editingKey, setEditingKey] = useState<ContentKey | null>(null)
+
+	const [mode, setMode] = useState<'edit' | 'preview'>('edit')
+
+	const editingRef = useRef<HTMLDivElement | null>(null)
 
 	useEffect(() => {
 		setMounted(true)
@@ -46,42 +76,53 @@ export default function AdminPage() {
 			.then(setData)
 	}, [])
 
-	const updateValue = (key: ContentKey, newValue: string) => {
+	// OUTSIDE CLICK
+	useEffect(() => {
+		const handler = (e: MouseEvent) => {
+			const target = e.target as HTMLElement
+
+			if (target.closest('[data-action="true"]')) return
+			if (editingRef.current?.contains(target)) return
+			if (!editingKey) return
+
+			const original = data.find(i => i.key === editingKey)?.value
+
+			if (draftValue !== original) {
+				setShowUnsavedDialog(true)
+			} else {
+				setEditingKey(null)
+			}
+		}
+
+		document.addEventListener('mousedown', handler)
+		return () => document.removeEventListener('mousedown', handler)
+	}, [editingKey, draftValue, data])
+
+	const updateValue = (key: ContentKey, value: string) => {
 		setData(prev =>
-			prev.map(item =>
-				item.key === key ? { ...item, value: newValue } : item,
-			),
+			prev.map(item => (item.key === key ? { ...item, value } : item)),
 		)
 	}
 
 	const save = async (item: Item) => {
 		setLoading(true)
+		const updatedItem = { ...item, value: draftValue }
+
+		updateValue(item.key, draftValue)
 
 		try {
-			const savedPassword = localStorage.getItem('admin-password')
-
-			if (!savedPassword) {
-				localStorage.clear()
-				setIsAuthed(false)
-				toast.error('Session expired')
-				return
-			}
+			const pass = localStorage.getItem('admin-password')
 
 			const res = await fetch('/api/content', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
-					'x-admin-password': savedPassword,
+					'x-admin-password': pass!,
 				},
 				body: JSON.stringify(item),
 			})
 
-			if (!res.ok) {
-				localStorage.clear()
-				setIsAuthed(false)
-				toast.error('Wrong password')
-				return
-			}
+			if (!res.ok) throw new Error()
 
 			toast.success('Saved')
 			setEditingKey(null)
@@ -93,20 +134,25 @@ export default function AdminPage() {
 	}
 
 	const reset = async (key: ContentKey) => {
+		const val = defaultContent[key]
+		const pass = localStorage.getItem('admin-password')
 		const defaultValue = defaultContent[key]
-		const savedPassword = localStorage.getItem('admin-password')
+
+		setDraftValue(defaultValue)
+		updateValue(key, defaultValue)
 
 		await fetch('/api/content', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				'x-admin-password': savedPassword!,
+				'x-admin-password': pass!,
 			},
-			body: JSON.stringify({ key, value: defaultValue }),
+			body: JSON.stringify({ key, value: val }),
 		})
 
-		updateValue(key, defaultValue)
-		toast.success(`${labelMap[key]} reset`)
+		updateValue(key, val)
+		toast.success('Reset')
+		setEditingKey(null)
 	}
 
 	const login = async () => {
@@ -115,29 +161,25 @@ export default function AdminPage() {
 			body: JSON.stringify({ password }),
 		})
 
-		if (!res.ok) {
-			toast.error('Wrong password')
-			return
-		}
+		if (!res.ok) return toast.error('Wrong password')
 
 		localStorage.setItem('admin-auth', 'true')
 		localStorage.setItem('admin-password', password)
+
 		setIsAuthed(true)
-		toast.success('Welcome')
 	}
 
 	if (!mounted) return null
 
-	// LOGIN
 	if (!isAuthed) {
 		return (
 			<main className='min-h-screen flex items-center justify-center p-6'>
 				<div className='w-full max-w-sm space-y-4'>
-					<h1 className='text-2xl font-semibold text-center'>Admin</h1>
+					<h1 className='text-xl font-semibold text-center'>Admin</h1>
 
 					<input
+						className='border p-3 rounded w-full'
 						placeholder='Password'
-						className='border rounded-lg p-3 w-full'
 						value={password}
 						onChange={e => setPassword(e.target.value)}
 						onKeyDown={e => e.key === 'Enter' && login()}
@@ -145,7 +187,7 @@ export default function AdminPage() {
 
 					<button
 						onClick={login}
-						className='w-full bg-black text-white py-3 rounded-lg active:scale-95 transition'
+						className='w-full bg-black text-white py-3 rounded'
 					>
 						Enter
 					</button>
@@ -154,77 +196,172 @@ export default function AdminPage() {
 		)
 	}
 
-	// PANEL
 	return (
-		<main className='min-h-screen p-6 max-w-3xl mx-auto space-y-10'>
-			<h1 className='text-3xl font-semibold'>Editor</h1>
+		<main className='min-h-screen p-6 max-w-6xl mx-auto space-y-6'>
+			<h1 className='text-2xl font-semibold text-left md:text-center md:mb-10 md:mt-2'>
+				Editor
+			</h1>
 
-			{Object.entries(sections).map(([section, keys]) => (
-				<div key={section} className='space-y-4'>
-					<h2 className='text-sm uppercase text-gray-400 tracking-wide'>
-						{section}
-					</h2>
+			{/* MOBILE TOGGLE */}
+			<div className='flex md:hidden gap-2 bg-gray-100 p-1 rounded-lg w-fit'>
+				<button
+					onClick={() => setMode('edit')}
+					className={`flex items-center gap-1 px-3 py-1 rounded-md text-sm ${
+						mode === 'edit' ? 'bg-white shadow' : ''
+					}`}
+				>
+					<Pencil size={14} /> Edit
+				</button>
 
-					{keys.map(key => {
-						const item = data.find(i => i.key === (key as ContentKey))
-						if (!item) return null
+				<button
+					onClick={() => setMode('preview')}
+					className={`flex items-center gap-1 px-3 py-1 rounded-md text-sm ${
+						mode === 'preview' ? 'bg-white shadow' : ''
+					}`}
+				>
+					<Eye size={14} /> Preview
+				</button>
+			</div>
 
-						const isEditing = editingKey === item.key
-
-						return (
-							<div
-								key={item.key}
-								className='w-full max-w-3xl mx-auto border rounded-xl p-4 space-y-3'
-							>
-								<div className='text-xs text-gray-400'>
-									{labelMap[item.key]}
-								</div>
-
-								{!isEditing ? (
-									<div
-										onClick={() => setEditingKey(item.key)}
-										className='cursor-pointer text-lg hover:bg-gray-100 p-2 rounded-md transition'
-									>
-										{item.value || 'Click to edit'}
-									</div>
-								) : (
-									<textarea
-										autoFocus
-										className='w-full max-w-full min-w-0 resize-none border p-3 rounded-md outline-none focus:ring-2 focus:ring-black transition box-border'
-										value={item.value}
-										onChange={e => updateValue(item.key, e.target.value)}
-									/>
-								)}
-
-								<div className='flex gap-3 text-sm'>
-									{!isEditing ? (
-										<button
-											onClick={() => setEditingKey(item.key)}
-											className='cursor-pointer underline'
-										>
-											Edit
-										</button>
-									) : (
-										<button
-											onClick={() => save(item)}
-											className='cursor-pointer text-black underline'
-										>
-											{loading ? 'Saving...' : 'Save'}
-										</button>
-									)}
-
-									<button
-										onClick={() => reset(item.key)}
-										className='cursor-pointer text-gray-400 underline'
-									>
-										Reset
-									</button>
-								</div>
-							</div>
-						)
-					})}
+			{/* DESKTOP GRID */}
+			<div className='grid md:grid-cols-2 gap-8 items-start'>
+				{/* PREVIEW LEFT */}
+				<div className='hidden md:block'>
+					<Preview data={data} />
 				</div>
-			))}
+
+				{/* EDITOR */}
+				{(mode === 'edit' ||
+					(typeof window !== 'undefined' && window.innerWidth >= 768)) && (
+					<div className='space-y-6'>
+						{Object.entries(sections).map(([section, keys]) => (
+							<div key={section} className='space-y-3'>
+								<h2 className='text-xs uppercase text-gray-400'>{section}</h2>
+
+								{keys.map(key => {
+									const item = data.find(i => i.key === (key as ContentKey))
+									if (!item) return null
+
+									const editing = editingKey === item.key
+
+									return (
+										<div
+											key={item.key}
+											ref={editing ? editingRef : null}
+											className='border rounded-xl p-4 space-y-2'
+										>
+											<div className='text-xs text-gray-400'>
+												{labelMap[item.key]}
+											</div>
+
+											{!editing ? (
+												<div
+													onClick={() => setEditingKey(item.key)}
+													className='cursor-pointer hover:bg-gray-100 p-2 rounded'
+												>
+													{item.value}
+												</div>
+											) : (
+												<textarea
+													autoFocus
+													className='
+                            w-full min-w-0 max-w-full
+                            resize-none
+                            border p-3 rounded
+                          '
+													value={draftValue}
+													onChange={e => setDraftValue(e.target.value)}
+													onKeyDown={e => {
+														if (e.key === 'Escape') {
+															setEditingKey(null)
+														}
+													}}
+												/>
+											)}
+
+											<div className='flex gap-3 text-sm'>
+												{!editing ? (
+													<button
+														onClick={() => {
+															setEditingKey(item.key)
+															setDraftValue(item.value)
+														}}
+														className='cursor-pointer underline'
+														data-action='true'
+													>
+														Edit
+													</button>
+												) : (
+													<button
+														onClick={() => save(item)}
+														className='cursor-pointer underline'
+														data-action='true'
+													>
+														{loading ? 'Saving...' : 'Save'}
+													</button>
+												)}
+
+												<button
+													onClick={() => reset(item.key)}
+													className='text-gray-400 cursor-pointer'
+													data-action='true'
+												>
+													Reset
+												</button>
+											</div>
+										</div>
+									)
+								})}
+							</div>
+						))}
+					</div>
+				)}
+
+				{/* MOBILE PREVIEW */}
+				{mode === 'preview' && (
+					<div className='md:hidden'>
+						<Preview data={data} />
+					</div>
+				)}
+			</div>
+			<Dialog open={showUnsavedDialog} onOpenChange={setShowUnsavedDialog}>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle>Unsaved changes</DialogTitle>
+					</DialogHeader>
+
+					<p className='text-sm text-gray-500'>
+						You have unsaved changes. What do you want to do?
+					</p>
+
+					<DialogFooter className='flex gap-2'>
+						<button
+							className='px-4 py-2 border rounded'
+							onClick={() => {
+								setShowUnsavedDialog(false)
+								setEditingKey(null)
+							}}
+						>
+							Discard
+						</button>
+
+						<button
+							className='px-4 py-2 bg-black text-white rounded'
+							onClick={async () => {
+								const item = data.find(i => i.key === editingKey)
+
+								if (!item) return
+
+								await save({ ...item, value: draftValue })
+
+								setShowUnsavedDialog(false)
+							}}
+						>
+							Save
+						</button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 		</main>
 	)
 }
