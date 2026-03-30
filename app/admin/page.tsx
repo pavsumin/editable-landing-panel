@@ -1,10 +1,11 @@
 'use client'
 
+import { ContentKey, defaultContent } from '@/lib/defaultContent'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 type Item = {
-	key: string
+	key: ContentKey
 	value: string
 }
 
@@ -92,6 +93,29 @@ export default function AdminPage() {
 		setIsAuthed(true)
 	}
 
+	const reset = async (key: ContentKey) => {
+		const defaultValue = defaultContent[key]
+
+		const savedPassword = localStorage.getItem('admin-password')
+
+		await fetch('/api/content', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-admin-password': savedPassword!,
+			},
+			body: JSON.stringify({ key, value: defaultValue }),
+		})
+
+		setData(prev =>
+			prev.map(item =>
+				item.key === key ? { ...item, value: defaultValue } : item,
+			),
+		)
+
+		toast.success(`${key} reset`)
+	}
+
 	if (!mounted) return null
 
 	// LOGIN
@@ -141,6 +165,13 @@ export default function AdminPage() {
 						className='cursor-pointer bg-black text-white px-4 py-2 rounded active:scale-95 transition-all duration-200'
 					>
 						{loading ? 'Saving...' : 'Save'}
+					</button>
+
+					<button
+						onClick={() => reset(item.key)}
+						className='ml-5 cursor-pointer text-sm text-gray-500 underline active:scale-95 transition-all duration-200'
+					>
+						Reset to default
 					</button>
 				</div>
 			))}
