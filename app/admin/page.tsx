@@ -12,8 +12,18 @@ export default function AdminPage() {
 	const [password, setPassword] = useState('')
 	const [isAuthed, setIsAuthed] = useState(false)
 	const [loading, setLoading] = useState(false)
+	const [mounted, setMounted] = useState(false)
 
 	useEffect(() => {
+		setMounted(true)
+
+		const auth = localStorage.getItem('admin-auth')
+		const pass = localStorage.getItem('admin-password')
+
+		if (auth === 'true' && pass) {
+			setIsAuthed(true)
+		}
+
 		fetch('/api/get-content')
 			.then(res => res.json())
 			.then(setData)
@@ -29,17 +39,30 @@ export default function AdminPage() {
 		setLoading(true)
 
 		try {
+			const savedPassword = localStorage.getItem('admin-password')
+
+			if (!savedPassword) {
+				localStorage.removeItem('admin-auth')
+				setIsAuthed(false)
+				alert('Session expired, login again')
+				return
+			}
+
 			const res = await fetch('/api/content', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
-					'x-admin-password': password,
+					'x-admin-password': savedPassword,
 				},
 				body: JSON.stringify(item),
 			})
 
 			if (!res.ok) {
-				alert('Wrong password or error ❌')
+				localStorage.removeItem('admin-auth')
+				localStorage.removeItem('admin-password')
+				setIsAuthed(false)
+
+				alert('Wrong password, login again ❌')
 				return
 			}
 
@@ -51,7 +74,26 @@ export default function AdminPage() {
 		}
 	}
 
-	// LOGIN SCREEN
+	const login = async () => {
+		const res = await fetch('/api/login', {
+			method: 'POST',
+			body: JSON.stringify({ password }),
+		})
+
+		if (!res.ok) {
+			alert('Wrong password ❌')
+			return
+		}
+
+		localStorage.setItem('admin-auth', 'true')
+		localStorage.setItem('admin-password', password)
+
+		setIsAuthed(true)
+	}
+
+	if (!mounted) return null
+
+	// LOGIN
 	if (!isAuthed) {
 		return (
 			<main className='p-6 max-w-md mx-auto space-y-4'>
@@ -62,14 +104,14 @@ export default function AdminPage() {
 					className='border p-2 w-full'
 					value={password}
 					onChange={e => setPassword(e.target.value)}
+					onKeyDown={e => {
+						if (e.key === 'Enter') login()
+					}}
 				/>
 
 				<button
-					onClick={() => {
-						if (password.length < 1) return alert('Enter password')
-						setIsAuthed(true)
-					}}
-					className='bg-black text-white px-4 py-2 rounded'
+					onClick={login}
+					className='cursor-pointer bg-black text-white px-4 py-2 rounded active:scale-95 transition-all duration-200'
 				>
 					Enter
 				</button>
@@ -77,7 +119,7 @@ export default function AdminPage() {
 		)
 	}
 
-	// ADMIN PANEL
+	// PANEL
 	return (
 		<main className='p-6 max-w-2xl mx-auto space-y-6'>
 			<h1 className='text-2xl font-bold'>Admin Panel</h1>
@@ -95,7 +137,7 @@ export default function AdminPage() {
 					<button
 						disabled={loading}
 						onClick={() => save(item)}
-						className='bg-black text-white px-4 py-2 rounded'
+						className='cursor-pointer bg-black text-white px-4 py-2 rounded active:scale-95 transition-all duration-200'
 					>
 						{loading ? 'Saving...' : 'Save'}
 					</button>

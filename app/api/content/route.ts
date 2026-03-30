@@ -7,13 +7,19 @@ export async function POST(req: Request) {
 		const adminPassword = process.env.ADMIN_PASSWORD
 
 		if (!url || !key || !adminPassword) {
-			console.error('Missing env variables')
 			return new Response('Server misconfigured', { status: 500 })
 		}
 
 		const supabase = createClient(url, key)
 
 		const password = req.headers.get('x-admin-password')
+
+		console.log('HEADER PASSWORD:', password)
+		console.log('ENV PASSWORD:', adminPassword)
+
+		if (!password) {
+			return new Response('No password', { status: 401 })
+		}
 
 		if (password !== adminPassword) {
 			return new Response('Unauthorized', { status: 401 })
@@ -26,7 +32,7 @@ export async function POST(req: Request) {
 			.upsert({ key: contentKey, value }, { onConflict: 'key' })
 
 		if (error) {
-			console.error(error)
+			console.error('SUPABASE ERROR:', error)
 			return new Response('DB error', { status: 500 })
 		}
 
