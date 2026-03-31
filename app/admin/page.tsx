@@ -2,7 +2,7 @@
 
 import { ContentKey, defaultContent } from '@/lib/defaultContent'
 import { Eye, Pencil } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 type Item = {
@@ -47,6 +47,7 @@ export default function AdminPage() {
 	const [mounted, setMounted] = useState(false)
 
 	const [editingKey, setEditingKey] = useState<ContentKey | null>(null)
+	const textareaRef = useRef<HTMLTextAreaElement | null>(null)
 	const [draftValue, setDraftValue] = useState('')
 
 	const [mode, setMode] = useState<'edit' | 'preview'>('edit')
@@ -66,7 +67,7 @@ export default function AdminPage() {
 			.then(setData)
 	}, [])
 
-	// 🔥 OUTSIDE CLICK (без ref!)
+	// OUTSIDE CLICK
 	useEffect(() => {
 		const handler = (e: MouseEvent) => {
 			const target = e.target as HTMLElement
@@ -76,6 +77,7 @@ export default function AdminPage() {
 			if (!editingKey) return
 
 			setEditingKey(null)
+			setDraftValue('')
 		}
 
 		document.addEventListener('mousedown', handler)
@@ -87,6 +89,16 @@ export default function AdminPage() {
 			prev.map(item => (item.key === key ? { ...item, value } : item)),
 		)
 	}
+
+	useEffect(() => {
+		if (editingKey && textareaRef.current) {
+			const el = textareaRef.current
+			const length = el.value.length
+
+			el.focus()
+			el.setSelectionRange(length, length)
+		}
+	}, [editingKey])
 
 	const save = async (item: Item) => {
 		setLoading(true)
@@ -107,6 +119,7 @@ export default function AdminPage() {
 
 			toast.success('Saved')
 			setEditingKey(null)
+			setDraftValue('')
 		} catch {
 			toast.error('Error')
 		} finally {
@@ -131,6 +144,7 @@ export default function AdminPage() {
 
 		toast.success('Reset')
 		setEditingKey(null)
+		setDraftValue('')
 	}
 
 	const login = async () => {
@@ -241,9 +255,10 @@ export default function AdminPage() {
 												</div>
 											) : (
 												<textarea
+													ref={textareaRef}
 													autoFocus
 													className='block w-full min-w-0 resize-none border p-3 rounded whitespace-pre-wrap break-words'
-													value={draftValue}
+													value={draftValue || item.value}
 													onChange={e => setDraftValue(e.target.value)}
 												/>
 											)}
@@ -264,6 +279,8 @@ export default function AdminPage() {
 														onClick={() => {
 															updateValue(item.key, draftValue)
 															save({ ...item, value: draftValue })
+															setEditingKey(null)
+															setDraftValue('')
 														}}
 														data-action='true'
 													>
@@ -272,7 +289,11 @@ export default function AdminPage() {
 												)}
 
 												<button
-													onClick={() => reset(item.key)}
+													onClick={() => {
+														reset(item.key)
+														setEditingKey(null)
+														setDraftValue('')
+													}}
 													data-action='true'
 													className='text-gray-400'
 												>
