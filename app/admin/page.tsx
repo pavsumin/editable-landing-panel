@@ -209,7 +209,7 @@ export default function AdminPage() {
 	}
 
 	return (
-		<main className='min-h-screen p-6 max-w-6xl mx-auto space-y-6'>
+		<main className='min-h-screen p-6 max-w-6xl mx-auto w-full space-y-6'>
 			<h1 className='text-2xl font-semibold md:text-center md:mt-2 md:mb-8'>
 				Editor
 			</h1>
@@ -279,7 +279,7 @@ export default function AdminPage() {
 												<textarea
 													ref={textareaRef}
 													autoFocus
-													className='block w-full min-w-0 resize-none border p-3 rounded whitespace-pre-wrap break-words'
+													className='block max-w-full w-full min-w-0 resize-none border p-3 rounded whitespace-pre-wrap break-words'
 													value={draftValue || item.value}
 													onChange={e => setDraftValue(e.target.value)}
 												/>
