@@ -5,6 +5,14 @@ import { Eye, Pencil } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
+import {
+	Dialog,
+	DialogContent,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from '@/components/ui/dialog'
+
 type Item = {
 	key: ContentKey
 	value: string
@@ -46,6 +54,9 @@ export default function AdminPage() {
 	const [loading, setLoading] = useState(false)
 	const [mounted, setMounted] = useState(false)
 
+	const [showDialog, setShowDialog] = useState(false)
+	const [pendingKey, setPendingKey] = useState<ContentKey | null>(null)
+
 	const [editingKey, setEditingKey] = useState<ContentKey | null>(null)
 	const textareaRef = useRef<HTMLTextAreaElement | null>(null)
 	const [draftValue, setDraftValue] = useState('')
@@ -76,13 +87,20 @@ export default function AdminPage() {
 			if (target.closest('[data-editing="true"]')) return
 			if (!editingKey) return
 
-			setEditingKey(null)
-			setDraftValue('')
+			const original = data.find(i => i.key === editingKey)?.value
+
+			if (draftValue !== original) {
+				setPendingKey(editingKey)
+				setShowDialog(true)
+			} else {
+				setEditingKey(null)
+				setDraftValue('')
+			}
 		}
 
 		document.addEventListener('mousedown', handler)
 		return () => document.removeEventListener('mousedown', handler)
-	}, [editingKey])
+	}, [editingKey, draftValue, data])
 
 	const updateValue = (key: ContentKey, value: string) => {
 		setData(prev =>
@@ -100,7 +118,7 @@ export default function AdminPage() {
 		}
 	}, [editingKey])
 
-	const save = async (item: Item) => {
+	const save = async (key: ContentKey, value: string) => {
 		setLoading(true)
 
 		try {
@@ -112,10 +130,12 @@ export default function AdminPage() {
 					'Content-Type': 'application/json',
 					'x-admin-password': pass!,
 				},
-				body: JSON.stringify(item),
+				body: JSON.stringify({ key, value }),
 			})
 
 			if (!res.ok) throw new Error()
+
+			updateValue(key, value)
 
 			toast.success('Saved')
 			setEditingKey(null)
@@ -249,7 +269,7 @@ export default function AdminPage() {
 														setEditingKey(item.key)
 														setDraftValue(item.value)
 													}}
-													className='cursor-pointer hover:bg-gray-100 p-2 rounded w-full break-words'
+													className='cursor-pointer bg-gray-100 p-2 rounded-[8px] w-full break-words'
 												>
 													{item.value}
 												</div>
@@ -278,7 +298,7 @@ export default function AdminPage() {
 													<button
 														onClick={() => {
 															updateValue(item.key, draftValue)
-															save({ ...item, value: draftValue })
+															save(item.key, draftValue)
 															setEditingKey(null)
 															setDraftValue('')
 														}}
@@ -315,6 +335,47 @@ export default function AdminPage() {
 					</div>
 				)}
 			</div>
+
+			<Dialog open={showDialog} onOpenChange={setShowDialog}>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle>Unsaved changes</DialogTitle>
+					</DialogHeader>
+
+					<p className='text-sm text-gray-500'>
+						You have unsaved changes. What do you want to do?
+					</p>
+
+					<DialogFooter className='flex gap-2'>
+						<button
+							className='px-4 py-2 border rounded'
+							onClick={() => {
+								setShowDialog(false)
+								setEditingKey(null)
+								setDraftValue('')
+							}}
+						>
+							Discard
+						</button>
+
+						<button
+							className='px-4 py-2 bg-black text-white rounded'
+							onClick={async () => {
+								const item = data.find(i => i.key === pendingKey)
+
+								if (!item) return
+
+								await save(item.key, draftValue)
+
+								setShowDialog(false)
+								setPendingKey(null)
+							}}
+						>
+							Save
+						</button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 		</main>
 	)
 }
