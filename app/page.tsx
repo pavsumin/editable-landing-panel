@@ -117,26 +117,13 @@ export default function Home() {
 					</div>
 
 					{/* VISUAL */}
-					<div className='relative rounded-xl border bg-gradient-to-br from-muted to-muted/50 p-6 shadow-xl space-y-4'>
-						<div className='text-xs text-muted-foreground'>Code</div>
-
-						<pre className='text-sm bg-background p-3 rounded border overflow-x-auto'>
-							{`<h1>${c.hero_title}</h1>`}
-						</pre>
-
-						<div className='text-center text-muted-foreground text-xs'>↓</div>
-
-						<div className='text-xs text-muted-foreground'>Edit</div>
-
-						<div className='border p-3 rounded bg-background'>
-							Change text...
-						</div>
-
-						<div className='text-center text-muted-foreground text-xs'>↓</div>
-
-						<div className='text-xs text-muted-foreground'>Website</div>
-
-						<div className='text-xl font-bold text-primary'>Hello world</div>
+					<div className='relative space-y-4'>
+						<Image
+							width={528}
+							height={366}
+							src={'/hero-image.webp'}
+							alt={'Image of the product'}
+						/>
 					</div>
 				</section>
 
@@ -164,28 +151,78 @@ export default function Home() {
 				</section>
 
 				{/*  SOLUTION  */}
-				<section className='grid md:grid-cols-2 gap-12 items-center'>
-					<div className='space-y-4'>
-						<h2 className='text-4xl font-bold'>{c.solution_title}</h2>
-
-						<p className='text-muted-foreground'>{c.solution_text}</p>
+				<section className='grid md:grid-cols-2 gap-16 items-center py-12'>
+					<div className='space-y-6'>
+						<h2 className='text-4xl md:text-5xl font-bold tracking-tight'>
+							There is a better way
+						</h2>
+						<p className='text-lg text-muted-foreground leading-relaxed'>
+							Keep your code. Add a simple editing layer. Let clients update
+							content without touching your logic.
+						</p>
 					</div>
 
-					<div className='rounded-xl border p-6 bg-gradient-to-br from-primary/5 to-transparent space-y-4'>
-						<div className='flex justify-between text-sm'>
-							<span>Developer</span>
-							<span>Client</span>
-						</div>
+					<div className='relative group'>
+						<div className='absolute -inset-4 bg-gradient-to-r from-primary/20 to-secondary/20 blur-3xl opacity-50 group-hover:opacity-100 transition-all duration-300' />
 
-						<div className='h-[2px] bg-muted relative'>
-							<div className='absolute left-1/2 -translate-x-1/2 bg-primary text-white px-2 text-xs rounded'>
-								Edit
+						<div className='relative rounded-2xl border bg-card p-8 shadow-sm overflow-hidden'>
+							<div className='flex justify-between items-center mb-12'>
+								<div className='text-center space-y-2'>
+									<div className='w-12 h-12 rounded-lg bg-muted flex items-center justify-center border shadow-sm'>
+										<code className='text-primary font-bold text-xs'>
+											&lt;/&gt;
+										</code>
+									</div>
+									<span className='text-[10px] uppercase tracking-widest font-semibold text-muted-foreground'>
+										Developer
+									</span>
+									<p className='text-sm font-medium'>Clean Code</p>
+								</div>
+
+								<div className='relative flex flex-col items-center z-10'>
+									<Image
+										width={32}
+										height={32}
+										src={'/icon.svg'}
+										alt={'Logo'}
+									/>
+
+									<div className='absolute top-full mt-2 bg-primary/10 text-primary px-3 py-1 rounded-md text-[14px] font-bold tracking-tighter'>
+										Edit.
+									</div>
+								</div>
+
+								<div className='text-center space-y-2'>
+									<div className='w-12 h-12 rounded-lg bg-muted flex items-center justify-center border shadow-sm'>
+										<span className='text-primary text-lg'>✨</span>
+									</div>
+									<span className='text-[10px] uppercase tracking-widest font-semibold text-muted-foreground'>
+										Client
+									</span>
+									<p className='text-sm font-medium'>Live Edit</p>
+								</div>
 							</div>
-						</div>
 
-						<div className='flex justify-between text-xs text-muted-foreground'>
-							<span>Code</span>
-							<span>Edit content</span>
+							<div className='absolute top-[72px] left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-border to-transparent -z-0' />
+
+							<div className='grid grid-cols-2 gap-4 mt-4 pt-6 border-t border-dashed'>
+								<div className='space-y-1'>
+									<div className='h-1 w-full bg-muted rounded-full overflow-hidden'>
+										<div className='h-full bg-primary/40 w-3/4' />
+									</div>
+									<p className='text-[10px] text-muted-foreground uppercase'>
+										Logic Protected
+									</p>
+								</div>
+								<div className='space-y-1 text-right'>
+									<div className='h-1 w-full bg-muted rounded-full overflow-hidden'>
+										<div className='h-full bg-primary w-1/2 ml-auto' />
+									</div>
+									<p className='text-[10px] text-muted-foreground uppercase'>
+										Content Sync
+									</p>
+								</div>
+							</div>
 						</div>
 					</div>
 				</section>
