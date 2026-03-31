@@ -119,6 +119,14 @@ export default function AdminPage() {
 				body: JSON.stringify({ key, value }),
 			})
 
+			if (res.status === 401) {
+				localStorage.removeItem('admin-auth')
+				localStorage.removeItem('admin-password')
+				setIsAuthed(false)
+				toast.error('Session expired. Login again')
+				return
+			}
+
 			if (!res.ok) throw new Error()
 
 			updateValue(key, value)
@@ -138,21 +146,37 @@ export default function AdminPage() {
 		const val = defaultContent[key]
 		const pass = localStorage.getItem('admin-password')
 
-		updateValue(key, val)
+		try {
+			const res = await fetch('/api/content', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'x-admin-password': pass!,
+				},
+				body: JSON.stringify({ key, value: val }),
+			})
 
-		await fetch('/api/content', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'x-admin-password': pass!,
-			},
-			body: JSON.stringify({ key, value: val }),
-		})
+			if (res.status === 401) {
+				localStorage.removeItem('admin-auth')
+				localStorage.removeItem('admin-password')
+				setIsAuthed(false)
 
-		toast.success('Reset')
-		setEditingKey(null)
-		setDraftValue('')
-		iframeRef.current?.contentWindow?.location.reload()
+				toast.error('Session expired. Login again')
+				return
+			}
+
+			if (!res.ok) throw new Error()
+
+			updateValue(key, val)
+
+			toast.success('Reset')
+			setEditingKey(null)
+			setDraftValue('')
+
+			iframeRef.current?.contentWindow?.location.reload()
+		} catch {
+			toast.error('Error')
+		}
 	}
 
 	const login = async () => {
@@ -161,12 +185,17 @@ export default function AdminPage() {
 			body: JSON.stringify({ password }),
 		})
 
-		if (!res.ok) return toast.error('Wrong password')
+		if (!res.ok) {
+			setPassword('')
+			return toast.error('Wrong password')
+		}
 
 		localStorage.setItem('admin-auth', 'true')
 		localStorage.setItem('admin-password', password)
 
+		toast.success('Welcome!')
 		setIsAuthed(true)
+		setPassword('')
 	}
 
 	if (!mounted) return null
@@ -281,7 +310,7 @@ export default function AdminPage() {
 													ref={textareaRef}
 													autoFocus
 													className='block max-w-full w-full min-w-0 resize-none border p-3 rounded whitespace-pre-wrap break-words'
-													value={draftValue || item.value}
+													value={draftValue}
 													onChange={e => setDraftValue(e.target.value)}
 												/>
 											)}
@@ -300,7 +329,6 @@ export default function AdminPage() {
 												) : (
 													<button
 														onClick={() => {
-															updateValue(item.key, draftValue)
 															save(item.key, draftValue)
 															setEditingKey(null)
 															setDraftValue('')
