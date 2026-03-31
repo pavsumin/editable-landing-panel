@@ -236,7 +236,7 @@ export default function AdminPage() {
 
 						{/* OVERLAY */}
 						<div
-							className='absolute inset-0 z-10 cursor-not-allowed bg-transparent transition'
+							className='absolute inset-0 z-10 bg-transparent transition'
 							onClick={e => e.preventDefault()}
 						/>
 					</div>
