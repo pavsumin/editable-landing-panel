@@ -1,15 +1,8 @@
 'use client'
 
-import {
-	Dialog,
-	DialogContent,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-} from '@/components/ui/dialog'
 import { ContentKey, defaultContent } from '@/lib/defaultContent'
 import { Eye, Pencil } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 type Item = {
@@ -35,7 +28,7 @@ function Preview({ data }: { data: Item[] }) {
 	const get = (key: ContentKey) => data.find(i => i.key === key)?.value || ''
 
 	return (
-		<div className='p-6 space-y-4 border rounded-xl bg-white'>
+		<div className='p-6 space-y-4 border rounded-xl bg-white w-full'>
 			<h1 className='text-2xl font-bold'>{get('hero_title')}</h1>
 			<p className='text-gray-600'>{get('hero_subtitle')}</p>
 			<p>{get('about_text')}</p>
@@ -49,18 +42,14 @@ function Preview({ data }: { data: Item[] }) {
 export default function AdminPage() {
 	const [data, setData] = useState<Item[]>([])
 	const [password, setPassword] = useState('')
-	const [draftValue, setDraftValue] = useState('')
 	const [isAuthed, setIsAuthed] = useState(false)
 	const [loading, setLoading] = useState(false)
 	const [mounted, setMounted] = useState(false)
 
 	const [editingKey, setEditingKey] = useState<ContentKey | null>(null)
-	const [showUnsavedDialog, setShowUnsavedDialog] = useState(false)
+	const [draftValue, setDraftValue] = useState('')
 
 	const [mode, setMode] = useState<'edit' | 'preview'>('edit')
-
-	const editingRef = useRef<HTMLDivElement | null>(null)
-	const pendingActionRef = useRef<(() => void) | null>(null)
 
 	useEffect(() => {
 		setMounted(true)
@@ -77,20 +66,16 @@ export default function AdminPage() {
 			.then(setData)
 	}, [])
 
-	// OUTSIDE CLICK
+	// 🔥 OUTSIDE CLICK (без ref!)
 	useEffect(() => {
 		const handler = (e: MouseEvent) => {
 			const target = e.target as HTMLElement
 
 			if (target.closest('[data-action="true"]')) return
-			if (editingRef.current?.contains(target)) return
+			if (target.closest('[data-editing="true"]')) return
 			if (!editingKey) return
 
-			setShowUnsavedDialog(true)
-
-			pendingActionRef.current = () => {
-				setEditingKey(null)
-			}
+			setEditingKey(null)
 		}
 
 		document.addEventListener('mousedown', handler)
@@ -171,7 +156,7 @@ export default function AdminPage() {
 					<h1 className='text-xl font-semibold text-center'>Admin</h1>
 
 					<input
-						className='border p-3 rounded w-full'
+						className='border p-3 rounded-xl w-full'
 						placeholder='Password'
 						value={password}
 						onChange={e => setPassword(e.target.value)}
@@ -180,7 +165,7 @@ export default function AdminPage() {
 
 					<button
 						onClick={login}
-						className='w-full bg-black text-white py-3 rounded'
+						className='w-full bg-black text-white py-3 rounded-xl active:scale-95'
 					>
 						Enter
 					</button>
@@ -191,15 +176,13 @@ export default function AdminPage() {
 
 	return (
 		<main className='min-h-screen p-6 max-w-6xl mx-auto space-y-6'>
-			<h1 className='text-2xl font-semibold text-left md:text-center'>
-				Editor
-			</h1>
+			<h1 className='text-2xl font-semibold'>Editor</h1>
 
 			{/* MOBILE TOGGLE */}
 			<div className='flex md:hidden gap-2 bg-gray-100 p-1 rounded-lg w-fit'>
 				<button
 					onClick={() => setMode('edit')}
-					className={`flex items-center gap-1 px-3 py-1 rounded-md text-sm ${
+					className={`flex items-center gap-1 px-3 py-1 rounded-md text-sm active:scale-95 ${
 						mode === 'edit' ? 'bg-white shadow' : ''
 					}`}
 				>
@@ -208,7 +191,7 @@ export default function AdminPage() {
 
 				<button
 					onClick={() => setMode('preview')}
-					className={`flex items-center gap-1 px-3 py-1 rounded-md text-sm ${
+					className={`flex items-center gap-1 px-3 py-1 rounded-md text-sm active:scale-95 ${
 						mode === 'preview' ? 'bg-white shadow' : ''
 					}`}
 				>
@@ -225,7 +208,7 @@ export default function AdminPage() {
 				{/* EDITOR */}
 				{(mode === 'edit' ||
 					(typeof window !== 'undefined' && window.innerWidth >= 768)) && (
-					<div className='space-y-6'>
+					<div className='space-y-6 w-full min-w-0'>
 						{Object.entries(sections).map(([section, keys]) => (
 							<div key={section} className='space-y-3'>
 								<h2 className='text-xs uppercase text-gray-400'>{section}</h2>
@@ -239,8 +222,8 @@ export default function AdminPage() {
 									return (
 										<div
 											key={item.key}
-											ref={editing ? editingRef : null}
-											className='border rounded-xl p-4 space-y-2'
+											data-editing={editing}
+											className='border rounded-xl p-4 space-y-2 w-full min-w-0 box-border'
 										>
 											<div className='text-xs text-gray-400'>
 												{labelMap[item.key]}
@@ -248,29 +231,30 @@ export default function AdminPage() {
 
 											{!editing ? (
 												<div
-													onClick={() => setEditingKey(item.key)}
-													className='cursor-pointer hover:bg-gray-100 p-2 rounded'
+													onClick={() => {
+														setEditingKey(item.key)
+														setDraftValue(item.value)
+													}}
+													className='cursor-pointer hover:bg-gray-100 p-2 rounded w-full break-words'
 												>
 													{item.value}
 												</div>
 											) : (
 												<textarea
 													autoFocus
-													className='w-full resize-none border p-3 rounded'
+													className='block w-full min-w-0 resize-none border p-3 rounded whitespace-pre-wrap break-words'
 													value={draftValue}
 													onChange={e => setDraftValue(e.target.value)}
-													onKeyDown={e => {
-														if (e.key === 'Escape') {
-															setEditingKey(null)
-														}
-													}}
 												/>
 											)}
 
 											<div className='flex gap-3 text-sm'>
 												{!editing ? (
 													<button
-														onClick={() => setEditingKey(item.key)}
+														onClick={() => {
+															setEditingKey(item.key)
+															setDraftValue(item.value)
+														}}
 														data-action='true'
 													>
 														Edit
@@ -310,37 +294,6 @@ export default function AdminPage() {
 					</div>
 				)}
 			</div>
-
-			{/* DIALOG */}
-			<Dialog open={showUnsavedDialog} onOpenChange={setShowUnsavedDialog}>
-				<DialogContent>
-					<DialogHeader>
-						<DialogTitle>Unsaved changes</DialogTitle>
-					</DialogHeader>
-
-					<p className='text-sm text-gray-500'>You have unsaved changes</p>
-
-					<DialogFooter>
-						<button
-							onClick={() => {
-								setShowUnsavedDialog(false)
-								pendingActionRef.current?.()
-							}}
-						>
-							Discard
-						</button>
-
-						<button
-							className='bg-black text-white px-4 py-2 rounded'
-							onClick={() => {
-								setShowUnsavedDialog(false)
-							}}
-						>
-							Continue editing
-						</button>
-					</DialogFooter>
-				</DialogContent>
-			</Dialog>
 		</main>
 	)
 }
