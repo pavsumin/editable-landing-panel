@@ -18,17 +18,80 @@ type Item = {
 	value: string
 }
 
-const sections = {
-	Hero: ['hero_title', 'hero_subtitle'],
-	About: ['about_text'],
-	CTA: ['cta_text'],
+export const sections = {
+	Hero: [
+		'hero_title',
+		'hero_subtitle',
+		'hero_cta_primary',
+		'hero_cta_secondary',
+	],
+	Problem: [
+		'problem_title',
+		'problem_1_title',
+		'problem_1_text',
+		'problem_2_title',
+		'problem_2_text',
+		'problem_3_title',
+		'problem_3_text',
+	],
+	Solution: ['solution_title', 'solution_text'],
+	'How it works': [
+		'how_title',
+		'how_1_title',
+		'how_1_text',
+		'how_2_title',
+		'how_2_text',
+		'how_3_title',
+		'how_3_text',
+	],
+	Features: [
+		'features_title',
+		'feature_1',
+		'feature_2',
+		'feature_3',
+		'feature_4',
+		'feature_5',
+		'feature_6',
+	],
+	Final: ['final_title', 'final_subtitle', 'final_cta'],
 } as const
 
-const labelMap: Record<ContentKey, string> = {
+export const labelMap: Record<ContentKey, string> = {
 	hero_title: 'Hero Title',
 	hero_subtitle: 'Hero Subtitle',
-	about_text: 'About Text',
-	cta_text: 'CTA Text',
+	hero_cta_primary: 'Primary CTA (GitHub)',
+	hero_cta_secondary: 'Secondary CTA (Docs)',
+
+	problem_title: 'Problem Title',
+	problem_1_title: 'Problem 1 Title',
+	problem_1_text: 'Problem 1 Text',
+	problem_2_title: 'Problem 2 Title',
+	problem_2_text: 'Problem 2 Text',
+	problem_3_title: 'Problem 3 Title',
+	problem_3_text: 'Problem 3 Text',
+
+	solution_title: 'Solution Title',
+	solution_text: 'Solution Text',
+
+	how_title: 'How It Works Title',
+	how_1_title: 'Step 1 Title',
+	how_1_text: 'Step 1 Text',
+	how_2_title: 'Step 2 Title',
+	how_2_text: 'Step 2 Text',
+	how_3_title: 'Step 3 Title',
+	how_3_text: 'Step 3 Text',
+
+	features_title: 'Features Title',
+	feature_1: 'Feature 1',
+	feature_2: 'Feature 2',
+	feature_3: 'Feature 3',
+	feature_4: 'Feature 4',
+	feature_5: 'Feature 5',
+	feature_6: 'Feature 6',
+
+	final_title: 'Final Title',
+	final_subtitle: 'Final Subtitle',
+	final_cta: 'Final Button Text',
 }
 
 export default function AdminPage() {
@@ -260,12 +323,12 @@ export default function AdminPage() {
 						<iframe
 							ref={iframeRef}
 							src='/?preview=true'
-							className='w-full h-full border-0 pointer-events-none'
+							className='w-full h-full border-0'
 						/>
 
 						{/* OVERLAY */}
 						<div
-							className='absolute inset-0 z-10 bg-transparent transition'
+							className='absolute inset-0 z-10 bg-transparent pointer-events-none'
 							onClick={e => e.preventDefault()}
 						/>
 					</div>
@@ -367,12 +430,12 @@ export default function AdminPage() {
 							<iframe
 								ref={iframeRef}
 								src='/?preview=true'
-								className='w-full h-full border-0 pointer-events-none'
+								className='w-full h-full border-0'
 							/>
 
 							{/* OVERLAY */}
 							<div
-								className='absolute inset-0 z-10'
+								className='absolute inset-0 z-10 bg-transparent pointer-events-none'
 								onClick={e => e.preventDefault()}
 							/>
 						</div>
