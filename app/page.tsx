@@ -1,154 +1,37 @@
 'use client'
 
-import { ContentKey } from '@/lib/defaultContent'
+import { ContentKey, defaultContent } from '@/lib/defaultContent'
 import { getContent } from '@/lib/getContent'
-import { Cloud, Code2, Lock, Moon, Shield, Sun, Zap } from 'lucide-react'
+import {
+	Code2,
+	Database,
+	Moon,
+	RefreshCcw,
+	Shield,
+	Sun,
+	User,
+	Zap,
+} from 'lucide-react'
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import { FaGithub } from 'react-icons/fa'
+
+/*  TYPES  */
 
 type Content = Record<ContentKey, string>
 
-const featureIcons = {
-	feature_1: <Code2 className='w-6 h-6' />,
-	feature_2: <Zap className='w-6 h-6' />,
-	feature_3: <Shield className='w-6 h-6' />,
-	feature_4: <Zap className='w-6 h-6' />,
-	feature_5: <Lock className='w-6 h-6' />,
-	feature_6: <Cloud className='w-6 h-6' />,
+type CardProps = {
+	icon: ReactNode
+	title: string
+	text: string
 }
 
-function useSmartTyping(text: string) {
-	const [display, setDisplay] = useState('')
-	const [index, setIndex] = useState(0)
-	const [phase, setPhase] = useState<'typing' | 'pause' | 'deleting'>('typing')
-
-	useEffect(() => {
-		let timeout: NodeJS.Timeout
-
-		if (phase === 'typing') {
-			if (index < text.length) {
-				timeout = setTimeout(() => {
-					setDisplay(text.slice(0, index + 1))
-					setIndex(i => i + 1)
-				}, 35)
-			} else {
-				timeout = setTimeout(() => {
-					setPhase('pause')
-				}, 1200)
-			}
-		} else if (phase === 'pause') {
-			timeout = setTimeout(() => {
-				setPhase('deleting')
-			}, 400)
-		} else if (phase === 'deleting') {
-			if (index > 0) {
-				timeout = setTimeout(() => {
-					setDisplay(text.slice(0, index - 1))
-					setIndex(i => i - 1)
-				}, 20)
-			} else {
-				timeout = setTimeout(() => {
-					setPhase('typing')
-				}, 0)
-			}
-		}
-
-		return () => clearTimeout(timeout)
-	}, [index, phase, text])
-
-	return display
+type FeatureProps = {
+	icon: ReactNode
+	text: string
 }
 
-function DemoBox({ content }: { content: Content }) {
-	const samples = [
-		content.hero_title,
-		'Ship faster with Edit',
-		'Let clients update content',
-		'No code. Full control.',
-	]
-
-	const [sampleIndex, setSampleIndex] = useState(0)
-	const [previewText, setPreviewText] = useState('')
-	const [status, setStatus] = useState<'idle' | 'saving' | 'saved'>('idle')
-
-	const typed = useSmartTyping(samples[sampleIndex])
-
-	// preview sync simulation
-	useEffect(() => {
-		const savingTimeout = setTimeout(() => {
-			const doneTimeout = setTimeout(() => {
-				setPreviewText(typed)
-
-				const resetTimeout = setTimeout(() => {}, 800)
-
-				return () => clearTimeout(resetTimeout)
-			}, 300)
-
-			return () => clearTimeout(doneTimeout)
-		}, 0)
-
-		return () => clearTimeout(savingTimeout)
-	}, [typed])
-
-	// change sample
-	useEffect(() => {
-		const timeout = setTimeout(() => {
-			setSampleIndex(i => (i + 1) % samples.length)
-		}, 5000)
-
-		return () => clearTimeout(timeout)
-	}, [sampleIndex])
-
-	return (
-		<div className='grid md:grid-cols-2 gap-10'>
-			{/* EDITOR */}
-			<div className='space-y-3'>
-				<p className='text-sm text-muted-foreground'>
-					{content.demo_input_label}
-				</p>
-
-				<div className='relative group'>
-					<div className='absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20 blur-xl opacity-0 group-hover:opacity-100 transition duration-300' />
-
-					<div className='relative bg-card border rounded-2xl p-6 shadow-lg hover:scale-[1.02] transition-all duration-300'>
-						<div className='font-mono text-lg min-h-[80px] break-words'>
-							{typed}
-							<span className='ml-1 animate-pulse'>|</span>
-						</div>
-
-						{/* STATUS */}
-						<div className='mt-3 text-xs text-muted-foreground'>
-							{status === 'saving' && 'Saving...'}
-							{status === 'saved' && 'Saved ✓'}
-						</div>
-					</div>
-				</div>
-			</div>
-
-			{/* PREVIEW */}
-			<div className='space-y-3'>
-				<p className='text-sm text-muted-foreground'>
-					{content.demo_preview_label}
-				</p>
-
-				<div className='relative group'>
-					<div
-						className='absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 blur-xl opacity-0 group-hover:opacity-100 transition
-						duration-300'
-					/>
-
-					<div className='relative bg-primary/5 border rounded-2xl p-6 shadow-lg min-h-[80px] flex items-center justify-center hover:scale-[1.02] transition-all duration-300'>
-						<p className='text-4xl md:text-5xl font-bold text-primary text-center transition-all duration-300'>
-							{previewText}
-							<span className='ml-1 animate-pulse'>|</span>
-						</p>
-					</div>
-				</div>
-			</div>
-		</div>
-	)
-}
+/*  PAGE  */
 
 export default function Home() {
 	const [content, setContent] = useState<Content | null>(null)
@@ -166,10 +49,10 @@ export default function Home() {
 		document.documentElement.classList.toggle('dark', isDark)
 	}, [isDark])
 
-	if (!content) return null
+	const c = content || defaultContent
 
 	return (
-		<>
+		<div className='min-h-screen bg-background text-foreground'>
 			{/* HEADER */}
 			<header className='sticky top-0 z-50 border-b border-border/40 backdrop-blur-sm bg-background/95'>
 				<div className='max-w-6xl mx-auto px-6 py-4 flex items-center justify-between'>
@@ -203,99 +86,172 @@ export default function Home() {
 				</div>
 			</header>
 
-			<main className='w-full transition-all duration-300'>
-				{/* HERO */}
-				<section className='min-h-screen flex items-center justify-center px-6 py-20 text-center'>
-					<div className='max-w-4xl space-y-6'>
-						<h1 className='text-5xl md:text-7xl font-bold'>
-							{content.hero_title}
+			{/* MAIN */}
+			<main className='max-w-6xl mx-auto px-6 py-20 space-y-32'>
+				{/*  HERO  */}
+				<section className='grid md:grid-cols-2 gap-12 items-center'>
+					<div className='space-y-6'>
+						<h1 className='text-5xl md:text-6xl font-bold leading-tight'>
+							{c.hero_title}
 						</h1>
 
-						<p className='text-xl text-muted-foreground'>
-							{content.hero_subtitle}
-						</p>
+						<p className='text-lg text-muted-foreground'>{c.hero_subtitle}</p>
 
-						<div className='flex flex-col sm:flex-row gap-4 justify-center pt-4'>
+						<div className='flex gap-4'>
 							<a
 								href='https://github.com/pavsumin/editable-landing-panel'
 								className='flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-xl hover:scale-102 transition duration-300'
 								target='_blank'
 							>
 								<FaGithub />
-								{content.cta_primary}
+								{c.hero_cta_primary}
 							</a>
 
 							<a
 								href='/docs'
-								className='border px-6 py-3 rounded-xl hover:bg-muted transition duration-300'
-								target='_blank'
+								className='border px-6 py-3 rounded-lg hover:bg-muted transition'
 							>
-								{content.cta_secondary}
+								{c.hero_cta_secondary}
 							</a>
 						</div>
 					</div>
-				</section>
 
-				{/* DEMO */}
-				<section className='py-20 px-6 bg-muted/30'>
-					<div className='max-w-5xl mx-auto space-y-10'>
-						<div className='text-center'>
-							<p className='text-primary text-sm uppercase'>
-								{content.demo_label}
-							</p>
-							<h2 className='text-4xl font-bold'>
-								Real-time editing experience
-							</h2>
+					{/* VISUAL */}
+					<div className='relative rounded-xl border bg-gradient-to-br from-muted to-muted/50 p-6 shadow-xl space-y-4'>
+						<div className='text-xs text-muted-foreground'>Code</div>
+
+						<pre className='text-sm bg-background p-3 rounded border overflow-x-auto'>
+							{`<h1>${c.hero_title}</h1>`}
+						</pre>
+
+						<div className='text-center text-muted-foreground text-xs'>↓</div>
+
+						<div className='text-xs text-muted-foreground'>Edit</div>
+
+						<div className='border p-3 rounded bg-background'>
+							Change text...
 						</div>
 
-						<DemoBox content={content} />
+						<div className='text-center text-muted-foreground text-xs'>↓</div>
+
+						<div className='text-xs text-muted-foreground'>Website</div>
+
+						<div className='text-xl font-bold text-primary'>Hello world</div>
 					</div>
 				</section>
 
-				{/* FEATURES */}
-				<section className='py-20 px-6'>
-					<div className='max-w-5xl mx-auto space-y-12'>
-						<h2 className='text-4xl font-bold text-center'>
-							{content.features_title}
-						</h2>
+				{/*  PROBLEM  */}
+				<section className='space-y-10'>
+					<h2 className='text-4xl font-bold text-center'>{c.problem_title}</h2>
 
-						<div className='grid md:grid-cols-3 gap-6'>
-							{[1, 2, 3, 4, 5, 6].map(num => (
-								<div
-									key={num}
-									className='p-6 border rounded-xl hover:scale-105 transition duration-300'
-								>
-									<div className='text-primary mb-2'>
-										{
-											featureIcons[
-												`feature_${num}` as keyof typeof featureIcons
-											]
-										}
-									</div>
-									<p>{content[`feature_${num}` as keyof typeof content]}</p>
-								</div>
-							))}
+					<div className='grid md:grid-cols-3 gap-6'>
+						<Card
+							icon={<Code2 />}
+							title={c.problem_1_title}
+							text={c.problem_1_text}
+						/>
+						<Card
+							icon={<User />}
+							title={c.problem_2_title}
+							text={c.problem_2_text}
+						/>
+						<Card
+							icon={<RefreshCcw />}
+							title={c.problem_3_title}
+							text={c.problem_3_text}
+						/>
+					</div>
+				</section>
+
+				{/*  SOLUTION  */}
+				<section className='grid md:grid-cols-2 gap-12 items-center'>
+					<div className='space-y-4'>
+						<h2 className='text-4xl font-bold'>{c.solution_title}</h2>
+
+						<p className='text-muted-foreground'>{c.solution_text}</p>
+					</div>
+
+					<div className='rounded-xl border p-6 bg-gradient-to-br from-primary/5 to-transparent space-y-4'>
+						<div className='flex justify-between text-sm'>
+							<span>Developer</span>
+							<span>Client</span>
+						</div>
+
+						<div className='h-[2px] bg-muted relative'>
+							<div className='absolute left-1/2 -translate-x-1/2 bg-primary text-white px-2 text-xs rounded'>
+								Edit
+							</div>
+						</div>
+
+						<div className='flex justify-between text-xs text-muted-foreground'>
+							<span>Code</span>
+							<span>Edit content</span>
 						</div>
 					</div>
 				</section>
 
-				{/* CTA */}
-				<section className='py-24 text-center px-6'>
-					<div className='max-w-2xl mx-auto space-y-6'>
-						<h2 className='text-4xl font-bold'>{content.final_title}</h2>
+				{/*  FEATURES  */}
+				<section className='space-y-12'>
+					<h2 className='text-4xl font-bold text-center'>{c.features_title}</h2>
 
-						<p className='text-muted-foreground'>{content.final_subtitle}</p>
-
-						<a
-							href='https://github.com/pavsumin/editable-landing-panel'
-							className='bg-primary text-primary-foreground px-8 py-4 rounded-xl hover:scale-102 transition inline-block duration-300'
-							target='_blank'
-						>
-							{content.final_button}
-						</a>
+					<div className='grid md:grid-cols-3 gap-6'>
+						<Feature icon={<Zap />} text={c.feature_1} />
+						<Feature icon={<Code2 />} text={c.feature_2} />
+						<Feature icon={<Shield />} text={c.feature_3} />
+						<Feature icon={<Zap />} text={c.feature_4} />
+						<Feature icon={<Database />} text={c.feature_5} />
+						<Feature icon={<Shield />} text={c.feature_6} />
 					</div>
+				</section>
+
+				{/*  CTA  */}
+				<section className='text-center space-y-6'>
+					<h2 className='text-4xl font-bold'>{c.final_title}</h2>
+
+					<p className='text-muted-foreground'>{c.final_subtitle}</p>
+
+					<a
+						href='https://github.com/pavsumin/editable-landing-panel'
+						target='_blank'
+						className='inline-block bg-primary  text-primary-foreground px-8 py-4 rounded-xl shadow hover:opacity-90 transition'
+					>
+						{c.final_cta}
+					</a>
 				</section>
 			</main>
-		</>
+
+			{/* FOOTER */}
+			<footer className='text-center text-sm text-muted-foreground py-10'>
+				Built by{' '}
+				<a
+					className='text-blue-400 hover:text-blue-500 transition duration-300 underline'
+					href='https://pavelsumin.com/'
+					target='_blank'
+				>
+					Pavel Sumin
+				</a>
+			</footer>
+		</div>
+	)
+}
+
+/*  COMPONENTS  */
+
+function Card({ icon, title, text }: CardProps) {
+	return (
+		<div className='p-6 border rounded-xl space-y-3 hover:shadow-xl/2 transition duration-300'>
+			<div className='text-primary'>{icon}</div>
+			<h3 className='font-semibold'>{title}</h3>
+			<p className='text-sm text-muted-foreground'>{text}</p>
+		</div>
+	)
+}
+
+function Feature({ icon, text }: FeatureProps) {
+	return (
+		<div className='p-6 border rounded-xl flex items-center gap-3 hover:shadow-xl/2 transition duration-300'>
+			<div className='text-primary'>{icon}</div>
+			<p className='text-sm'>{text}</p>
+		</div>
 	)
 }
