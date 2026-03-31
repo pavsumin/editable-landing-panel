@@ -31,22 +31,6 @@ const labelMap: Record<ContentKey, string> = {
 	cta_text: 'CTA Text',
 }
 
-// PREVIEW
-function Preview({ data }: { data: Item[] }) {
-	const get = (key: ContentKey) => data.find(i => i.key === key)?.value || ''
-
-	return (
-		<div className='p-6 space-y-4 border rounded-xl bg-white w-full'>
-			<h1 className='text-2xl font-bold'>{get('hero_title')}</h1>
-			<p className='text-gray-600'>{get('hero_subtitle')}</p>
-			<p>{get('about_text')}</p>
-			<button className='bg-black text-white px-4 py-2 rounded'>
-				{get('cta_text')}
-			</button>
-		</div>
-	)
-}
-
 export default function AdminPage() {
 	const [data, setData] = useState<Item[]>([])
 	const [password, setPassword] = useState('')
@@ -60,6 +44,8 @@ export default function AdminPage() {
 	const [editingKey, setEditingKey] = useState<ContentKey | null>(null)
 	const textareaRef = useRef<HTMLTextAreaElement | null>(null)
 	const [draftValue, setDraftValue] = useState('')
+
+	const iframeRef = useRef<HTMLIFrameElement | null>(null)
 
 	const [mode, setMode] = useState<'edit' | 'preview'>('edit')
 
@@ -140,6 +126,7 @@ export default function AdminPage() {
 			toast.success('Saved')
 			setEditingKey(null)
 			setDraftValue('')
+			iframeRef.current?.contentWindow?.location.reload()
 		} catch {
 			toast.error('Error')
 		} finally {
@@ -165,6 +152,7 @@ export default function AdminPage() {
 		toast.success('Reset')
 		setEditingKey(null)
 		setDraftValue('')
+		iframeRef.current?.contentWindow?.location.reload()
 	}
 
 	const login = async () => {
@@ -238,7 +226,20 @@ export default function AdminPage() {
 			<div className='grid md:grid-cols-2 gap-8 items-start'>
 				{/* PREVIEW */}
 				<div className='hidden md:block'>
-					<Preview data={data} />
+					<div className='relative w-full h-[80vh] border rounded-xl overflow-hidden hover:shadow-xl/5 transition'>
+						{/* IFRAME */}
+						<iframe
+							ref={iframeRef}
+							src='/?preview=true'
+							className='w-full h-full border-0 pointer-events-none'
+						/>
+
+						{/* OVERLAY */}
+						<div
+							className='absolute inset-0 z-10 cursor-not-allowed bg-transparent transition'
+							onClick={e => e.preventDefault()}
+						/>
+					</div>
 				</div>
 
 				{/* EDITOR */}
@@ -333,7 +334,20 @@ export default function AdminPage() {
 				{/* MOBILE PREVIEW */}
 				{mode === 'preview' && (
 					<div className='md:hidden'>
-						<Preview data={data} />
+						<div className='relative w-full h-[80vh] border rounded-xl overflow-hidden'>
+							{/* IFRAME */}
+							<iframe
+								ref={iframeRef}
+								src='/?preview=true'
+								className='w-full h-full border-0 pointer-events-none'
+							/>
+
+							{/* OVERLAY */}
+							<div
+								className='absolute inset-0 z-10'
+								onClick={e => e.preventDefault()}
+							/>
+						</div>
 					</div>
 				)}
 			</div>

@@ -13,6 +13,10 @@ const geistMono = Geist_Mono({
 	subsets: ['latin'],
 })
 
+const isPreview =
+	typeof window !== 'undefined' &&
+	window.location.search.includes('preview=true')
+
 export const metadata: Metadata = {
 	title: 'Editable Landing Panel',
 	description: 'You can edit text on your website without khowing code',
