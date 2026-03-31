@@ -210,7 +210,9 @@ export default function AdminPage() {
 
 	return (
 		<main className='min-h-screen p-6 max-w-6xl mx-auto space-y-6'>
-			<h1 className='text-2xl font-semibold'>Editor</h1>
+			<h1 className='text-2xl font-semibold md:text-center md:mt-2 md:mb-8'>
+				Editor
+			</h1>
 
 			{/* MOBILE TOGGLE */}
 			<div className='flex md:hidden gap-2 bg-gray-100 p-1 rounded-lg w-fit'>
