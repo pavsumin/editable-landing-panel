@@ -1,5 +1,6 @@
 import { Toaster } from '@/components/ui/toaster'
 import type { Metadata } from 'next'
+import { Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 
@@ -13,6 +14,10 @@ const geistMono = Geist_Mono({
 	subsets: ['latin'],
 })
 
+export const viewport: Viewport = {
+	themeColor: 'var(--primary)',
+}
+
 export const metadata: Metadata = {
 	title: 'Editable Landing Panel',
 	description: 'You can edit text on your website without khowing code',
@@ -24,10 +29,8 @@ export default function RootLayout({
 	children: React.ReactNode
 }>) {
 	return (
-		<html lang='en' className='h-full antialiased bg-background'>
-			<body
-				className={`${geistSans.className} min-h-full flex flex-col bg-background`}
-			>
+		<html lang='en' className='h-full antialiased'>
+			<body className={`${geistSans.className} min-h-full flex flex-col`}>
 				{children}
 				<Toaster />
 			</body>
