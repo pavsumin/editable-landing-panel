@@ -50,6 +50,7 @@ export default function Home() {
 		document.documentElement.classList.toggle('dark', isDark)
 	}, [isDark])
 
+	if (!content) return null
 	const c = content || defaultContent
 
 	return (
