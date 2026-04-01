@@ -165,7 +165,7 @@ export default function Home() {
 
 					<div className='relative group'>
 						{/* glow */}
-						<div className='absolute -inset-4 bg-gradient-to-r from-primary/20 to-secondary/20 blur-3xl opacity-40 group-hover:opacity-80 transition-all duration-500' />
+						<div className='absolute -inset-4 bg-gradient-to-r from-primary/20 to-secondary/20 blur-3xl opacity-50 group-hover:opacity-80 transition-all duration-500' />
 
 						<div className='relative rounded-2xl border bg-card p-8 shadow-sm overflow-hidden'>
 							{/* TOP FLOW */}
