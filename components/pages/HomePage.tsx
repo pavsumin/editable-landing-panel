@@ -96,14 +96,25 @@ export default function Home({ content }: Props) {
 						<p className='text-lg text-muted-foreground'>{c.hero_subtitle}</p>
 
 						<div className='flex gap-4'>
-							<a
-								href='https://github.com/pavsumin/editable-landing-panel'
-								className='flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-xl hover:scale-102 transition duration-300'
-								target='_blank'
-							>
-								<FaGithub />
-								{c.hero_cta_primary}
-							</a>
+							{isDark ? (
+								<a
+									href='https://github.com/pavsumin/editable-landing-panel'
+									className='flex items-center gap-2 bg-white text-primary-foreground px-6 py-3 rounded-xl hover:scale-102 transition duration-300'
+									target='_blank'
+								>
+									<FaGithub />
+									{c.hero_cta_primary}
+								</a>
+							) : (
+								<a
+									href='https://github.com/pavsumin/editable-landing-panel'
+									className='flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-xl hover:scale-102 transition duration-300'
+									target='_blank'
+								>
+									<FaGithub />
+									{c.hero_cta_primary}
+								</a>
+							)}
 
 							<a
 								href='/docs'
@@ -395,13 +406,23 @@ export default function Home({ content }: Props) {
 
 					<p className='text-muted-foreground'>{c.final_subtitle}</p>
 
-					<a
-						href='https://github.com/pavsumin/editable-landing-panel'
-						target='_blank'
-						className='inline-block bg-primary  text-primary-foreground px-8 py-4 rounded-xl shadow hover:opacity-90 transition'
-					>
-						{c.final_cta}
-					</a>
+					{isDark ? (
+						<a
+							href='https://github.com/pavsumin/editable-landing-panel'
+							target='_blank'
+							className='inline-block bg-white text-primary-foreground px-8 py-4 rounded-xl shadow hover:opacity-90 transition'
+						>
+							{c.final_cta}
+						</a>
+					) : (
+						<a
+							href='https://github.com/pavsumin/editable-landing-panel'
+							target='_blank'
+							className='inline-block bg-primary text-primary-foreground px-8 py-4 rounded-xl shadow hover:opacity-90 transition'
+						>
+							{c.final_cta}
+						</a>
+					)}
 				</section>
 			</main>
 
