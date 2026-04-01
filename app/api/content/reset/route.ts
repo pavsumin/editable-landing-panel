@@ -14,19 +14,20 @@ export async function POST(req: Request) {
 
 		const password = req.headers.get('x-admin-password')
 
-		if (!password) {
-			return new Response('No password', { status: 401 })
-		}
-
-		if (password !== adminPassword) {
+		if (!password || password !== adminPassword) {
 			return new Response('Unauthorized', { status: 401 })
 		}
 
-		const { key: contentKey, value } = await req.json()
+		const { key: contentKey } = await req.json()
+
+		if (!contentKey) {
+			return new Response('Missing key', { status: 400 })
+		}
 
 		const { error } = await supabase
 			.from('content')
-			.upsert([{ key: contentKey, value }], { onConflict: 'key' })
+			.delete()
+			.eq('key', contentKey)
 
 		if (error) {
 			return new Response('DB error', { status: 500 })

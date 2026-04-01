@@ -256,17 +256,16 @@ export default function AdminPage() {
 	}
 
 	const reset = async (key: ContentKey) => {
-		const val = defaultContent[key]
 		const pass = localStorage.getItem('admin-password')
 
 		try {
-			const res = await fetch('/api/content', {
+			const res = await fetch('/api/content/reset', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
 					'x-admin-password': pass!,
 				},
-				body: JSON.stringify({ key, value: val }),
+				body: JSON.stringify({ key }),
 			})
 
 			if (res.status === 401) {
@@ -278,7 +277,12 @@ export default function AdminPage() {
 				return
 			}
 
-			if (!res.ok) throw new Error()
+			if (!res.ok) {
+				const txt = await res.text()
+				throw new Error()
+			}
+
+			const val = defaultContent[key]
 
 			updateValue(key, val)
 
