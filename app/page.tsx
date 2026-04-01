@@ -227,6 +227,120 @@ export default function Home() {
 					</div>
 				</section>
 
+				{/* HOW IT WORKS */}
+				<section className='space-y-16'>
+					<div className='text-center space-y-4'>
+						<h2 className='text-4xl md:text-5xl font-bold'>{c.how_title}</h2>
+					</div>
+
+					{/* STEPS */}
+					<div className='grid md:grid-cols-3 gap-6'>
+						<HowCard
+							step='01'
+							title={c.how_1_title}
+							text={c.how_1_text}
+							icon={<Code2 />}
+						/>
+
+						<HowCard
+							step='02'
+							title={c.how_2_title}
+							text={c.how_2_text}
+							icon={<Database />}
+						/>
+
+						<HowCard
+							step='03'
+							title={c.how_3_title}
+							text={c.how_3_text}
+							icon={<User />}
+						/>
+					</div>
+				</section>
+
+				{/* FLOW SECTION */}
+				<section className='space-y-16'>
+					<div className='text-center space-y-4'>
+						<p className='text-sm text-muted-foreground uppercase tracking-wider'>
+							{c.flow_badge}
+						</p>
+
+						<h2 className='text-4xl md:text-5xl font-bold'>{c.flow_title}</h2>
+
+						<p className='text-muted-foreground max-w-xl mx-auto'>
+							{c.flow_subtitle}
+						</p>
+					</div>
+
+					<div className='relative'>
+						<div className='rounded-2xl border bg-card p-8 overflow-hidden'>
+							{/* DESKTOP FLOW */}
+							<div className='hidden md:flex items-center justify-between gap-6'>
+								<FlowBlock
+									label={c.flow_1_label}
+									title={c.flow_1_title}
+									desc={c.flow_1_desc}
+								/>
+
+								<Arrow />
+
+								<FlowBlock
+									label={c.flow_2_label}
+									title={c.flow_2_title}
+									desc={c.flow_2_desc}
+								/>
+
+								<Arrow />
+
+								<FlowBlock
+									label={c.flow_3_label}
+									title={c.flow_3_title}
+									desc={c.flow_3_desc}
+								/>
+
+								<Arrow />
+
+								<FlowBlock
+									label={c.flow_4_label}
+									title={c.flow_4_title}
+									desc={c.flow_4_desc}
+								/>
+							</div>
+
+							{/* MOBILE TIMELINE */}
+							<div className='md:hidden relative'>
+								<div className='absolute left-4 top-0 bottom-0 w-px bg-border' />
+
+								<div className='space-y-10'>
+									<TimelineItem
+										label={c.flow_1_label}
+										title={c.flow_1_title}
+										desc={c.flow_1_desc}
+									/>
+
+									<TimelineItem
+										label={c.flow_2_label}
+										title={c.flow_2_title}
+										desc={c.flow_2_desc}
+									/>
+
+									<TimelineItem
+										label={c.flow_3_label}
+										title={c.flow_3_title}
+										desc={c.flow_3_desc}
+									/>
+
+									<TimelineItem
+										label={c.flow_4_label}
+										title={c.flow_4_title}
+										desc={c.flow_4_desc}
+									/>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+
 				{/*  FEATURES  */}
 				<section className='space-y-12'>
 					<h2 className='text-4xl font-bold text-center'>{c.features_title}</h2>
@@ -289,6 +403,82 @@ function Feature({ icon, text }: FeatureProps) {
 		<div className='p-6 border rounded-xl flex items-center gap-3 hover:shadow-xl/2 transition duration-300'>
 			<div className='text-primary'>{icon}</div>
 			<p className='text-sm'>{text}</p>
+		</div>
+	)
+}
+
+function HowCard({
+	step,
+	title,
+	text,
+	icon,
+}: {
+	step: string
+	title: string
+	text: string
+	icon: ReactNode
+}) {
+	return (
+		<div className='p-6 border rounded-xl space-y-4 hover:shadow-xl/2 transition duration-300'>
+			<div className='flex items-center justify-between'>
+				<span className='text-xs text-muted-foreground'>{step}</span>
+				<div className='text-primary'>{icon}</div>
+			</div>
+
+			<h3 className='font-semibold text-lg'>{title}</h3>
+
+			<p className='text-sm text-muted-foreground leading-relaxed'>{text}</p>
+		</div>
+	)
+}
+
+function FlowBlock({
+	label,
+	title,
+	desc,
+}: {
+	label: string
+	title: string
+	desc: string
+}) {
+	return (
+		<div className='text-center space-y-2'>
+			<p className='text-xs uppercase text-muted-foreground'>{label}</p>
+
+			<p className='font-semibold'>{title}</p>
+
+			<p className='text-xs text-muted-foreground'>{desc}</p>
+		</div>
+	)
+}
+
+function Arrow() {
+	return <div className='hidden md:block text-muted-foreground text-xl'>→</div>
+}
+
+function TimelineItem({
+	label,
+	title,
+	desc,
+}: {
+	label: string
+	title: string
+	desc: string
+}) {
+	return (
+		<div className='relative pl-12'>
+			{/* DOT */}
+			<div className='absolute left-[10.65px] top-2 w-3 h-3 rounded-full bg-primary ring-4 ring-card' />
+
+			<div className='space-y-1'>
+				<p className='text-[10px] uppercase tracking-widest text-muted-foreground'>
+					{label}
+				</p>
+
+				<p className='text-lg font-semibold leading-tight'>{title}</p>
+
+				<p className='text-sm text-muted-foreground leading-relaxed'>{desc}</p>
+			</div>
 		</div>
 	)
 }

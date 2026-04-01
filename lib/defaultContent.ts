@@ -21,16 +21,39 @@ export const defaultContent = {
 	solution_text:
 		'Keep your code. Add a simple editing layer. Let clients update content without touching your logic.',
 
-	how_title: 'How it works',
+	how_title: 'How it actually works',
 
-	how_1_title: 'Mark content',
-	how_1_text: 'Wrap your text with simple keys.',
+	how_1_title: 'Define your content',
+	how_1_text:
+		'Replace hardcoded text with content keys and provide default values in your codebase.',
 
-	how_2_title: 'Connect admin',
-	how_2_text: 'Add a lightweight editing panel.',
+	how_2_title: 'Sync with database',
+	how_2_text:
+		'Content is stored in Supabase and overrides your default values when available.',
 
-	how_3_title: 'Client edits safely',
-	how_3_text: 'Content updates without breaking anything.',
+	how_3_title: 'Edit without code',
+	how_3_text:
+		'Clients use a simple admin panel to update content safely in real-time.',
+
+	flow_badge: 'Behind the scenes',
+	flow_title: 'Content flow',
+	flow_subtitle: 'From code to live updates in seconds',
+
+	flow_1_label: 'CODE',
+	flow_1_title: 'defaultContent',
+	flow_1_desc: 'Fallback values',
+
+	flow_2_label: 'DATABASE',
+	flow_2_title: 'Supabase',
+	flow_2_desc: 'Stores content',
+
+	flow_3_label: 'ADMIN',
+	flow_3_title: '/admin',
+	flow_3_desc: 'Edit interface',
+
+	flow_4_label: 'WEBSITE',
+	flow_4_title: 'Live site',
+	flow_4_desc: 'Always up-to-date',
 
 	features_title: 'Built for real workflows',
 
