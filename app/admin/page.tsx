@@ -34,7 +34,17 @@ export const sections = {
 		'problem_3_title',
 		'problem_3_text',
 	],
-	Solution: ['solution_title', 'solution_text'],
+	Solution: [
+		'solution_title',
+		'solution_text',
+		'solution_dev_label',
+		'solution_dev_title',
+		'solution_edit_label',
+		'solution_client_label',
+		'solution_client_title',
+		'solution_logic_label',
+		'solution_content_label',
+	],
 	'How it works': [
 		'how_title',
 		'how_1_title',
@@ -89,6 +99,13 @@ export const labelMap: Record<ContentKey, string> = {
 
 	solution_title: 'Solution Title',
 	solution_text: 'Solution Text',
+	solution_dev_label: 'Solution Dev Label',
+	solution_dev_title: 'Solution Dev Title',
+	solution_edit_label: 'Solution Edit Label',
+	solution_client_label: 'Solution Client Label',
+	solution_client_title: 'Solution Client Title',
+	solution_logic_label: 'Solution Logic Label',
+	solution_content_label: 'Solution Content Label',
 
 	how_title: 'How It Works Title',
 	how_1_title: 'Step 1 Title',

@@ -21,6 +21,17 @@ export const defaultContent = {
 	solution_text:
 		'Keep your code. Add a simple editing layer. Let clients update content without touching your logic.',
 
+	solution_dev_label: 'Developer',
+	solution_dev_title: 'Clean Code',
+
+	solution_edit_label: 'Edit layer',
+
+	solution_client_label: 'Client',
+	solution_client_title: 'Live Editing',
+
+	solution_logic_label: 'Logic protected',
+	solution_content_label: 'Content synced',
+
 	how_title: 'How it actually works',
 
 	how_1_title: 'Define your content',

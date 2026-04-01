@@ -8,6 +8,7 @@ import {
 	Moon,
 	RefreshCcw,
 	Shield,
+	Sparkles,
 	Sun,
 	User,
 	Zap,
@@ -153,73 +154,109 @@ export default function Home() {
 				{/*  SOLUTION  */}
 				<section className='grid md:grid-cols-2 gap-16 items-center py-12'>
 					<div className='space-y-6'>
-						<h2 className='text-4xl md:text-5xl font-bold tracking-tight'>
+						<h2 className='text-4xl md:text-5xl font-bold text-center md:text-left tracking-tight'>
 							There is a better way
 						</h2>
-						<p className='text-lg text-muted-foreground leading-relaxed'>
+						<p className='text-lg text-muted-foreground text-center md:text-left leading-relaxed'>
 							Keep your code. Add a simple editing layer. Let clients update
 							content without touching your logic.
 						</p>
 					</div>
 
 					<div className='relative group'>
-						<div className='absolute -inset-4 bg-gradient-to-r from-primary/20 to-secondary/20 blur-3xl opacity-50 group-hover:opacity-100 transition-all duration-300' />
+						{/* glow */}
+						<div className='absolute -inset-6 bg-gradient-to-r from-primary/20 via-transparent to-secondary/20 blur-3xl opacity-40 group-hover:opacity-80 transition duration-500' />
 
 						<div className='relative rounded-2xl border bg-card p-8 shadow-sm overflow-hidden'>
-							<div className='flex justify-between items-center mb-12'>
-								<div className='text-center space-y-2'>
-									<div className='w-12 h-12 rounded-lg bg-muted flex items-center justify-center border shadow-sm'>
-										<code className='text-primary font-bold text-xs'>
+							{/* TOP FLOW */}
+							<div className='flex items-center justify-between gap-6 mb-10'>
+								{/* line */}
+								<div className='absolute z-1 top-16 left-6 right-6 h-px bg-gradient-to-r from-transparent via-border to-transparent' />
+
+								{/* DEV */}
+								<div className='flex flex-col items-center text-center space-y-2'>
+									<div className='z-10 w-12 h-12 rounded-xl bg-muted border flex items-center justify-center shadow-sm'>
+										<code className='text-primary text-xs font-bold'>
 											&lt;/&gt;
 										</code>
 									</div>
-									<span className='text-[10px] uppercase tracking-widest font-semibold text-muted-foreground'>
-										Developer
+
+									<span className='text-[10px] uppercase tracking-widest text-muted-foreground'>
+										{c.solution_dev_label}
 									</span>
-									<p className='text-sm font-medium'>Clean Code</p>
+
+									<p className='text-sm font-medium'>{c.solution_dev_title}</p>
 								</div>
 
-								<div className='relative flex flex-col items-center z-10'>
-									<Image
-										width={32}
-										height={32}
-										src={'/icon.svg'}
-										alt={'Logo'}
-									/>
+								{/* CENTER */}
+								<div className='relative flex flex-col items-center'>
+									<div className='relative z-10 flex flex-col items-center'>
+										{isDark ? (
+											<Image
+												width={32}
+												height={32}
+												src={'/icon-dark.svg'}
+												alt={'Logo'}
+											/>
+										) : (
+											<Image
+												width={32}
+												height={32}
+												src={'/icon.svg'}
+												alt={'Logo'}
+											/>
+										)}
 
-									<div className='absolute top-full mt-2 bg-primary/10 text-primary px-3 py-1 rounded-md text-[14px] font-bold tracking-tighter'>
-										Edit.
+										<span className='mt-2 text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-md'>
+											{c.solution_edit_label}
+										</span>
 									</div>
 								</div>
 
-								<div className='text-center space-y-2'>
-									<div className='w-12 h-12 rounded-lg bg-muted flex items-center justify-center border shadow-sm'>
-										<span className='text-primary text-lg'>✨</span>
+								{/* CLIENT */}
+								<div className='flex flex-col items-center text-center space-y-2'>
+									<div className='z-10 w-12 h-12 rounded-xl bg-muted border flex items-center justify-center shadow-sm'>
+										<span className='text-primary text-lg'>
+											<Sparkles
+												size={18}
+												strokeWidth={1.6}
+												className='text-yellow-400'
+											/>
+										</span>
 									</div>
-									<span className='text-[10px] uppercase tracking-widest font-semibold text-muted-foreground'>
-										Client
+
+									<span className='text-[10px] uppercase tracking-widest text-muted-foreground'>
+										{c.solution_client_label}
 									</span>
-									<p className='text-sm font-medium'>Live Edit</p>
+
+									<p className='text-sm font-medium'>
+										{c.solution_client_title}
+									</p>
 								</div>
 							</div>
 
-							<div className='absolute top-[72px] left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-border to-transparent -z-0' />
+							{/* DIVIDER */}
+							<div className='border-t border-dashed mb-6' />
 
-							<div className='grid grid-cols-2 gap-4 mt-4 pt-6 border-t border-dashed'>
-								<div className='space-y-1'>
-									<div className='h-1 w-full bg-muted rounded-full overflow-hidden'>
-										<div className='h-full bg-primary/40 w-3/4' />
+							{/* STATUS BARS */}
+							<div className='grid grid-cols-2 gap-6'>
+								<div className='space-y-2'>
+									<div className='h-1.5 w-full bg-muted rounded-full overflow-hidden'>
+										<div className='h-full bg-primary/40 w-3/4 transition-all duration-500' />
 									</div>
-									<p className='text-[10px] text-muted-foreground uppercase'>
-										Logic Protected
+
+									<p className='text-[11px] uppercase tracking-wide text-muted-foreground'>
+										{c.solution_logic_label}
 									</p>
 								</div>
-								<div className='space-y-1 text-right'>
-									<div className='h-1 w-full bg-muted rounded-full overflow-hidden'>
-										<div className='h-full bg-primary w-1/2 ml-auto' />
+
+								<div className='space-y-2 text-right'>
+									<div className='h-1.5 w-full bg-muted rounded-full overflow-hidden'>
+										<div className='h-full bg-primary w-2/3 ml-auto transition-all duration-500' />
 									</div>
-									<p className='text-[10px] text-muted-foreground uppercase'>
-										Content Sync
+
+									<p className='text-[11px] uppercase tracking-wide text-muted-foreground'>
+										{c.solution_content_label}
 									</p>
 								</div>
 							</div>
