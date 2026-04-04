@@ -29,10 +29,18 @@ export default function RootLayout({
 	children: React.ReactNode
 }>) {
 	return (
-		<html lang='en' className='h-full antialiased'>
+		<html lang='en' className='h-full antialiased' suppressHydrationWarning>
 			<body className={`${geistSans.className} min-h-full flex flex-col`}>
 				{children}
 				<Toaster />
+				<script
+					dangerouslySetInnerHTML={{
+						__html: `
+							const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+							if (isDark) document.documentElement.classList.add('dark');
+						`,
+					}}
+				/>
 			</body>
 		</html>
 	)

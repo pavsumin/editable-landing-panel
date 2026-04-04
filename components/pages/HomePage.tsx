@@ -56,16 +56,20 @@ export default function Home({ content }: Props) {
 				<div className='max-w-6xl mx-auto px-6 py-4 flex items-center justify-between'>
 					<div className='flex items-center gap-2'>
 						<div className='flex items-center justify-center'>
-							{isDark ? (
-								<Image
-									width={32}
-									height={32}
-									src={'/icon-dark.svg'}
-									alt={'Logo'}
-								/>
-							) : (
-								<Image width={32} height={32} src={'/icon.svg'} alt={'Logo'} />
-							)}
+							<Image
+								width={32}
+								height={32}
+								src={'/icon-dark.svg'}
+								alt={'Logo'}
+								className='hidden dark:block'
+							/>
+							<Image
+								width={32}
+								height={32}
+								src={'/icon.svg'}
+								alt={'Logo'}
+								className='block dark:hidden'
+							/>
 						</div>
 						<span className='font-bold text-xl'>Edit.</span>
 					</div>
@@ -75,11 +79,8 @@ export default function Home({ content }: Props) {
 						className='p-2 rounded-lg border border-border hover:bg-muted transition duration-300 cursor-pointer'
 						aria-label='Toggle theme'
 					>
-						{isDark ? (
-							<Moon className='h-5 w-5 text-blue-400' />
-						) : (
-							<Sun className='h-5 w-5 text-yellow-500' />
-						)}
+						<Moon className='hidden dark:block h-5 w-5 text-blue-400' />
+						<Sun className='block dark:hidden h-5 w-5 text-yellow-500' />
 					</button>
 				</div>
 			</header>
@@ -96,25 +97,14 @@ export default function Home({ content }: Props) {
 						<p className='text-lg text-muted-foreground'>{c.hero_subtitle}</p>
 
 						<div className='flex gap-4'>
-							{isDark ? (
-								<a
-									href='https://github.com/pavsumin/editable-landing-panel'
-									className='flex items-center gap-2 bg-white text-primary-foreground px-6 py-3 rounded-xl hover:scale-102 transition duration-300'
-									target='_blank'
-								>
-									<FaGithub />
-									{c.hero_cta_primary}
-								</a>
-							) : (
-								<a
-									href='https://github.com/pavsumin/editable-landing-panel'
-									className='flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-xl hover:scale-102 transition duration-300'
-									target='_blank'
-								>
-									<FaGithub />
-									{c.hero_cta_primary}
-								</a>
-							)}
+							<a
+								href='https://github.com/pavsumin/editable-landing-panel'
+								className='flex items-center gap-2 bg-primary dark:bg-white text-primary-foreground px-6 py-3 rounded-xl hover:scale-102 transition duration-300'
+								target='_blank'
+							>
+								<FaGithub />
+								{c.hero_cta_primary}
+							</a>
 
 							<a
 								href='/docs'
@@ -199,21 +189,20 @@ export default function Home({ content }: Props) {
 								{/* CENTER */}
 								<div className='relative flex flex-col items-center'>
 									<div className='relative z-10 flex flex-col items-center'>
-										{isDark ? (
-											<Image
-												width={32}
-												height={32}
-												src={'/icon-dark.svg'}
-												alt={'Logo'}
-											/>
-										) : (
-											<Image
-												width={32}
-												height={32}
-												src={'/icon.svg'}
-												alt={'Logo'}
-											/>
-										)}
+										<Image
+											width={32}
+											height={32}
+											src={'/icon-dark.svg'}
+											alt={'Logo'}
+											className='hidden dark:block'
+										/>
+										<Image
+											width={32}
+											height={32}
+											src={'/icon.svg'}
+											alt={'Logo'}
+											className='block dark:hidden'
+										/>
 
 										<span className='mt-2 text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-md'>
 											{c.solution_edit_label}
@@ -406,23 +395,13 @@ export default function Home({ content }: Props) {
 
 					<p className='text-muted-foreground'>{c.final_subtitle}</p>
 
-					{isDark ? (
-						<a
-							href='https://github.com/pavsumin/editable-landing-panel'
-							target='_blank'
-							className='inline-block bg-white text-primary-foreground px-8 py-4 rounded-xl shadow hover:opacity-90 transition'
-						>
-							{c.final_cta}
-						</a>
-					) : (
-						<a
-							href='https://github.com/pavsumin/editable-landing-panel'
-							target='_blank'
-							className='inline-block bg-primary text-primary-foreground px-8 py-4 rounded-xl shadow hover:opacity-90 transition'
-						>
-							{c.final_cta}
-						</a>
-					)}
+					<a
+						href='https://github.com/pavsumin/editable-landing-panel'
+						target='_blank'
+						className='inline-block bg-primary dark:bg-white text-primary-foreground px-8 py-4 rounded-xl shadow hover:opacity-90 transition'
+					>
+						{c.final_cta}
+					</a>
 				</section>
 			</main>
 
