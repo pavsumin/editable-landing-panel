@@ -160,6 +160,11 @@ export default function AdminPage() {
 	const [loading, setLoading] = useState(false)
 	const [mounted, setMounted] = useState(false)
 
+	const [imageModalOpen, setImageModalOpen] = useState(false)
+	const [imageKey, setImageKey] = useState<ContentKey | null>(null)
+	const [imagePreview, setImagePreview] = useState<string | null>(null)
+	const [imageFile, setImageFile] = useState<File | null>(null)
+
 	const [showDialog, setShowDialog] = useState(false)
 	const [pendingKey, setPendingKey] = useState<ContentKey | null>(null)
 
@@ -265,6 +270,31 @@ export default function AdminPage() {
 	}
 
 	// IMAGE UPLOAD
+
+	const uploadAndSaveImage = async (file: File, key: ContentKey) => {
+		const compressed = await imageCompression(file, {
+			maxSizeMB: 0.4,
+			maxWidthOrHeight: 1600,
+			fileType: 'image/webp',
+			useWebWorker: true,
+		})
+
+		const formData = new FormData()
+		formData.append('file', compressed)
+
+		const res = await fetch('/api/upload', {
+			method: 'POST',
+			headers: {
+				'x-admin-password': localStorage.getItem('admin-password')!,
+			},
+			body: formData,
+		})
+
+		const { url } = await res.json()
+
+		await save(key, url)
+	}
+
 	const handleImageUpload = async (
 		e: React.ChangeEvent<HTMLInputElement>,
 		key: ContentKey,
@@ -273,32 +303,45 @@ export default function AdminPage() {
 		if (!file) return
 
 		try {
-			const compressed = await imageCompression(file, {
-				maxSizeMB: 0.5,
-				maxWidthOrHeight: 1600,
-				useWebWorker: true,
-			})
-
-			const formData = new FormData()
-			formData.append('file', compressed)
-			formData.append('key', key)
-
-			const res = await fetch('/api/upload', {
-				method: 'POST',
-				body: formData,
-				headers: {
-					'x-admin-password': localStorage.getItem('admin-password')!,
-				},
-			})
-
-			const { url } = await res.json()
-
-			await save(key, url)
-
+			await uploadAndSaveImage(file, key)
 			toast.success('Image updated')
 		} catch {
 			toast.error('Upload failed')
 		}
+	}
+
+	const openImageModal = (key: ContentKey, current: string) => {
+		setImageKey(key)
+		setImagePreview(current)
+		setImageModalOpen(true)
+	}
+
+	const uploadImage = async () => {
+		if (!imageFile || !imageKey) return
+
+		try {
+			await uploadAndSaveImage(imageFile, imageKey)
+
+			setImageModalOpen(false)
+			setImageFile(null)
+			setImagePreview(null)
+			setImageKey(null)
+
+			toast.success('Image saved')
+		} catch {
+			toast.error('Upload failed')
+		}
+	}
+
+	const handleFile = async (file: File) => {
+		setImageFile(file)
+		setImagePreview(URL.createObjectURL(file))
+	}
+
+	const handleDrop = (e: React.DragEvent) => {
+		e.preventDefault()
+		const file = e.dataTransfer.files[0]
+		if (file) handleFile(file)
 	}
 
 	const reset = async (key: ContentKey) => {
@@ -460,7 +503,6 @@ export default function AdminPage() {
 
 											{isImageKey(item.key) ? (
 												<div className='space-y-3'>
-													{/* preview */}
 													{item.value && (
 														<img
 															src={item.value}
@@ -468,12 +510,12 @@ export default function AdminPage() {
 														/>
 													)}
 
-													{/* upload */}
-													<input
-														type='file'
-														accept='image/*'
-														onChange={e => handleImageUpload(e, item.key)}
-													/>
+													<button
+														onClick={() => openImageModal(item.key, item.value)}
+														className='text-sm px-3 py-1 border rounded-md hover:bg-muted transition'
+													>
+														{item.value ? 'Edit image' : 'Upload image'}
+													</button>
 												</div>
 											) : !editing ? (
 												<div
@@ -600,6 +642,59 @@ export default function AdminPage() {
 					</DialogFooter>
 				</DialogContent>
 			</Dialog>
+
+			{imageModalOpen && (
+				<Dialog open={imageModalOpen} onOpenChange={setImageModalOpen}>
+					<DialogContent>
+						<DialogHeader>
+							<DialogTitle>Upload image</DialogTitle>
+						</DialogHeader>
+
+						<div
+							onDrop={handleDrop}
+							onDragOver={e => e.preventDefault()}
+							className='border-2 border-dashed rounded-xl p-6 text-center cursor-pointer hover:bg-muted transition'
+						>
+							{imagePreview ? (
+								<img
+									src={imagePreview}
+									className='mx-auto max-h-60 object-contain'
+								/>
+							) : (
+								<p className='text-sm text-muted-foreground'>
+									Drag & drop image or click below
+								</p>
+							)}
+
+							<input
+								type='file'
+								accept='image/*'
+								onChange={e => {
+									const file = e.target.files?.[0]
+									if (file) handleFile(file)
+								}}
+								className='mt-4'
+							/>
+						</div>
+
+						<DialogFooter className='flex gap-2'>
+							<button
+								onClick={() => setImageModalOpen(false)}
+								className='px-4 py-2 border rounded'
+							>
+								Cancel
+							</button>
+
+							<button
+								onClick={uploadImage}
+								className='px-4 py-2 bg-black text-white rounded'
+							>
+								Save
+							</button>
+						</DialogFooter>
+					</DialogContent>
+				</Dialog>
+			)}
 		</main>
 	)
 }
