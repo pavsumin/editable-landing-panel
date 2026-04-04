@@ -118,10 +118,18 @@ export default function Home({ content }: Props) {
 					{/* VISUAL */}
 					<div className='relative space-y-4'>
 						<Image
+							src={c.hero_image_light}
+							alt={'Image of the product'}
 							width={528}
 							height={366}
-							src={'/hero-image.webp'}
+							className='block dark:hidden'
+						/>
+						<Image
+							src={c.hero_image_dark}
 							alt={'Image of the product'}
+							width={528}
+							height={366}
+							className='hidden dark:block'
 						/>
 					</div>
 				</section>

@@ -6,6 +6,9 @@ export const defaultContent = {
 	hero_cta_primary: 'GitHub',
 	hero_cta_secondary: 'Docs',
 
+	hero_image_light: '/hero-image.webp',
+	hero_image_dark: '/hero-image-dark.webp',
+
 	problem_title: 'Right now, someone always loses',
 
 	problem_1_title: 'You build it right',

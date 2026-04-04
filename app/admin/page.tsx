@@ -1,6 +1,7 @@
 'use client'
 
 import { ContentKey, defaultContent } from '@/lib/defaultContent'
+import imageCompression from 'browser-image-compression'
 import { Eye, Pencil } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -18,12 +19,18 @@ type Item = {
 	value: string
 }
 
+const imageKeys: ContentKey[] = ['hero_image_light', 'hero_image_dark']
+
+const isImageKey = (key: ContentKey) => imageKeys.includes(key)
+
 export const sections = {
 	Hero: [
 		'hero_title',
 		'hero_subtitle',
 		'hero_cta_primary',
 		'hero_cta_secondary',
+		'hero_image_light',
+		'hero_image_dark',
 	],
 	Problem: [
 		'problem_title',
@@ -88,6 +95,8 @@ export const labelMap: Record<ContentKey, string> = {
 	hero_subtitle: 'Hero Subtitle',
 	hero_cta_primary: 'Primary CTA (GitHub)',
 	hero_cta_secondary: 'Secondary CTA (Docs)',
+	hero_image_light: 'Hero Image (Light Theme)',
+	hero_image_dark: 'Hero Image (Dark Theme)',
 
 	problem_title: 'Problem Title',
 	problem_1_title: 'Problem 1 Title',
@@ -255,6 +264,43 @@ export default function AdminPage() {
 		}
 	}
 
+	// IMAGE UPLOAD
+	const handleImageUpload = async (
+		e: React.ChangeEvent<HTMLInputElement>,
+		key: ContentKey,
+	) => {
+		const file = e.target.files?.[0]
+		if (!file) return
+
+		try {
+			const compressed = await imageCompression(file, {
+				maxSizeMB: 0.5,
+				maxWidthOrHeight: 1600,
+				useWebWorker: true,
+			})
+
+			const formData = new FormData()
+			formData.append('file', compressed)
+			formData.append('key', key)
+
+			const res = await fetch('/api/upload', {
+				method: 'POST',
+				body: formData,
+				headers: {
+					'x-admin-password': localStorage.getItem('admin-password')!,
+				},
+			})
+
+			const { url } = await res.json()
+
+			await save(key, url)
+
+			toast.success('Image updated')
+		} catch {
+			toast.error('Upload failed')
+		}
+	}
+
 	const reset = async (key: ContentKey) => {
 		const pass = localStorage.getItem('admin-password')
 
@@ -412,7 +458,24 @@ export default function AdminPage() {
 												{labelMap[item.key]}
 											</div>
 
-											{!editing ? (
+											{isImageKey(item.key) ? (
+												<div className='space-y-3'>
+													{/* preview */}
+													{item.value && (
+														<img
+															src={item.value}
+															className='rounded-lg border max-h-40 object-contain'
+														/>
+													)}
+
+													{/* upload */}
+													<input
+														type='file'
+														accept='image/*'
+														onChange={e => handleImageUpload(e, item.key)}
+													/>
+												</div>
+											) : !editing ? (
 												<div
 													onClick={() => {
 														setEditingKey(item.key)
