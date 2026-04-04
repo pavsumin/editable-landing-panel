@@ -165,6 +165,10 @@ export default function AdminPage() {
 	const [imagePreview, setImagePreview] = useState<string | null>(null)
 	const [imageFile, setImageFile] = useState<File | null>(null)
 
+	const [previewModalOpen, setPreviewModalOpen] = useState(false)
+	const [previewImage, setPreviewImage] = useState<string | null>(null)
+	const [previewKey, setPreviewKey] = useState<ContentKey | null>(null)
+
 	const [showDialog, setShowDialog] = useState(false)
 	const [pendingKey, setPendingKey] = useState<ContentKey | null>(null)
 
@@ -173,6 +177,7 @@ export default function AdminPage() {
 	const [draftValue, setDraftValue] = useState('')
 
 	const iframeRef = useRef<HTMLIFrameElement | null>(null)
+	const fileInputRef = useRef<HTMLInputElement | null>(null)
 
 	const [mode, setMode] = useState<'edit' | 'preview'>('edit')
 
@@ -344,6 +349,12 @@ export default function AdminPage() {
 		if (file) handleFile(file)
 	}
 
+	const openPreviewModal = (key: ContentKey, url: string) => {
+		setPreviewKey(key)
+		setPreviewImage(url)
+		setPreviewModalOpen(true)
+	}
+
 	const reset = async (key: ContentKey) => {
 		const pass = localStorage.getItem('admin-password')
 
@@ -506,16 +517,12 @@ export default function AdminPage() {
 													{item.value && (
 														<img
 															src={item.value}
-															className='rounded-lg border max-h-40 object-contain'
+															className='rounded-lg border max-h-40 object-contain cursor-pointer'
+															onClick={() =>
+																openPreviewModal(item.key, item.value)
+															}
 														/>
 													)}
-
-													<button
-														onClick={() => openImageModal(item.key, item.value)}
-														className='text-sm px-3 py-1 border rounded-md hover:bg-muted transition'
-													>
-														{item.value ? 'Edit image' : 'Upload image'}
-													</button>
 												</div>
 											) : !editing ? (
 												<div
@@ -541,8 +548,12 @@ export default function AdminPage() {
 												{!editing ? (
 													<button
 														onClick={() => {
-															setEditingKey(item.key)
-															setDraftValue(item.value)
+															if (isImageKey(item.key)) {
+																openImageModal(item.key, item.value)
+															} else {
+																setEditingKey(item.key)
+																setDraftValue(item.value)
+															}
 														}}
 														data-action='true'
 													>
@@ -603,10 +614,14 @@ export default function AdminPage() {
 			</div>
 
 			<Dialog open={showDialog} onOpenChange={setShowDialog}>
-				<DialogContent>
+				<DialogContent aria-describedby='image-upload-desc'>
 					<DialogHeader>
 						<DialogTitle>Unsaved changes</DialogTitle>
 					</DialogHeader>
+
+					<p id='image-upload-desc' className='sr-only'>
+						Upload and preview image
+					</p>
 
 					<p className='text-sm text-gray-500'>
 						You have unsaved changes. What do you want to do?
@@ -645,37 +660,54 @@ export default function AdminPage() {
 
 			{imageModalOpen && (
 				<Dialog open={imageModalOpen} onOpenChange={setImageModalOpen}>
-					<DialogContent>
+					<DialogContent aria-describedby='image-upload-desc'>
 						<DialogHeader>
 							<DialogTitle>Upload image</DialogTitle>
 						</DialogHeader>
 
+						<p id='image-upload-desc' className='sr-only'>
+							Upload and preview image
+						</p>
+
 						<div
 							onDrop={handleDrop}
 							onDragOver={e => e.preventDefault()}
-							className='border-2 border-dashed rounded-xl p-6 text-center cursor-pointer hover:bg-muted transition'
+							onClick={() => fileInputRef.current?.click()}
+							className='border-2 border-dashed rounded-xl p-8 text-center cursor-pointer hover:bg-muted transition'
 						>
 							{imagePreview ? (
-								<img
-									src={imagePreview}
-									className='mx-auto max-h-60 object-contain'
-								/>
+								<>
+									<img
+										src={imagePreview}
+										className='mx-auto max-h-60 object-contain'
+									/>
+									<div className='space-y-2 mt-8'>
+										<p className='text-sm font-medium'>Drop image here</p>
+										<p className='text-xs text-muted-foreground'>
+											or click to upload
+										</p>
+									</div>
+								</>
 							) : (
-								<p className='text-sm text-muted-foreground'>
-									Drag & drop image or click below
-								</p>
+								<div className='space-y-2'>
+									<p className='text-sm font-medium'>Drop image here</p>
+									<p className='text-xs text-muted-foreground'>
+										or click to upload
+									</p>
+								</div>
 							)}
-
-							<input
-								type='file'
-								accept='image/*'
-								onChange={e => {
-									const file = e.target.files?.[0]
-									if (file) handleFile(file)
-								}}
-								className='mt-4'
-							/>
 						</div>
+
+						<input
+							ref={fileInputRef}
+							type='file'
+							accept='image/*'
+							className='hidden'
+							onChange={e => {
+								const file = e.target.files?.[0]
+								if (file) handleFile(file)
+							}}
+						/>
 
 						<DialogFooter className='flex gap-2'>
 							<button
@@ -695,6 +727,44 @@ export default function AdminPage() {
 					</DialogContent>
 				</Dialog>
 			)}
+
+			<Dialog open={previewModalOpen} onOpenChange={setPreviewModalOpen}>
+				<DialogContent aria-describedby='image-upload-desc'>
+					<DialogHeader>
+						<DialogTitle>Image preview</DialogTitle>
+					</DialogHeader>
+
+					<p id='image-upload-desc' className='sr-only'>
+						Upload and preview image
+					</p>
+
+					{previewImage && (
+						<img
+							src={previewImage}
+							className='w-full max-h-[400px] object-contain rounded-lg border'
+						/>
+					)}
+
+					<DialogFooter className='flex gap-2'>
+						<button
+							onClick={() => setPreviewModalOpen(false)}
+							className='px-4 py-2 border rounded'
+						>
+							Close
+						</button>
+
+						<button
+							onClick={() => {
+								setPreviewModalOpen(false)
+								openImageModal(previewKey!, previewImage!)
+							}}
+							className='px-4 py-2 bg-black text-white rounded'
+						>
+							Upload new image
+						</button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 		</main>
 	)
 }
