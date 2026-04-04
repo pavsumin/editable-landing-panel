@@ -2,7 +2,7 @@
 
 import { ContentKey, defaultContent } from '@/lib/defaultContent'
 import imageCompression from 'browser-image-compression'
-import { Eye, Pencil } from 'lucide-react'
+import { Eye, Moon, Pencil, Sun } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -180,6 +180,15 @@ export default function AdminPage() {
 	const fileInputRef = useRef<HTMLInputElement | null>(null)
 
 	const [mode, setMode] = useState<'edit' | 'preview'>('edit')
+
+	const [isDark, setIsDark] = useState(() => {
+		if (typeof window === 'undefined') return false
+		return window.matchMedia('(prefers-color-scheme: dark)').matches
+	})
+
+	useEffect(() => {
+		document.documentElement.classList.toggle('dark', isDark)
+	}, [isDark])
 
 	useEffect(() => {
 		setMounted(true)
@@ -444,9 +453,18 @@ export default function AdminPage() {
 
 	return (
 		<main className='min-h-screen p-6 max-w-6xl mx-auto w-full space-y-6'>
-			<h1 className='text-2xl font-semibold md:text-center md:mt-2 md:mb-8'>
-				Editor
-			</h1>
+			<div className='max-w-6xl mx-auto flex items-center justify-between'>
+				<h1 className='text-2xl font-semibold md:mt-2 md:mb-8'>Editor</h1>
+
+				<button
+					onClick={() => setIsDark(prev => !prev)}
+					className='p-2 rounded-lg border border-border hover:bg-muted transition duration-300 cursor-pointer'
+					aria-label='Toggle theme'
+				>
+					<Moon className='hidden dark:block h-5 w-5 text-blue-400' />
+					<Sun className='block dark:hidden h-5 w-5 text-yellow-500' />
+				</button>
+			</div>
 
 			{/* MOBILE TOGGLE */}
 			<div className='flex md:hidden gap-2 bg-gray-100 p-1 rounded-lg w-fit'>
@@ -530,7 +548,7 @@ export default function AdminPage() {
 														setEditingKey(item.key)
 														setDraftValue(item.value)
 													}}
-													className='cursor-pointer bg-gray-100 p-2 rounded-[8px] w-full break-words'
+													className='cursor-pointer bg-gray-100 dark:bg-zinc-900 p-2 rounded-[8px] w-full break-words'
 												>
 													{item.value}
 												</div>
@@ -538,7 +556,7 @@ export default function AdminPage() {
 												<textarea
 													ref={textareaRef}
 													autoFocus
-													className='block max-w-full w-full min-w-0 resize-none border p-3 rounded whitespace-pre-wrap break-words'
+													className='block max-w-full w-full min-w-0 resize-none border p-3 rounded whitespace-pre-wrap break-words outline-none'
 													value={draftValue}
 													onChange={e => setDraftValue(e.target.value)}
 												/>
