@@ -2,6 +2,7 @@ import { Toaster } from '@/components/ui/toaster'
 import type { Metadata } from 'next'
 import { Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
+import Script from 'next/script'
 import './globals.css'
 
 const geistSans = Geist({
@@ -33,14 +34,14 @@ export default function RootLayout({
 			<body className={`${geistSans.className} min-h-full flex flex-col`}>
 				{children}
 				<Toaster />
-				<script
-					dangerouslySetInnerHTML={{
-						__html: `
+				<Script id='theme-init' strategy='beforeInteractive'>
+					{`
+						try {
 							const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 							if (isDark) document.documentElement.classList.add('dark');
-						`,
-					}}
-				/>
+						} catch (e) {}
+					`}
+				</Script>
 			</body>
 		</html>
 	)
