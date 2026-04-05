@@ -47,6 +47,20 @@ export default function Home({ content }: Props) {
 		document.documentElement.classList.toggle('dark', isDark)
 	}, [isDark])
 
+	useEffect(() => {
+		const handler = (e: MessageEvent) => {
+			if (e.data?.type === 'scroll-to') {
+				const el = document.getElementById(e.data.id)
+				if (el) {
+					el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+				}
+			}
+		}
+
+		window.addEventListener('message', handler)
+		return () => window.removeEventListener('message', handler)
+	}, [])
+
 	const c = content
 
 	return (
@@ -88,7 +102,7 @@ export default function Home({ content }: Props) {
 			{/* MAIN */}
 			<main className='max-w-6xl mx-auto px-6 py-20 space-y-32'>
 				{/*  HERO  */}
-				<section className='grid md:grid-cols-2 gap-12 items-center'>
+				<section id='hero' className='grid md:grid-cols-2 gap-12 items-center'>
 					<div className='space-y-6'>
 						<h1 className='text-5xl md:text-6xl font-bold leading-tight'>
 							{c.hero_title}
@@ -135,7 +149,7 @@ export default function Home({ content }: Props) {
 				</section>
 
 				{/*  PROBLEM  */}
-				<section className='space-y-10'>
+				<section id='problem' className='space-y-10'>
 					<h2 className='text-4xl font-bold text-center'>{c.problem_title}</h2>
 
 					<div className='grid md:grid-cols-3 gap-6'>
@@ -158,7 +172,10 @@ export default function Home({ content }: Props) {
 				</section>
 
 				{/*  SOLUTION  */}
-				<section className='grid md:grid-cols-2 gap-16 items-center py-12'>
+				<section
+					id='solution'
+					className='grid md:grid-cols-2 gap-16 items-center py-12'
+				>
 					<div className='space-y-6'>
 						<h2 className='text-4xl md:text-5xl font-bold text-center md:text-left tracking-tight'>
 							There is a better way
@@ -270,7 +287,7 @@ export default function Home({ content }: Props) {
 				</section>
 
 				{/* HOW IT WORKS */}
-				<section className='space-y-16'>
+				<section id='how' className='space-y-16'>
 					<div className='text-center space-y-4'>
 						<h2 className='text-4xl md:text-5xl font-bold'>{c.how_title}</h2>
 					</div>
@@ -301,7 +318,7 @@ export default function Home({ content }: Props) {
 				</section>
 
 				{/* FLOW SECTION */}
-				<section className='space-y-16'>
+				<section id='flow' className='space-y-16'>
 					<div className='text-center space-y-4'>
 						<p className='text-sm text-muted-foreground uppercase tracking-wider'>
 							{c.flow_badge}
@@ -384,7 +401,7 @@ export default function Home({ content }: Props) {
 				</section>
 
 				{/*  FEATURES  */}
-				<section className='space-y-12'>
+				<section id='features' className='space-y-12'>
 					<h2 className='text-4xl font-bold text-center'>{c.features_title}</h2>
 
 					<div className='grid md:grid-cols-3 gap-6'>
@@ -398,7 +415,7 @@ export default function Home({ content }: Props) {
 				</section>
 
 				{/*  CTA  */}
-				<section className='text-center space-y-6'>
+				<section id='final' className='text-center space-y-6'>
 					<h2 className='text-4xl font-bold'>{c.final_title}</h2>
 
 					<p className='text-muted-foreground'>{c.final_subtitle}</p>
