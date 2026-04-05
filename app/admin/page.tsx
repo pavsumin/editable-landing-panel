@@ -489,7 +489,7 @@ export default function AdminPage() {
 
 			<div className='grid md:grid-cols-2 gap-8 items-start'>
 				{/* PREVIEW */}
-				<div className='hidden md:block'>
+				<div className='hidden md:block sticky top-18 self-start'>
 					<div className='relative w-full h-[80vh] border rounded-xl overflow-hidden hover:shadow-xl/5 duration-200 transition'>
 						{/* IFRAME */}
 						<iframe
