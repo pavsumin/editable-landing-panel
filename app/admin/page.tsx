@@ -2,7 +2,7 @@
 
 import { ContentKey, defaultContent } from '@/lib/defaultContent'
 import imageCompression from 'browser-image-compression'
-import { Eye, Moon, Pencil, Sun } from 'lucide-react'
+import { Eye, Moon, Pencil, Sun, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -553,13 +553,24 @@ export default function AdminPage() {
 													{item.value}
 												</div>
 											) : (
-												<textarea
-													ref={textareaRef}
-													autoFocus
-													className='block max-w-full w-full min-w-0 resize-none border p-3 rounded whitespace-pre-wrap break-words outline-none'
-													value={draftValue}
-													onChange={e => setDraftValue(e.target.value)}
-												/>
+												<div className='relative'>
+													<textarea
+														ref={textareaRef}
+														autoFocus
+														className='block max-w-full w-full min-w-0 resize-none border p-3 pr-10 rounded-[8px] whitespace-pre-wrap break-words outline-none'
+														value={draftValue}
+														onChange={e => setDraftValue(e.target.value)}
+													/>
+													{draftValue && (
+														<button
+															type='button'
+															onClick={() => setDraftValue('')}
+															className='absolute top-3.5 right-3.5 text-muted-foreground hover:text-foreground transition cursor-pointer'
+														>
+															<X size={20} />
+														</button>
+													)}
+												</div>
 											)}
 
 											<div className='flex gap-3 text-sm'>
