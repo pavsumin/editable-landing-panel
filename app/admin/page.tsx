@@ -467,11 +467,11 @@ export default function AdminPage() {
 			</div>
 
 			{/* MOBILE TOGGLE */}
-			<div className='flex md:hidden gap-2 bg-gray-100 p-1 rounded-lg w-fit'>
+			<div className='flex md:hidden gap-2 bg-gray-100 dark:bg-zinc-900 p-2 p-1 rounded-lg w-fit'>
 				<button
 					onClick={() => setMode('edit')}
 					className={`flex items-center gap-1 px-3 py-1 rounded-md text-sm active:scale-95 ${
-						mode === 'edit' ? 'bg-white shadow' : ''
+						mode === 'edit' ? 'bg-white dark:bg-background shadow' : ''
 					}`}
 				>
 					<Pencil size={14} /> Edit
@@ -480,7 +480,7 @@ export default function AdminPage() {
 				<button
 					onClick={() => setMode('preview')}
 					className={`flex items-center gap-1 px-3 py-1 rounded-md text-sm active:scale-95 ${
-						mode === 'preview' ? 'bg-white shadow' : ''
+						mode === 'preview' ? 'bg-white dark:bg-background shadow' : ''
 					}`}
 				>
 					<Eye size={14} /> Preview
