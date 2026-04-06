@@ -8,7 +8,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from '@/components/ui/dialog'
-import { Eye, Moon, Pencil, Sun, X } from 'lucide-react'
+import { Eye, Pencil, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
 type DemoData = {
@@ -132,19 +132,6 @@ export default function DemoPage() {
 
 	return (
 		<main className='min-h-screen p-6 max-w-6xl mx-auto w-full space-y-6'>
-			{/* HEADER */}
-			<div className='max-w-6xl mx-auto flex items-center justify-between'>
-				<h1 className='text-2xl font-semibold'>Live Demo</h1>
-
-				<button
-					onClick={() => setIsDark(prev => !prev)}
-					className='p-2 border rounded-lg'
-				>
-					<Moon className='hidden dark:block h-5 w-5' />
-					<Sun className='block dark:hidden h-5 w-5' />
-				</button>
-			</div>
-
 			{/* MOBILE TOGGLE */}
 			<div className='flex md:hidden gap-2 bg-gray-100 dark:bg-zinc-900 p-2 rounded-lg w-fit'>
 				<button

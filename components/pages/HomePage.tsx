@@ -1,5 +1,6 @@
 'use client'
 
+import DemoPage from '@/app/demo/page'
 import { ContentKey } from '@/lib/defaultContent'
 import {
 	Code2,
@@ -154,6 +155,24 @@ export default function Home({ content }: Props) {
 							height={366}
 							className='hidden dark:block'
 						/>
+					</div>
+				</section>
+
+				{/* DEMO */}
+				<section id='demo' className='space-y-12'>
+					<div className='text-center space-y-4'>
+						<h2 className='text-4xl md:text-5xl font-bold'>{c.demo_title}</h2>
+
+						<p className='text-muted-foreground max-w-xl mx-auto mt-8'>
+							{c.demo_subtitle}
+						</p>
+					</div>
+
+					{/* DEMO WRAPPER */}
+					<div className='border rounded-2xl overflow-hidden bg-card'>
+						<div className='h-[700px] overflow-y-auto'>
+							<DemoPage />
+						</div>
 					</div>
 				</section>
 

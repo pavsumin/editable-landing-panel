@@ -38,6 +38,7 @@ export const sections = {
 		'hero_image_light',
 		'hero_image_dark',
 	],
+	Demo: ['demo_title', 'demo_subtitle'],
 	Problem: [
 		'problem_title',
 		'problem_1_title',
@@ -103,6 +104,9 @@ export const labelMap: Record<ContentKey, string> = {
 	hero_cta_secondary: 'Secondary CTA (Docs)',
 	hero_image_light: 'Hero Image (Light Theme)',
 	hero_image_dark: 'Hero Image (Dark Theme)',
+
+	demo_title: 'Demo Title',
+	demo_subtitle: 'Demo Subtitle',
 
 	problem_title: 'Problem Title',
 	problem_1_title: 'Problem 1 Title',
@@ -434,6 +438,7 @@ export default function AdminPage() {
 	const scrollToSection = (section: string) => {
 		const map: Record<string, string> = {
 			Hero: 'hero',
+			Demo: 'demo',
 			Problem: 'problem',
 			Solution: 'solution',
 			'How it works': 'how',

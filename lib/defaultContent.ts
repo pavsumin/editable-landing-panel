@@ -9,6 +9,9 @@ export const defaultContent = {
 	hero_image_light: '/hero-image.webp',
 	hero_image_dark: '/hero-image-dark.webp',
 
+	demo_title: 'Try it yourself',
+	demo_subtitle: 'Edit content and see changes instantly',
+
 	problem_title: 'Right now, someone always loses',
 
 	problem_1_title: 'You build it right',

@@ -27,7 +27,7 @@ export default function DemoPreview({ content }: Props) {
 					/>
 				</div>
 
-				<button className='px-6 py-3 bg-black text-white rounded-xl'>
+				<button className='px-6 py-3 bg-primary text-primary-foreground rounded-xl'>
 					{content.hero_btn}
 				</button>
 			</section>
