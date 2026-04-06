@@ -475,7 +475,7 @@ export default function AdminPage() {
 
 					<button
 						onClick={login}
-						className='w-full bg-black text-white py-3 rounded-xl active:scale-95'
+						className='w-full bg-black text-white py-3 rounded-xl active:scale-95 cursor-pointer transition duration-200'
 					>
 						Enter
 					</button>
@@ -491,7 +491,7 @@ export default function AdminPage() {
 
 				<button
 					onClick={() => setIsDark(prev => !prev)}
-					className='p-2 rounded-lg border border-border hover:bg-muted transition duration-300 cursor-pointer'
+					className='p-2 rounded-lg border border-border hover:bg-muted transition duration-300 cursor-pointer active:scale-95'
 					aria-label='Toggle theme'
 				>
 					<Moon className='hidden dark:block h-5 w-5 text-blue-400' />
@@ -503,7 +503,7 @@ export default function AdminPage() {
 			<div className='flex md:hidden gap-2 bg-gray-100 dark:bg-zinc-900 p-2 p-1 rounded-lg w-fit'>
 				<button
 					onClick={() => setMode('edit')}
-					className={`flex items-center gap-1 px-3 py-1 rounded-md text-sm active:scale-95 ${
+					className={`flex items-center gap-1 px-3 py-1 rounded-md text-sm active:scale-95 cursor-pointer transition duration-200 ${
 						mode === 'edit' ? 'bg-white dark:bg-background shadow' : ''
 					}`}
 				>
@@ -512,7 +512,7 @@ export default function AdminPage() {
 
 				<button
 					onClick={() => setMode('preview')}
-					className={`flex items-center gap-1 px-3 py-1 rounded-md text-sm active:scale-95 ${
+					className={`flex items-center gap-1 px-3 py-1 rounded-md text-sm active:scale-95 cursor-pointer transition duration-200 ${
 						mode === 'preview' ? 'bg-white dark:bg-background shadow' : ''
 					}`}
 				>
@@ -587,7 +587,7 @@ export default function AdminPage() {
 																	{item.value && (
 																		<img
 																			src={item.value}
-																			className='rounded-lg border h-40 object-contain cursor-pointer'
+																			className='rounded-lg border h-40 object-contain active:scale-95 cursor-pointer transition duration-200'
 																			onClick={() =>
 																				openPreviewModal(item.key, item.value)
 																			}
@@ -600,7 +600,7 @@ export default function AdminPage() {
 																		setEditingKey(item.key)
 																		setDraftValue(item.value)
 																	}}
-																	className='cursor-pointer bg-gray-100 dark:bg-zinc-900 p-2 rounded-[8px] w-full break-words'
+																	className='active:scale-95 cursor-pointer transition duration-200 bg-gray-100 dark:bg-zinc-900 p-2 rounded-[8px] w-full break-words'
 																>
 																	{item.value}
 																</div>
@@ -619,7 +619,7 @@ export default function AdminPage() {
 																		<button
 																			type='button'
 																			onClick={() => setDraftValue('')}
-																			className='absolute top-3.5 right-3.5 text-muted-foreground hover:text-foreground transition cursor-pointer'
+																			className='absolute top-3.5 right-3.5 text-muted-foreground hover:text-foreground active:scale-95 cursor-pointer transition duration-200'
 																		>
 																			<X size={20} />
 																		</button>
@@ -639,6 +639,7 @@ export default function AdminPage() {
 																			}
 																		}}
 																		data-action='true'
+																		className='active:scale-95 cursor-pointer transition duration-200'
 																	>
 																		Edit
 																	</button>
@@ -650,6 +651,7 @@ export default function AdminPage() {
 																			setDraftValue('')
 																		}}
 																		data-action='true'
+																		className='active:scale-95 cursor-pointer transition duration-200'
 																	>
 																		{loading ? 'Saving...' : 'Save'}
 																	</button>
@@ -662,7 +664,7 @@ export default function AdminPage() {
 																		setDraftValue('')
 																	}}
 																	data-action='true'
-																	className='text-gray-400'
+																	className='text-gray-400 active:scale-95 cursor-pointer transition duration-200'
 																>
 																	Reset
 																</button>
@@ -716,7 +718,7 @@ export default function AdminPage() {
 
 					<DialogFooter className='flex gap-2'>
 						<button
-							className='px-4 py-2 border rounded'
+							className='px-4 py-2 border rounded active:scale-95 cursor-pointer transition duration-200'
 							onClick={() => {
 								setShowDialog(false)
 								setEditingKey(null)
@@ -727,7 +729,7 @@ export default function AdminPage() {
 						</button>
 
 						<button
-							className='px-4 py-2 bg-black text-white rounded'
+							className='px-4 py-2 bg-black text-white rounded active:scale-95 cursor-pointer transition duration-200'
 							onClick={async () => {
 								const item = data.find(i => i.key === pendingKey)
 
@@ -799,14 +801,14 @@ export default function AdminPage() {
 						<DialogFooter className='flex gap-2'>
 							<button
 								onClick={() => setImageModalOpen(false)}
-								className='px-4 py-2 border rounded'
+								className='px-4 py-2 border rounded active:scale-95 cursor-pointer transition duration-200'
 							>
 								Cancel
 							</button>
 
 							<button
 								onClick={uploadImage}
-								className='px-4 py-2 bg-black text-white rounded'
+								className='px-4 py-2 bg-black text-white rounded active:scale-95 cursor-pointer transition duration-200'
 							>
 								Save
 							</button>
@@ -835,7 +837,7 @@ export default function AdminPage() {
 					<DialogFooter className='flex gap-2'>
 						<button
 							onClick={() => setPreviewModalOpen(false)}
-							className='px-4 py-2 border rounded'
+							className='px-4 py-2 border rounded active:scale-95 cursor-pointer transition duration-200'
 						>
 							Close
 						</button>
@@ -845,7 +847,7 @@ export default function AdminPage() {
 								setPreviewModalOpen(false)
 								openImageModal(previewKey!, previewImage!)
 							}}
-							className='px-4 py-2 bg-black text-white rounded'
+							className='px-4 py-2 bg-black text-white rounded active:scale-95 cursor-pointer transition duration-200'
 						>
 							Upload new image
 						</button>
