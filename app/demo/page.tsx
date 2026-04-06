@@ -191,7 +191,7 @@ export default function DemoPage() {
 												setEditingKey(key)
 												setDraftValue(value)
 											}}
-											className='cursor-pointer bg-gray-100 dark:bg-zinc-900 p-2 rounded'
+											className='cursor-pointer bg-gray-100 dark:bg-zinc-900 p-2 rounded text-[16px]'
 										>
 											{value}
 										</div>
@@ -199,7 +199,7 @@ export default function DemoPage() {
 										<div className='relative'>
 											<textarea
 												ref={textareaRef}
-												className='w-full border p-3 pr-10 rounded'
+												className='w-full border p-3 pr-10 rounded text-[16px]'
 												value={draftValue}
 												onChange={e => setDraftValue(e.target.value)}
 											/>

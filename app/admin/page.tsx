@@ -612,7 +612,7 @@ export default function AdminPage() {
 																		setEditingKey(item.key)
 																		setDraftValue(item.value)
 																	}}
-																	className='active:scale-95 cursor-pointer transition duration-200 bg-gray-100 dark:bg-zinc-900 p-2 rounded-[8px] w-full break-words'
+																	className='active:scale-95 cursor-pointer transition duration-200 bg-gray-100 dark:bg-zinc-900 p-2 rounded-[8px] w-full break-words text-[16px]'
 																>
 																	{item.value}
 																</div>
@@ -621,7 +621,7 @@ export default function AdminPage() {
 																	<textarea
 																		ref={textareaRef}
 																		autoFocus
-																		className='block max-w-full w-full min-w-0 resize-none border p-3 pr-10 rounded-[8px] whitespace-pre-wrap break-words outline-none'
+																		className='block max-w-full w-full min-w-0 resize-none border p-3 pr-10 rounded-[8px] whitespace-pre-wrap break-words text-[16px]'
 																		value={draftValue}
 																		onChange={e =>
 																			setDraftValue(e.target.value)
