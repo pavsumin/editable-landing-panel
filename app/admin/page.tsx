@@ -290,24 +290,6 @@ export default function AdminPage() {
 		}
 	}
 
-	// SCROLL TO SECTION ON MOBILE
-
-	useEffect(() => {
-		if (mode === 'preview' && activeSection) {
-			const t = setTimeout(() => {
-				iframeRef.current?.contentWindow?.postMessage(
-					{
-						type: 'scroll-to',
-						id: activeSection,
-					},
-					'*',
-				)
-			}, 200)
-
-			return () => clearTimeout(t)
-		}
-	}, [mode])
-
 	// IMAGE UPLOAD
 
 	const uploadAndSaveImage = async (file: File, key: ContentKey) => {
