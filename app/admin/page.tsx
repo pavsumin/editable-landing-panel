@@ -509,7 +509,7 @@ export default function AdminPage() {
 				<button
 					onClick={() => setMode('edit')}
 					className={`flex items-center gap-1 px-3 py-1 rounded-md text-sm active:scale-95 cursor-pointer transition duration-200 ${
-						mode === 'edit' ? 'bg-white dark:bg-background shadow' : ''
+						mode === 'edit' ? 'bg-white dark:bg-zinc-800 shadow' : ''
 					}`}
 				>
 					<Pencil size={14} /> Edit
@@ -518,7 +518,7 @@ export default function AdminPage() {
 				<button
 					onClick={() => setMode('preview')}
 					className={`flex items-center gap-1 px-3 py-1 rounded-md text-sm active:scale-95 cursor-pointer transition duration-200 ${
-						mode === 'preview' ? 'bg-white dark:bg-background shadow' : ''
+						mode === 'preview' ? 'bg-white dark:bg-zinc-800 shadow' : ''
 					}`}
 				>
 					<Eye size={14} /> Preview

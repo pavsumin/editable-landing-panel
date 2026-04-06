@@ -133,11 +133,11 @@ export default function DemoPage() {
 	return (
 		<main className='min-h-screen p-6 max-w-6xl mx-auto w-full space-y-6'>
 			{/* MOBILE TOGGLE */}
-			<div className='flex md:hidden gap-2 bg-gray-100 dark:bg-zinc-900 p-2 rounded-lg w-fit'>
+			<div className='flex md:hidden gap-2 bg-gray-100 dark:bg-zinc-800 p-2 rounded-lg w-fit'>
 				<button
 					onClick={() => setMode('edit')}
-					className={`flex items-center gap-1 px-3 py-1 rounded-md text-sm ${
-						mode === 'edit' ? 'bg-white dark:bg-background shadow' : ''
+					className={`flex items-center gap-1 px-3 py-1 rounded-md text-sm active:scale-95 cursor-pointer transition duration-200 ${
+						mode === 'edit' ? 'bg-white dark:bg-zinc-700 shadow' : ''
 					}`}
 				>
 					<Pencil size={14} /> Edit
@@ -145,8 +145,8 @@ export default function DemoPage() {
 
 				<button
 					onClick={() => setMode('preview')}
-					className={`flex items-center gap-1 px-3 py-1 rounded-md text-sm ${
-						mode === 'preview' ? 'bg-white dark:bg-background shadow' : ''
+					className={`flex items-center gap-1 px-3 py-1 rounded-md text-sm active:scale-95 cursor-pointer transition duration-200 ${
+						mode === 'preview' ? 'bg-white dark:bg-zinc-700 shadow' : ''
 					}`}
 				>
 					<Eye size={14} /> Preview
