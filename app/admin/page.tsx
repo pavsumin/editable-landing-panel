@@ -165,6 +165,7 @@ export default function AdminPage() {
 	const [isAuthed, setIsAuthed] = useState(false)
 	const [loading, setLoading] = useState(false)
 	const [mounted, setMounted] = useState(false)
+	const [activeSection, setActiveSection] = useState('hero')
 
 	const [imageModalOpen, setImageModalOpen] = useState(false)
 	const [imageKey, setImageKey] = useState<ContentKey | null>(null)
@@ -288,6 +289,24 @@ export default function AdminPage() {
 			setLoading(false)
 		}
 	}
+
+	// SCROLL TO SECTION ON MOBILE
+
+	useEffect(() => {
+		if (mode === 'preview' && activeSection) {
+			const t = setTimeout(() => {
+				iframeRef.current?.contentWindow?.postMessage(
+					{
+						type: 'scroll-to',
+						id: activeSection,
+					},
+					'*',
+				)
+			}, 200)
+
+			return () => clearTimeout(t)
+		}
+	}, [mode])
 
 	// IMAGE UPLOAD
 
@@ -541,135 +560,144 @@ export default function AdminPage() {
 				{/* EDITOR */}
 				{(mode === 'edit' ||
 					(typeof window !== 'undefined' && window.innerWidth >= 768)) && (
-					<div className='space-y-6 w-full min-w-0'>
-						<Accordion type='single' collapsible className='w-full space-y-2'>
-							{Object.entries(sections).map(([section, keys]) => (
-								<AccordionItem
-									key={section}
-									value={section}
-									className='border rounded-xl px-4'
-								>
-									<AccordionTrigger
-										onClick={() => scrollToSection(section)}
-										className='text-xs uppercase text-muted-foreground'
+					<div className='space-y-6 w-full min-w-0 items-start'>
+						{data.length > 0 && (
+							<Accordion
+								type='single'
+								defaultValue='hero'
+								collapsible
+								onValueChange={val => {
+									if (!val) return
+									setActiveSection(val)
+								}}
+								className='w-full space-y-2'
+							>
+								{Object.entries(sections).map(([section, keys]) => (
+									<AccordionItem
+										key={section}
+										value={section.toLowerCase()}
+										className='border rounded-xl px-4 will-change-[height]'
 									>
-										{section}
-									</AccordionTrigger>
-									<AccordionContent className='pt-4 space-y-4'>
-										<div key={section} className='space-y-3'>
-											<h2 className='text-xs uppercase text-gray-400'>
-												{section}
-											</h2>
+										<AccordionTrigger
+											onClick={() => scrollToSection(section)}
+											className='text-xs uppercase text-muted-foreground cursor-pointer'
+										>
+											{section}
+										</AccordionTrigger>
+										<AccordionContent className='pt-4 space-y-4 overflow-hidden'>
+											<div key={section} className='space-y-3'>
+												{keys.map(key => {
+													const item = data.find(
+														i => i.key === (key as ContentKey),
+													)
+													if (!item) return null
 
-											{keys.map(key => {
-												const item = data.find(
-													i => i.key === (key as ContentKey),
-												)
-												if (!item) return null
+													const editing = editingKey === item.key
 
-												const editing = editingKey === item.key
+													return (
+														<div
+															key={item.key}
+															data-editing={editing}
+															className='border rounded-xl p-4 space-y-2 w-full min-w-0 box-border'
+														>
+															<div className='text-xs text-gray-400'>
+																{labelMap[item.key]}
+															</div>
 
-												return (
-													<div
-														key={item.key}
-														data-editing={editing}
-														className='border rounded-xl p-4 space-y-2 w-full min-w-0 box-border'
-													>
-														<div className='text-xs text-gray-400'>
-															{labelMap[item.key]}
-														</div>
-
-														{isImageKey(item.key) ? (
-															<div className='space-y-3'>
-																{item.value && (
-																	<img
-																		src={item.value}
-																		className='rounded-lg border max-h-40 object-contain cursor-pointer'
-																		onClick={() =>
-																			openPreviewModal(item.key, item.value)
+															{isImageKey(item.key) ? (
+																<div className='space-y-3'>
+																	{item.value && (
+																		<img
+																			src={item.value}
+																			className='rounded-lg border max-h-40 object-contain cursor-pointer'
+																			onClick={() =>
+																				openPreviewModal(item.key, item.value)
+																			}
+																		/>
+																	)}
+																</div>
+															) : !editing ? (
+																<div
+																	onClick={() => {
+																		setEditingKey(item.key)
+																		setDraftValue(item.value)
+																	}}
+																	className='cursor-pointer bg-gray-100 dark:bg-zinc-900 p-2 rounded-[8px] w-full break-words'
+																>
+																	{item.value}
+																</div>
+															) : (
+																<div className='relative'>
+																	<textarea
+																		ref={textareaRef}
+																		autoFocus
+																		className='block max-w-full w-full min-w-0 resize-none border p-3 pr-10 rounded-[8px] whitespace-pre-wrap break-words outline-none'
+																		value={draftValue}
+																		onChange={e =>
+																			setDraftValue(e.target.value)
 																		}
 																	/>
-																)}
-															</div>
-														) : !editing ? (
-															<div
-																onClick={() => {
-																	setEditingKey(item.key)
-																	setDraftValue(item.value)
-																}}
-																className='cursor-pointer bg-gray-100 dark:bg-zinc-900 p-2 rounded-[8px] w-full break-words'
-															>
-																{item.value}
-															</div>
-														) : (
-															<div className='relative'>
-																<textarea
-																	ref={textareaRef}
-																	autoFocus
-																	className='block max-w-full w-full min-w-0 resize-none border p-3 pr-10 rounded-[8px] whitespace-pre-wrap break-words outline-none'
-																	value={draftValue}
-																	onChange={e => setDraftValue(e.target.value)}
-																/>
-																{draftValue && (
+																	{draftValue && (
+																		<button
+																			type='button'
+																			onClick={() => setDraftValue('')}
+																			className='absolute top-3.5 right-3.5 text-muted-foreground hover:text-foreground transition cursor-pointer'
+																		>
+																			<X size={20} />
+																		</button>
+																	)}
+																</div>
+															)}
+
+															<div className='flex gap-3 text-sm'>
+																{!editing ? (
 																	<button
-																		type='button'
-																		onClick={() => setDraftValue('')}
-																		className='absolute top-3.5 right-3.5 text-muted-foreground hover:text-foreground transition cursor-pointer'
+																		onClick={() => {
+																			if (isImageKey(item.key)) {
+																				openImageModal(item.key, item.value)
+																			} else {
+																				setEditingKey(item.key)
+																				setDraftValue(item.value)
+																			}
+																		}}
+																		data-action='true'
 																	>
-																		<X size={20} />
+																		Edit
+																	</button>
+																) : (
+																	<button
+																		onClick={() => {
+																			save(item.key, draftValue)
+																			setEditingKey(null)
+																			setDraftValue('')
+																		}}
+																		data-action='true'
+																	>
+																		{loading ? 'Saving...' : 'Save'}
 																	</button>
 																)}
-															</div>
-														)}
 
-														<div className='flex gap-3 text-sm'>
-															{!editing ? (
 																<button
 																	onClick={() => {
-																		if (isImageKey(item.key)) {
-																			openImageModal(item.key, item.value)
-																		} else {
-																			setEditingKey(item.key)
-																			setDraftValue(item.value)
-																		}
-																	}}
-																	data-action='true'
-																>
-																	Edit
-																</button>
-															) : (
-																<button
-																	onClick={() => {
-																		save(item.key, draftValue)
+																		reset(item.key)
 																		setEditingKey(null)
 																		setDraftValue('')
 																	}}
 																	data-action='true'
+																	className='text-gray-400'
 																>
-																	{loading ? 'Saving...' : 'Save'}
+																	Reset
 																</button>
-															)}
-
-															<button
-																onClick={() => {
-																	reset(item.key)
-																	setEditingKey(null)
-																	setDraftValue('')
-																}}
-																data-action='true'
-																className='text-gray-400'
-															>
-																Reset
-															</button>
+															</div>
 														</div>
-													</div>
-												)
-											})}
-										</div>
-									</AccordionContent>
-								</AccordionItem>
-							))}
-						</Accordion>
+													)
+												})}
+											</div>
+										</AccordionContent>
+									</AccordionItem>
+								))}
+							</Accordion>
+						)}
 					</div>
 				)}
 

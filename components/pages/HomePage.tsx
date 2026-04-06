@@ -49,12 +49,21 @@ export default function Home({ content }: Props) {
 
 	useEffect(() => {
 		const handler = (e: MessageEvent) => {
-			if (e.data?.type === 'scroll-to') {
-				const el = document.getElementById(e.data.id)
-				if (el) {
-					el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-				}
-			}
+			if (e.data?.type !== 'scroll-to') return
+
+			const id = e.data.id
+			if (!id) return
+
+			const el = document.getElementById(id)
+			if (!el) return
+
+			const yOffset = -80
+			const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset
+
+			window.scrollTo({
+				top: y,
+				behavior: 'smooth',
+			})
 		}
 
 		window.addEventListener('message', handler)
