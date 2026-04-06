@@ -580,7 +580,7 @@ export default function AdminPage() {
 										>
 											{section}
 										</AccordionTrigger>
-										<AccordionContent className='pt-4 space-y-4 overflow-hidden'>
+										<AccordionContent className='py-4 space-y-4 overflow-hidden'>
 											<div key={section} className='space-y-3'>
 												{keys.map(key => {
 													const item = data.find(
@@ -605,7 +605,7 @@ export default function AdminPage() {
 																	{item.value && (
 																		<img
 																			src={item.value}
-																			className='rounded-lg border max-h-40 object-contain cursor-pointer'
+																			className='rounded-lg border h-40 object-contain cursor-pointer'
 																			onClick={() =>
 																				openPreviewModal(item.key, item.value)
 																			}
