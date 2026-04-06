@@ -566,10 +566,6 @@ export default function AdminPage() {
 								type='single'
 								defaultValue='hero'
 								collapsible
-								onValueChange={val => {
-									if (!val) return
-									setActiveSection(val)
-								}}
 								className='w-full space-y-2'
 							>
 								{Object.entries(sections).map(([section, keys]) => (
