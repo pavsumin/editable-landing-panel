@@ -546,8 +546,15 @@ export default function AdminPage() {
 						{data.length > 0 && (
 							<Accordion
 								type='single'
-								defaultValue='hero'
 								collapsible
+								value={activeSection}
+								onValueChange={val => {
+									if (!val) {
+										setActiveSection('')
+										return
+									}
+									setActiveSection(val)
+								}}
 								className='w-full space-y-2'
 							>
 								{Object.entries(sections).map(([section, keys]) => (
