@@ -11,8 +11,4 @@ const nextConfig: NextConfig = {
 	},
 }
 
-module.exports = {
-	allowedDevOrigins: ['172.16.0.83'],
-}
-
 export default nextConfig
