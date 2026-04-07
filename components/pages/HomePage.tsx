@@ -170,7 +170,7 @@ export default function Home({ content }: Props) {
 
 					{/* DEMO WRAPPER */}
 					<div className='border rounded-2xl overflow-hidden bg-card'>
-						<div className='h-[700px] overflow-y-auto'>
+						<div className='h-180'>
 							<DemoPage />
 						</div>
 					</div>

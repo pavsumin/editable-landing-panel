@@ -181,7 +181,7 @@ export default function DemoPage() {
 										<div className='space-y-3'>
 											<img
 												src={value}
-												className='rounded-lg border h-40 object-contain cursor-pointer'
+												className='rounded-lg border h-20 object-contain cursor-pointer'
 												onClick={() => openPreviewModal(value)}
 											/>
 										</div>
