@@ -14,6 +14,7 @@ import {
 	Zap,
 } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { ReactNode, useEffect, useState } from 'react'
 import { FaGithub } from 'react-icons/fa'
 
@@ -78,7 +79,7 @@ export default function Home({ content }: Props) {
 			{/* HEADER */}
 			<header className='sticky top-0 z-50 border-b border-border/40 backdrop-blur-sm bg-background/95'>
 				<div className='max-w-6xl mx-auto px-6 py-4 flex items-center justify-between'>
-					<div className='flex items-center gap-2'>
+					<Link className='flex items-center gap-2' href='/'>
 						<div className='flex items-center justify-center'>
 							<Image
 								width={32}
@@ -96,7 +97,7 @@ export default function Home({ content }: Props) {
 							/>
 						</div>
 						<span className='font-bold text-xl'>Edit.</span>
-					</div>
+					</Link>
 
 					<button
 						onClick={() => setIsDark(prev => !prev)}
