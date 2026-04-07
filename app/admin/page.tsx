@@ -621,7 +621,7 @@ export default function AdminPage() {
 																	<textarea
 																		ref={textareaRef}
 																		autoFocus
-																		className='block max-w-full w-full min-w-0 resize-none border p-3 pr-10 rounded-[8px] whitespace-pre-wrap break-words text-[16px]'
+																		className='block max-w-full w-full min-w-0 resize-none border p-3 pr-10 rounded-[8px] whitespace-pre-wrap break-words text-[16px]  focus:ring-2 focus:ring-blue-300 outline-none'
 																		value={draftValue}
 																		onChange={e =>
 																			setDraftValue(e.target.value)

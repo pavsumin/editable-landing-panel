@@ -199,7 +199,7 @@ export default function DemoPage() {
 										<div className='relative'>
 											<textarea
 												ref={textareaRef}
-												className='w-full border p-3 pr-10 rounded text-[16px]'
+												className='w-full border p-3 pr-10 rounded text-[16px] resize-none focus:ring-2 focus:ring-blue-300 outline-none'
 												value={draftValue}
 												onChange={e => setDraftValue(e.target.value)}
 											/>
