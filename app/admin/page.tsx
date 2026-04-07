@@ -630,7 +630,12 @@ export default function AdminPage() {
 																	{draftValue && (
 																		<button
 																			type='button'
-																			onClick={() => setDraftValue('')}
+																			onClick={() => {
+																				setDraftValue('')
+																				requestAnimationFrame(() => {
+																					textareaRef.current?.focus()
+																				})
+																			}}
 																			className='absolute top-3.5 right-3.5 text-muted-foreground hover:text-foreground active:scale-95 cursor-pointer transition duration-200'
 																		>
 																			<X size={20} />
