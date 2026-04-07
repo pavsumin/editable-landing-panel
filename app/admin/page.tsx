@@ -574,7 +574,7 @@ export default function AdminPage() {
 										>
 											{section}
 										</AccordionTrigger>
-										<AccordionContent className='py-4 space-y-4 overflow-hidden'>
+										<AccordionContent className='py-4 space-y-4 overflow-y-auto'>
 											<div key={section} className='space-y-3'>
 												{keys.map(key => {
 													const item = data.find(
