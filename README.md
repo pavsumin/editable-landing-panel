@@ -1,5 +1,7 @@
 # Editable Landing Panel
 
+![Banner](/og-image.png)
+
 Add a simple admin panel to your Next.js website – without CMS complexity.
 
 Let clients update content. Keep your code clean.
