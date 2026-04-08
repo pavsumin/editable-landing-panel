@@ -4,7 +4,7 @@ Add a simple admin panel to your Next.js website – without CMS complexity.
 
 Let clients update content. Keep your code clean.
 
-[Get Started](https://github.com/pavsumin/editable-landing-panel/edit/main/README.md#installation)
+[Get Started](https://github.com/pavsumin/editable-landing-panel?tab=readme-ov-file#installation)
 
 ## Overview
 
