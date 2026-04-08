@@ -8,11 +8,14 @@ import {
 	ArrowRight,
 	Check,
 	ChevronRight,
+	Code2,
 	Database,
 	FileCode,
+	FileJson,
 	Folder,
 	Globe,
 	Moon,
+	Settings2,
 	ShieldCheck,
 	Sun,
 	Zap,
@@ -175,14 +178,43 @@ export default function DocsPage({ content }: Props) {
 								<li>Website always shows the latest version</li>
 							</ul>
 
-							<p className='text-sm text-muted-foreground'>
-								Flow: Code → Default content → Supabase → Admin panel → Website
-							</p>
+							<div className='py-4'>
+								<div className='flex flex-wrap items-center gap-y-4 gap-x-2 text-[11px] font-bold uppercase tracking-wider text-zinc-400'>
+									<div className='flex items-center gap-1.5 bg-muted/30 px-2 py-1 rounded-md border'>
+										<Code2 size={14} /> Code
+									</div>
+									<ChevronRight size={14} className='text-zinc-300' />
 
-							<p>
-								If there is no value in Supabase, the website uses{' '}
-								<code>defaultContent</code>.
-							</p>
+									<div className='flex items-center gap-1.5 bg-muted/30 px-2 py-1 rounded-md border'>
+										<FileJson size={14} /> Default content
+									</div>
+									<ChevronRight size={14} className='text-zinc-300' />
+
+									<div className='flex items-center gap-1.5 bg-muted/30 px-2 py-1 rounded-md border text-primary'>
+										<Settings2 size={14} /> Admin
+									</div>
+									<ChevronRight size={14} className='text-zinc-300' />
+
+									<div className='flex items-center gap-1.5 bg-muted/30 px-2 py-1 rounded-md border'>
+										<Database size={14} /> Supabase
+									</div>
+									<ChevronRight size={14} className='text-zinc-300' />
+
+									<div className='flex items-center gap-1.5 bg-primary/08 text-primary px-2 py-1 rounded-md border border-primary/20'>
+										<Globe size={14} /> Website
+									</div>
+								</div>
+							</div>
+
+							<div className='flex items-start gap-3 bg-muted/20 p-4 rounded-xl border border-border/50 text-sm'>
+								<ShieldCheck className='h-5 w-5 text-emerald-500 shrink-0 mt-0.5' />
+								<p>
+									<strong>Zero-downtime fallback:</strong> If a value is missing
+									in Supabase or the database is unreachable, the website
+									instantly uses <code>defaultContent</code> from your local
+									code.
+								</p>
+							</div>
 						</div>
 
 						<div
@@ -432,7 +464,7 @@ export default function DocsPage({ content }: Props) {
 							<p>Click &quot;New project&quot; and fill in the details:</p>
 							<div className='grid gap-3 sm:grid-cols-3'>
 								{[
-									{ label: 'Name', val: 'landing-admin' },
+									{ label: 'Name', val: 'Name of your project' },
 									{ label: 'Password', val: 'Strong pwd' },
 									{ label: 'Region', val: 'Closest to you' },
 								].map(item => (
