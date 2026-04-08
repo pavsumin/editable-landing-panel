@@ -1,3 +1,4 @@
+import GoogleAnalytics from '@/components/GoogleAnalytics'
 import { Toaster } from '@/components/ui/toaster'
 import { Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
@@ -101,6 +102,7 @@ export default function RootLayout({
 					`}
 				</Script>
 			</body>
+			<GoogleAnalytics gaId='G-QCMRWD72RP' />
 		</html>
 	)
 }
