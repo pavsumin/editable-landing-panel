@@ -1,5 +1,5 @@
-import GoogleAnalytics from '@/components/GoogleAnalytics'
 import { Toaster } from '@/components/ui/toaster'
+import { GoogleAnalytics } from '@next/third-parties/google'
 import { Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import Script from 'next/script'
