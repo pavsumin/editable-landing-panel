@@ -830,9 +830,13 @@ ADMIN_PASSWORD=your_password`}
 								Step 1. Move page
 							</h3>
 							<p>Move your current page content to a new component:</p>
-							<div className='flex items-center gap-3 p-3 rounded-lg border bg-muted/20 text-sm font-mono w-fit'>
+							<div className='flex flex-wrap items-center gap-2 p-3 rounded-xl border bg-muted/20 text-sm font-mono w-full'>
 								<span className='text-zinc-400'>app/page.tsx</span>
-								<ChevronRight size={14} className='text-zinc-300' />
+
+								<div className='flex items-center gap-2 text-zinc-300'>
+									<ArrowRight size={14} />
+								</div>
+
 								<span className='text-foreground font-medium'>
 									components/pages/HomePage.tsx
 								</span>
@@ -933,15 +937,17 @@ export default function Home({ content }: Props) {
 }`}
 							/>
 
-							<p className='text-sm flex items-start gap-2 bg-blue-500/5 border border-blue-500/10 p-4 rounded-lg text-blue-400/90 dark:text-blue-300/80'>
+							<div className='text-sm flex gap-3 bg-blue-500/5 border border-blue-500/10 p-4 rounded-xl text-blue-400/90 dark:text-blue-300/80'>
 								<Info className='h-5 w-5 shrink-0 mt-0.5' />
-								<span>
-									<strong>Tip:</strong> This template includes a required{' '}
-									<code>useEffect</code> for scroll synchronization. You can
-									also find it in <code>components/pages/TemplatePage.tsx</code>
-									.
-								</span>
-							</p>
+								<div className='min-w-0 flex-1'>
+									<p className='leading-relaxed break-words'>
+										<strong>Tip:</strong> This template includes a required{' '}
+										<code>useEffect</code> for scroll synchronization. You can
+										also find it in{' '}
+										<code>components/pages/TemplatePage.tsx</code>.
+									</p>
+								</div>
+							</div>
 						</div>
 
 						<div
@@ -952,9 +958,13 @@ export default function Home({ content }: Props) {
 								Multi-page websites
 							</h3>
 							<p>Repeat this pattern for any additional pages:</p>
-							<div className='flex items-center gap-3 p-3 rounded-lg border bg-muted/20 text-sm font-mono w-fit'>
+							<div className='flex flex-wrap items-center gap-2 p-3 rounded-xl border bg-muted/20 text-sm font-mono w-full'>
 								<span className='text-zinc-400'>app/about/page.tsx</span>
-								<ChevronRight size={14} className='text-zinc-300' />
+
+								<div className='flex items-center gap-2 text-zinc-300'>
+									<ArrowRight size={14} />
+								</div>
+
 								<span className='text-foreground font-medium'>
 									components/pages/AboutPage.tsx
 								</span>
@@ -1291,7 +1301,7 @@ docs_title: "..."`}
 								Important
 							</h3>
 
-							<div className='flex items-start gap-3 bg-blue-500/5 border border-blue-500/10 p-5 rounded-xl text-blue-600/90 dark:text-blue-400/80 text-sm'>
+							<div className='flex items-start gap-3 bg-blue-500/5 border border-blue-500/10 p-5 rounded-xl text-blue-400/90 dark:text-blue-300/80 text-sm'>
 								<Info className='h-5 w-5 shrink-0 mt-0.5' />
 								<p className='whitespace-pre-wrap leading-relaxed'>
 									You do not need to write this from scratch. {'\n'}
@@ -1416,15 +1426,15 @@ docs_title: "..."`}
 
 							<ul className='space-y-3 text-sm'>
 								<li className='flex items-start gap-2.5'>
-									<X className='h-4 w-4 mt-0.5 text-red-300' />
+									<X className='h-4 w-4 mt-0.5 text-red-400' />
 									<span>Text was not replaced with keys</span>
 								</li>
 								<li className='flex items-start gap-2.5'>
-									<X className='h-4 w-4 mt-0.5 text-red-300' />
+									<X className='h-4 w-4 mt-0.5 text-red-400' />
 									<span>Missing environment variables</span>
 								</li>
 								<li className='flex items-start gap-2.5'>
-									<X className='h-4 w-4 mt-0.5 text-red-300' />
+									<X className='h-4 w-4 mt-0.5 text-red-400' />
 									<span>Supabase is not configured</span>
 								</li>
 							</ul>
