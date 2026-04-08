@@ -966,100 +966,119 @@ export default function Home({ content }: Props) {
 
 						<div
 							id='replace-text'
-							className='space-y-6 max-w-2xl sm:max-w-3xl leading-relaxed text-muted-foreground'
+							className='space-y-6 max-w-3xl leading-relaxed text-muted-foreground'
 						>
 							<h3 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground'>
 								Replace text
 							</h3>
-
 							<p>Replace static text with content keys.</p>
 
-							<p>Example:</p>
+							<div className='space-y-4'>
+								<p className='text-sm font-medium'>Example:</p>
+								<div className='rounded-xl border bg-muted/20 px-4 py-3 text-sm text-zinc-400 font-mono'>
+									&lt;h1&gt;Welcome&lt;/h1&gt;
+								</div>
 
-							<pre className='bg-muted/40 border rounded-lg p-5 text-sm overflow-x-auto leading-relaxed text-primary/80'>
-								{`<h1>Welcome</h1>`}
-							</pre>
-
-							<p>Becomes:</p>
-
-							<pre className='bg-muted/40 border rounded-lg p-5 text-sm overflow-x-auto leading-relaxed text-primary/80'>
-								{`<h1>{c.hero_title}</h1>`}
-							</pre>
+								<p className='text-sm font-medium'>Becomes:</p>
+								<CodeBlock code={`<h1>{c.hero_title}</h1>`} />
+							</div>
 						</div>
 
 						<div
 							id='default-content'
-							className='space-y-6 max-w-2xl sm:max-w-3xl leading-relaxed text-muted-foreground'
+							className='space-y-6 max-w-3xl leading-relaxed text-muted-foreground'
 						>
 							<h3 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground'>
 								Add to defaultContent
 							</h3>
-
 							<p>
-								Add the key to <code>defaultContent</code>:
+								Add the key to{' '}
+								<code className='text-foreground'>defaultContent</code>:
 							</p>
 
-							<pre className='bg-muted/40 border rounded-lg p-5 text-sm overflow-x-auto leading-relaxed text-primary/80'>
-								{`hero_title: "Welcome"`}
-							</pre>
+							<CodeExample codeKey='hero_title' codeValue='Welcome' />
 
-							<p>
-								<strong>Important:</strong> <code>defaultContent</code> is your
-								foundation.
-							</p>
+							<div className='space-y-4'>
+								<p>
+									<strong>Important:</strong> <code>defaultContent</code> is
+									your foundation.
+								</p>
+								<p>
+									It is not just a fallback — it defines your entire content
+									structure.
+								</p>
 
-							<p>
-								It is not just a fallback — it defines your entire content
-								structure.
-							</p>
+								<ul className='space-y-3 text-sm'>
+									<li className='flex items-start gap-2.5'>
+										<Check className='h-4 w-4 mt-0.5 text-emerald-500' />
+										<span>All keys must exist here</span>
+									</li>
+									<li className='flex items-start gap-2.5'>
+										<Check className='h-4 w-4 mt-0.5 text-emerald-500' />
+										<span>Admin panel reads structure from here</span>
+									</li>
+									<li className='flex items-start gap-2.5'>
+										<Check className='h-4 w-4 mt-0.5 text-emerald-500' />
+										<span>Website uses it when Supabase is empty</span>
+									</li>
+								</ul>
 
-							<ul className='list-disc pl-6 space-y-2 text-muted-foreground'>
-								<li>All keys must exist here</li>
-								<li>Admin panel reads structure from here</li>
-								<li>Website uses it when Supabase is empty</li>
-							</ul>
-
-							<p>If a key is missing here, it will not work anywhere.</p>
+								<p className='text-sm flex items-start gap-2 bg-amber-500/5 border border-amber-500/10 p-4 rounded-lg text-amber-600/90 dark:text-amber-400/80'>
+									<AlertCircle className='h-5 w-5 shrink-0 mt-0.5' />
+									<span>
+										If a key is missing here, it will not work anywhere.
+									</span>
+								</p>
+							</div>
 						</div>
 
 						<div
 							id='important-content'
-							className='space-y-6 max-w-2xl sm:max-w-3xl leading-relaxed text-muted-foreground'
+							className='space-y-6 max-w-3xl leading-relaxed text-muted-foreground'
 						>
 							<h3 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground'>
 								Important
 							</h3>
-
 							<p>If text is not replaced with a key:</p>
-
-							<p>
+							<div className='p-4 rounded-lg border border-dashed text-sm'>
 								It will <strong>not</strong> appear in the admin panel.
-							</p>
+							</div>
 						</div>
 
 						<div
 							id='images-content'
-							className='space-y-6 max-w-2xl sm:max-w-3xl leading-relaxed text-muted-foreground'
+							className='space-y-6 max-w-3xl leading-relaxed text-muted-foreground'
 						>
 							<h3 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground'>
 								Images
 							</h3>
-
 							<p>Use the same logic:</p>
 
-							<pre className='bg-muted/40 border rounded-lg p-5 text-sm overflow-x-auto leading-relaxed text-primary/80'>
-								{`hero_image: "/image.png"`}
-							</pre>
+							<CodeExample codeKey='hero_image' codeValue='/image.png' />
 
-							<p>
-								<strong>Important:</strong> Images uploaded via the admin panel:
-							</p>
+							<p>And then in your component:</p>
+							<CodeBlock code={`<img src={c.hero_image} alt="Hero" />`} />
 
-							<ul className='list-disc pl-6 space-y-2 text-muted-foreground'>
-								<li>Are compressed</li>
-								<li>Converted to WebP</li>
-								<li>Optimized automatically</li>
-							</ul>
+							<div className='space-y-4 mt-6'>
+								<p>
+									<strong>Important:</strong> Images uploaded via the admin
+									panel:
+								</p>
+								<ul className='space-y-3 text-sm'>
+									<li className='flex items-start gap-2.5'>
+										<Zap className='h-4 w-4 mt-0.5 text-amber-500' />
+										<span>Are compressed</span>
+									</li>
+									<li className='flex items-start gap-2.5'>
+										<Zap className='h-4 w-4 mt-0.5 text-amber-500' />
+										<span>Converted to WebP</span>
+									</li>
+									<li className='flex items-start gap-2.5'>
+										<Zap className='h-4 w-4 mt-0.5 text-amber-500' />
+										<span>Optimized automatically</span>
+									</li>
+								</ul>
+							</div>
 						</div>
 					</section>
 
@@ -1071,19 +1090,27 @@ export default function Home({ content }: Props) {
 
 						<div
 							id='multi-page-prefixes'
-							className='space-y-6 max-w-2xl sm:max-w-3xl leading-relaxed text-muted-foreground'
+							className='space-y-6 max-w-3xl leading-relaxed text-muted-foreground'
 						>
-							<h3 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground'>
+							<h3 className='text-xl font-semibold tracking-tight text-foreground flex items-center gap-2'>
 								Multi-page setup
 							</h3>
 
-							<p>Use prefixes for keys:</p>
+							<p>
+								Since all keys are stored in a single table, use{' '}
+								<strong>prefixes</strong> to organize content for different
+								pages:
+							</p>
 
-							<pre className='bg-muted/40 border rounded-lg p-5 text-sm overflow-x-auto leading-relaxed text-primary/80'>
-								{`home_
-about_
-docs_`}
-							</pre>
+							<CodeBlock
+								code={`home_title: "..."
+about_title: "..."
+docs_title: "..."`}
+							/>
+
+							<p className='text-sm italic'>
+								This keeps your keys unique and easy to find in the Admin Panel.
+							</p>
 						</div>
 					</section>
 
@@ -1095,34 +1122,51 @@ docs_`}
 
 						<div
 							id='next-images'
-							className='space-y-6 max-w-2xl sm:max-w-3xl leading-relaxed text-muted-foreground'
+							className='space-y-6 max-w-3xl leading-relaxed text-muted-foreground'
 						>
-							<h3 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground'>
-								Next config
+							<h3 className='text-xl font-semibold tracking-tight text-foreground flex items-center gap-2'>
+								Images configuration
 							</h3>
 
-							<p>You must allow external images.</p>
-
-							<p>Why:</p>
-
-							<p>Images are loaded from Supabase.</p>
-
 							<p>
-								Add this to your <code>next.config.ts</code>:
+								You must allow external images in your project to render content
+								from Supabase storage.
 							</p>
 
-							<pre className='bg-muted/40 border rounded-lg p-5 text-sm overflow-x-auto leading-relaxed text-primary/80'>
-								{`images: {
-  remotePatterns: [
-    {
-      protocol: 'https',
-      hostname: '**.supabase.co',
-    },
-  ],
-},`}
-							</pre>
+							<div className='flex items-center gap-2.5 p-3 rounded-xl border bg-muted/20 w-full sm:w-fit'>
+								<FileCode className='h-4 w-4 text-blue-400/80' />
+								<code className='text-sm font-medium text-foreground'>
+									next.config.ts
+								</code>
+							</div>
+
+							<p>
+								Add the <code className='text-foreground'>remotePatterns</code>{' '}
+								to your config file:
+							</p>
+
+							<CodeBlock
+								code={`images: {
+									remotePatterns: [
+										{
+											protocol: 'https',
+											hostname: '**.supabase.co',
+										},
+									],
+								},`}
+							/>
+
+							<div className='flex items-start gap-3 bg-blue-500/5 border border-blue-500/10 p-4 rounded-xl text-blue-400/90 dark:text-blue-300/80 text-sm'>
+								<Info className='h-5 w-5 shrink-0 mt-0.5' />
+								<p>
+									<strong>Why this is required:</strong> Next.js blocks external
+									images by default for security. This configuration allows your
+									app to safely load optimized images from your Supabase bucket.
+								</p>
+							</div>
 						</div>
 					</section>
+
 					{/* 9. ADMIN CONFIGURATION */}
 					<section id='admin-configuration' className='space-y-16 scroll-mt-24'>
 						<h2 className='text-3xl sm:text-4xl font-semibold tracking-tight text-foreground'>
