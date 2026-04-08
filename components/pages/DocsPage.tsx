@@ -3,7 +3,20 @@
 import { CodeBlockCommand } from '@/components/code-block-command/code-block-command'
 
 import { ContentKey } from '@/lib/defaultContent'
-import { Database, Moon, ShieldCheck, Sun, Zap } from 'lucide-react'
+import {
+	AlertCircle,
+	ArrowRight,
+	Check,
+	ChevronRight,
+	Database,
+	FileCode,
+	Folder,
+	Globe,
+	Moon,
+	ShieldCheck,
+	Sun,
+	Zap,
+} from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -412,57 +425,56 @@ export default function DocsPage({ content }: Props) {
 							<p>Sign in using GitHub or email.</p>
 						</div>
 
-						<div
-							id='create-project'
-							className='space-y-6 max-w-2xl sm:max-w-3xl leading-relaxed text-muted-foreground'
-						>
-							<h3 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground'>
+						<div className='space-y-6 max-w-3xl leading-relaxed text-muted-foreground'>
+							<h3 className='text-xl font-semibold tracking-tight text-foreground flex items-center gap-2'>
 								Step 2. Create project
 							</h3>
+							<p>Click &quot;New project&quot; and fill in the details:</p>
+							<div className='grid gap-3 sm:grid-cols-3'>
+								{[
+									{ label: 'Name', val: 'landing-admin' },
+									{ label: 'Password', val: 'Strong pwd' },
+									{ label: 'Region', val: 'Closest to you' },
+								].map(item => (
+									<div
+										key={item.label}
+										className='p-3 rounded-lg border bg-muted/20'
+									>
+										<p className='text-[10px] uppercase font-bold text-zinc-400'>
+											{item.label}
+										</p>
+										<p className='text-sm text-foreground font-medium'>
+											{item.val}
+										</p>
+									</div>
+								))}
+							</div>
 
-							<p>Click &quot;New project&quot;</p>
-
-							<ul className='list-disc pl-6 space-y-2 text-muted-foreground'>
-								<li>Name → any name (example: landing-admin)</li>
-								<li>Database password → create a strong password (save it)</li>
-								<li>Region → choose the closest to you</li>
-							</ul>
-
-							<p>Click &quot;Create project&quot;</p>
 							<p>Wait 1–2 minutes until the project is ready.</p>
 						</div>
 
-						<div
-							id='create-table'
-							className='space-y-6 max-w-2xl sm:max-w-3xl leading-relaxed text-muted-foreground'
-						>
-							<h3 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground'>
+						<div className='space-y-6 max-w-3xl leading-relaxed text-muted-foreground'>
+							<h3 className='text-xl font-semibold tracking-tight text-foreground flex items-center gap-2'>
 								Step 3. Create table
 							</h3>
-
-							<p>Open Table Editor → New Table</p>
 							<p>
-								Name: <code>content</code>
+								Open <strong>SQL Editor</strong>, paste this code and run it:
 							</p>
 
-							<p>Add columns:</p>
-
-							<ul className='list-disc pl-6 space-y-2 text-muted-foreground'>
-								<li>key → text → PRIMARY KEY</li>
-								<li>value → text</li>
-							</ul>
-
-							<p>
-								<strong>Important:</strong> &quot;key&quot; must be PRIMARY KEY.
-								This ensures every content entry is unique.
-							</p>
-
-							<pre className='bg-muted/40 border rounded-lg p-5 text-sm overflow-x-auto leading-relaxed text-primary/80'>
-								{`create table content (
+							<CodeBlock
+								code={`create table content (
   key text primary key,
   value text
 );`}
-							</pre>
+							/>
+
+							<p className='text-sm flex items-start gap-2 bg-amber-500/5 border border-amber-500/10 p-3 rounded-lg text-amber-600/90 dark:text-amber-400/80'>
+								<AlertCircle className='h-4 w-4 shrink-0 mt-0.5' />
+								<span>
+									The <strong>key</strong> column must be the PRIMARY KEY. This
+									ensures every entry is unique.
+								</span>
+							</p>
 						</div>
 
 						<div
@@ -477,7 +489,9 @@ export default function DocsPage({ content }: Props) {
 							<p>
 								Name: <code>images</code>
 							</p>
-							<p>Make it public</p>
+							<span className='text-sm flex items-center gap-2'>
+								<Globe className='h-3.5 w-3.5' /> Public: Enabled
+							</span>
 
 							<p>This is required to store uploaded images.</p>
 						</div>
@@ -490,11 +504,23 @@ export default function DocsPage({ content }: Props) {
 								Step 5. Get API keys
 							</h3>
 
-							<p>Go to Settings → API</p>
+							<p>
+								Go to{' '}
+								<strong className='inline-flex items-center gap-1 text-muted-foreground'>
+									Settings <ArrowRight size={18} /> API
+								</strong>{' '}
+								and copy these values:
+							</p>
 
-							<ul className='list-disc pl-6 space-y-2 text-muted-foreground'>
-								<li>Project URL</li>
-								<li>anon public key</li>
+							<ul className='space-y-2 text-md text-foreground'>
+								<li className='flex items-center gap-2'>
+									<div className='h-1.5 w-1.5 rounded-full bg-blue-400' />{' '}
+									Project URL
+								</li>
+								<li className='flex items-center gap-2'>
+									<div className='h-1.5 w-1.5 rounded-full bg-blue-400' /> anon
+									public key
+								</li>
 							</ul>
 
 							<p>You will need them in the next step.</p>
@@ -509,110 +535,105 @@ export default function DocsPage({ content }: Props) {
 
 						<div
 							id='env-create-file'
-							className='space-y-6 max-w-2xl sm:max-w-3xl leading-relaxed text-muted-foreground'
+							className='space-y-6 max-w-3xl leading-relaxed text-muted-foreground'
 						>
-							<h3 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground'>
+							<h3 className='text-xl font-semibold tracking-tight text-foreground'>
 								Step 1. Create file
 							</h3>
-
 							<p>Create a file in your project root:</p>
-
-							<pre className='bg-muted/40 border rounded-lg p-5 text-sm overflow-x-auto leading-relaxed text-primary/80'>
-								{`.env.local`}
-							</pre>
+							<CodeBlock code={`.env.local`} />
 						</div>
 
 						<div
 							id='env-add-variables'
-							className='space-y-6 max-w-2xl sm:max-w-3xl leading-relaxed text-muted-foreground'
+							className='space-y-6 max-w-3xl leading-relaxed text-muted-foreground'
 						>
-							<h3 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground'>
+							<h3 className='text-xl font-semibold tracking-tight text-foreground'>
 								Step 2. Add variables
 							</h3>
-
-							<p>Paste the following:</p>
-
-							<pre className='bg-muted/40 border rounded-lg p-5 text-sm overflow-x-auto leading-relaxed text-primary/80'>
-								{`NEXT_PUBLIC_SUPABASE_URL=your_url
+							<p>Paste the following keys from Supabase settings:</p>
+							<CodeBlock
+								code={`NEXT_PUBLIC_SUPABASE_URL=your_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key
 SUPABASE_SERVICE_ROLE_KEY=your_key
 ADMIN_PASSWORD=your_password`}
-							</pre>
+							/>
 						</div>
 
 						<div
 							id='admin-password'
-							className='space-y-6 max-w-2xl sm:max-w-3xl leading-relaxed text-muted-foreground'
+							className='space-y-6 max-w-3xl leading-relaxed text-muted-foreground'
 						>
-							<h3 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground'>
+							<h3 className='text-xl font-semibold tracking-tight text-foreground'>
 								What is ADMIN_PASSWORD
 							</h3>
-
 							<p>
 								This is the password used to access the <code>/admin</code>{' '}
 								page.
 							</p>
-
 							<p>
-								When someone opens the admin panel, they must enter this
-								password.
+								It acts as a simple gatekeeper: without it, the admin panel is
+								inaccessible. Use a strong password to keep your content safe.
 							</p>
-
-							<p>Without it, access is denied.</p>
-
-							<p>Use a strong password.</p>
 						</div>
 
 						<div
 							id='env-hosting'
-							className='space-y-6 max-w-2xl sm:max-w-3xl leading-relaxed text-muted-foreground'
+							className='space-y-6 max-w-3xl leading-relaxed text-muted-foreground'
 						>
-							<h3 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground'>
+							<h3 className='text-xl font-semibold tracking-tight text-foreground'>
 								Add to hosting
 							</h3>
-
 							<p>
-								If you deploy your project, you must also add these variables to
-								your hosting platform.
+								When deploying, you must add these variables to your platform
+								settings.
 							</p>
 
-							<div className='space-y-3'>
-								<div>
-									<p className='font-medium'>Vercel:</p>
-									<ul className='list-disc pl-6 space-y-2 text-muted-foreground'>
-										<li>Go to Project → Settings → Environment Variables</li>
-										<li>Add all variables</li>
-									</ul>
+							<div className='space-y-4 pt-2'>
+								<div className='flex flex-col gap-1'>
+									<p className='font-medium text-foreground'>Vercel:</p>
+									<p className='flex items-center gap-1.5 text-sm'>
+										Project <ChevronRight size={14} className='text-zinc-400' />
+										Settings{' '}
+										<ChevronRight size={14} className='text-zinc-400' />
+										Environment Variables
+									</p>
 								</div>
 
-								<div>
-									<p className='font-medium'>Netlify:</p>
-									<ul className='list-disc pl-6 space-y-2 text-muted-foreground'>
-										<li>Go to Site settings → Environment variables</li>
-										<li>Add all variables</li>
-									</ul>
+								<div className='flex flex-col gap-1'>
+									<p className='font-medium text-foreground'>Netlify:</p>
+									<p className='flex items-center gap-1.5 text-sm'>
+										Site settings{' '}
+										<ChevronRight size={14} className='text-zinc-400' />
+										Environment variables
+									</p>
 								</div>
 							</div>
 
-							<p>
-								<strong>Important:</strong> If you skip this step, the admin
-								panel will not work in production.
-							</p>
+							<div className='flex items-start gap-3 bg-amber-500/5 border border-amber-500/10 p-4 rounded-xl text-amber-600/90 dark:text-amber-400/80 text-sm'>
+								<AlertCircle className='h-5 w-5 shrink-0 mt-0.5' />
+								<p>
+									<strong>Warning:</strong> <br />
+									If you skip this, the admin panel will not work in production.
+									Your website won&apos;t be able to connect to Supabase.
+								</p>
+							</div>
 						</div>
 
 						<div
 							id='env-warning'
-							className='space-y-6 max-w-2xl sm:max-w-3xl leading-relaxed text-muted-foreground'
+							className='space-y-6 max-w-3xl leading-relaxed text-muted-foreground'
 						>
-							<h3 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground'>
-								Important
+							<h3 className='text-xl font-semibold tracking-tight text-foreground'>
+								Security Note
 							</h3>
-
-							<p>You may see warnings about public environment variables.</p>
-
-							<p>This is expected.</p>
-
-							<p>These keys are safe to use on the frontend.</p>
+							<p>
+								You might see warnings about{' '}
+								<code className='mx-1'>NEXT_PUBLIC_</code> variables. This is
+								intentional. These keys are safe for the frontend, while the{' '}
+								<code className='mx-1'>SERVICE_ROLE_KEY</code> is used only on
+								the server to keep your data secure.
+							</p>
 						</div>
 					</section>
 
@@ -624,81 +645,110 @@ ADMIN_PASSWORD=your_password`}
 
 						<div
 							id='download-files'
-							className='space-y-6 max-w-2xl sm:max-w-3xl leading-relaxed text-muted-foreground'
+							className='space-y-6 max-w-3xl leading-relaxed text-muted-foreground'
 						>
-							<h3 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground'>
-								Step 1. Download files
+							<h3 className='text-xl font-semibold tracking-tight text-foreground'>
+								Step 1. Download source
 							</h3>
-
-							<p>Go to the GitHub repository.</p>
-							<p>Click &quot;Code&quot; → Download ZIP.</p>
-							<p>Extract it.</p>
+							<p>
+								Go to the{' '}
+								<Link
+									href='https://github.com/pavsumin/editable-landing-panel'
+									target='_blank'
+									className='text-blue-400 underline-offset-4 hover:underline'
+								>
+									GitHub repository
+								</Link>{' '}
+								and download the project as a ZIP file. Extract it on your
+								computer.
+							</p>
+							<p className='flex items-center gap-1.5 text-sm'>
+								Click <strong className='text-foreground'>Code</strong>
+								<ChevronRight size={14} className='text-zinc-400' />
+								<strong className='text-foreground'>Download ZIP</strong>
+							</p>
 						</div>
 
 						<div
 							id='copy-folders'
-							className='space-y-6 max-w-2xl sm:max-w-3xl leading-relaxed text-muted-foreground'
+							className='space-y-6 max-w-3xl leading-relaxed text-muted-foreground'
 						>
-							<h3 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground'>
+							<h3 className='text-xl font-semibold tracking-tight text-foreground'>
 								Step 2. Copy required folders
 							</h3>
+							<p>Copy these folders into your project root:</p>
 
-							<p>Copy the following into your project:</p>
+							<div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
+								{['app/api', 'lib', 'components/ui'].map(folder => (
+									<div
+										key={folder}
+										className='flex items-center gap-2.5 p-3 rounded-xl border bg-muted/20'
+									>
+										<Folder className='h-4 w-4 text-blue-400/80' />
+										<code className='text-sm font-medium text-foreground'>
+											{folder}
+										</code>
+									</div>
+								))}
+							</div>
 
-							<pre className='bg-muted/40 border rounded-lg p-5 text-sm overflow-x-auto leading-relaxed text-primary/80'>
-								{`app/api/*
-/lib/*
-/components/ui/*`}
-							</pre>
-
-							<p>
-								<strong>Important:</strong> Copy files exactly with the same
-								folder structure.
-							</p>
-
-							<p>
-								Do not rename folders or move files — paths are required for the
-								system to work.
-							</p>
+							<div className='flex items-start gap-3 bg-amber-500/5 border border-amber-500/10 p-4 rounded-xl text-amber-600/90 dark:text-amber-400/80 text-sm'>
+								<AlertCircle className='h-5 w-5 shrink-0 mt-0.5' />
+								<p>
+									<strong>Important:</strong> Maintain the exact folder
+									structure. Do not rename or move files — internal imports rely
+									on these specific paths.
+								</p>
+							</div>
 						</div>
 
 						<div
 							id='copy-admin'
-							className='space-y-6 max-w-2xl sm:max-w-3xl leading-relaxed text-muted-foreground'
+							className='space-y-6 max-w-3xl leading-relaxed text-muted-foreground'
 						>
-							<h3 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground'>
+							<h3 className='text-xl font-semibold tracking-tight text-foreground'>
 								Step 3. Copy admin page
 							</h3>
-
-							<p>Copy the following file:</p>
-
-							<pre className='bg-muted/40 border rounded-lg p-5 text-sm overflow-x-auto leading-relaxed text-primary/80'>
-								{`app/admin/page.tsx`}
-							</pre>
-
 							<p>
-								<strong>Important:</strong> Copy it completely without any
-								changes.
+								Copy the main admin file to your{' '}
+								<code className='text-foreground'>app</code> directory:
 							</p>
+
+							<div className='flex items-center gap-2.5 p-3 rounded-xl border bg-muted/20 w-full sm:w-fit'>
+								<FileCode className='h-4 w-4 text-emerald-400/80' />
+								<code className='text-sm font-medium text-foreground'>
+									app/admin/page.tsx
+								</code>
+							</div>
+
+							<p>Copy this file completely without any modifications.</p>
 						</div>
 
 						<div
 							id='install-result'
-							className='space-y-6 max-w-2xl sm:max-w-3xl leading-relaxed text-muted-foreground'
+							className='space-y-6 max-w-3xl leading-relaxed text-muted-foreground'
 						>
-							<h3 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground'>
+							<h3 className='text-xl font-semibold tracking-tight text-foreground'>
 								Result check
 							</h3>
-
-							<p>At this point, you should have:</p>
-
-							<ul className='list-disc pl-6 space-y-2 text-muted-foreground'>
-								<li>api folder</li>
-								<li>lib folder</li>
-								<li>ui components</li>
-								<li>admin page</li>
-								<li>env file</li>
-							</ul>
+							<p>Your project structure should now include:</p>
+							<div className='grid grid-cols-2 sm:grid-cols-3 gap-y-3 text-sm'>
+								{[
+									{ label: 'API folder', icon: Check },
+									{ label: 'Lib folder', icon: Check },
+									{ label: 'UI components', icon: Check },
+									{ label: 'Admin page', icon: Check },
+									{ label: 'Env file', icon: Check },
+								].map((item, i) => (
+									<div
+										key={i}
+										className='flex items-center gap-2 text-foreground/80'
+									>
+										<item.icon className='h-3.5 w-3.5 text-emerald-500' />
+										{item.label}
+									</div>
+								))}
+							</div>
 							<p>If something is missing, go back and check the steps.</p>
 						</div>
 					</section>
@@ -1289,15 +1339,22 @@ Problem → problem texts`}
 interface CodeBlockProps {
 	code: string
 }
-
 function CodeBlock({ code }: CodeBlockProps) {
 	return (
-		<div className='group relative flex items-center justify-between rounded-lg bg-background px-4 py-2.5 border mb-3 transition-all'>
-			<code className='whitespace-pre-wrap font-mono text-sm text-primary flex items-center overflow-hidden'>
-				<span className='truncate'>{code}</span>
-			</code>
+		<div className='group relative flex items-start justify-between rounded-lg bg-muted/20 border mb-3 transition-all'>
+			<pre className='p-4 overflow-x-auto w-full scrollbar-hide'>
+				<code className='font-mono text-sm text-foreground block leading-relaxed'>
+					{code}
+				</code>
+			</pre>
 
-			<CopyButton text={code} variant='ghost' className='cursor-pointer' />
+			<div className='pr-2 pt-2.5 shrink-0'>
+				<CopyButton
+					text={code}
+					variant='ghost'
+					className='h-8 w-8 hover:bg-muted/50 transition-colors cursor-pointer'
+				/>
+			</div>
 		</div>
 	)
 }
@@ -1313,7 +1370,7 @@ function CodeExample({
 
 	return (
 		<div className='w-full max-w-3xl group'>
-			<div className='relative flex items-center rounded-t-xl border border-border bg-muted/30 dark:bg-zinc-900/50'>
+			<div className='relative flex items-center rounded-t-lg border border-border bg-muted/30 dark:bg-zinc-900/50'>
 				<div className='grid grid-cols-[140px_1fr] w-full items-center px-4 py-3 font-mono text-sm leading-none'>
 					<span className='text-foreground font-medium'>{codeKey}:</span>
 					<span className='text-muted-foreground truncate ml-2'>
@@ -1330,7 +1387,7 @@ function CodeExample({
 				</div>
 			</div>
 
-			<div className='grid grid-cols-[140px_1fr] px-4 py-2 border-x border-b border-border rounded-b-xl bg-muted/10'>
+			<div className='grid grid-cols-[140px_1fr] px-4 py-2 border-x border-b border-border rounded-b-lg bg-muted/10'>
 				<div className='text-[10px] uppercase tracking-wider font-bold text-muted-foreground/60'>
 					Key
 				</div>
