@@ -95,14 +95,9 @@ export default function DocsPage({ content }: Props) {
 				<div className='space-y-24'>
 					{/* 0. START */}
 					<section id='start' className='space-y-16 scroll-mt-24'>
-						<h2 className='text-3xl sm:text-4xl font-semibold tracking-tight text-foreground'>
-							Documentation
-						</h2>
-
-						<p>
-							Important: You still keep full control over your layout, design,
-							and logic. Only the content becomes editable.
-						</p>
+						<h1 className='text-3xl sm:text-4xl font-bold tracking-tight text-foreground'>
+							Next.js Admin Panel Documentation
+						</h1>
 
 						<div
 							id='what-is-this'

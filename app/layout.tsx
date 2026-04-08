@@ -1,5 +1,4 @@
 import { Toaster } from '@/components/ui/toaster'
-import type { Metadata } from 'next'
 import { Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import Script from 'next/script'
@@ -19,9 +18,46 @@ export const viewport: Viewport = {
 	themeColor: 'var(--primary)',
 }
 
-export const metadata: Metadata = {
-	title: 'Editable Landing Panel',
-	description: 'You can edit text on your website without khowing code',
+export const metadata = {
+	title: 'Next.js Admin Panel — Edit Website Content Without CMS',
+	description:
+		'Add an admin panel to your Next.js website. Edit content without CMS, without redeploy, powered by Supabase.',
+
+	keywords: [
+		'Next.js admin panel',
+		'Next.js CMS alternative',
+		'edit website content without CMS',
+		'Supabase admin panel',
+		'Next.js content editor',
+		'headless CMS alternative',
+	],
+
+	openGraph: {
+		title: 'Next.js Admin Panel (No CMS)',
+		description:
+			'Edit your website content without touching code. Simple, fast, and powerful.',
+		url: 'https://editable-landing-panel.vercel.app',
+		siteName: 'Edit',
+		images: [
+			{
+				url: '/og-image.png',
+				width: 1200,
+				height: 630,
+			},
+		],
+		type: 'website',
+	},
+
+	twitter: {
+		card: 'summary_large_image',
+		title: 'Next.js Admin Panel (No CMS)',
+		description: 'Edit your website content without CMS or rebuild.',
+		images: ['/og-image.png'],
+	},
+
+	verification: {
+		google: 'mI5lddiADnTbuP5o3zx-l-tE0oC3YawlPp-RaIa4Oik',
+	},
 }
 
 export default function RootLayout({
@@ -31,6 +67,28 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang='en' className='h-full antialiased' suppressHydrationWarning>
+			<head>
+				<Script
+					id='schema'
+					type='application/ld+json'
+					strategy='afterInteractive'
+					dangerouslySetInnerHTML={{
+						__html: JSON.stringify({
+							'@context': 'https://schema.org',
+							'@type': 'SoftwareApplication',
+							name: 'Next.js Admin Panel',
+							description:
+								'Edit website content without CMS using Next.js and Supabase.',
+							applicationCategory: 'DeveloperTool',
+							operatingSystem: 'Web',
+						}),
+					}}
+				/>
+				<meta
+					name='google-site-verification'
+					content='mI5lddiADnTbuP5o3zx-l-tE0oC3YawlPp-RaIa4Oik'
+				/>
+			</head>
 			<body className={`${geistSans.className} min-h-full flex flex-col`}>
 				{children}
 				<Toaster />
