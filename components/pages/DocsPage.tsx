@@ -10,15 +10,22 @@ import {
 	ChevronRight,
 	Code2,
 	Database,
+	Eye,
 	FileCode,
 	FileJson,
 	Folder,
 	Globe,
+	ImagePlus,
 	Info,
 	Moon,
+	PartyPopper,
+	RotateCcw,
+	Save,
 	Settings2,
 	ShieldCheck,
 	Sun,
+	Type,
+	X,
 	Zap,
 } from 'lucide-react'
 import Image from 'next/image'
@@ -1147,13 +1154,13 @@ docs_title: "..."`}
 
 							<CodeBlock
 								code={`images: {
-									remotePatterns: [
-										{
-											protocol: 'https',
-											hostname: '**.supabase.co',
-										},
-									],
-								},`}
+	remotePatterns: [
+		{
+			protocol: 'https',
+			hostname: '**.supabase.co',
+		},
+	],
+},`}
 							/>
 
 							<div className='flex items-start gap-3 bg-blue-500/5 border border-blue-500/10 p-4 rounded-xl text-blue-400/90 dark:text-blue-300/80 text-sm'>
@@ -1181,27 +1188,42 @@ docs_title: "..."`}
 								File
 							</h3>
 
-							<pre className='bg-muted/40 border rounded-lg p-5 text-sm overflow-x-auto leading-relaxed text-primary/80'>
-								{`app/admin/page.tsx`}
-							</pre>
+							<div className='flex items-center gap-2.5 p-3 rounded-xl border bg-muted/20 w-full sm:w-fit'>
+								<FileCode className='h-4 w-4 text-blue-500/80' />
+								<code className='text-sm font-medium text-foreground'>
+									app/admin/page.tsx
+								</code>
+							</div>
 						</div>
 
 						<div
 							id='admin-sections'
 							className='space-y-6 max-w-2xl sm:max-w-3xl leading-relaxed text-muted-foreground'
 						>
-							<h3 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground'>
-								Sections
+							<h3 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground flex items-center gap-2'>
+								sections
 							</h3>
 
 							<p>Groups fields into logical blocks.</p>
 
 							<p>Example:</p>
 
-							<pre className='bg-muted/40 border rounded-lg p-5 text-sm overflow-x-auto leading-relaxed text-primary/80'>
-								{`Hero → title + subtitle
-Problem → problem texts`}
-							</pre>
+							<CodeBlock
+								code={`export const sections = {
+	Hero: [
+		'hero_title',
+		'hero_subtitle',
+	],
+	Demo: [
+		'demo_title', 
+		'demo_subtitle'
+	],
+	Problem: [
+		'problem_title',
+		'problem_text',
+	],
+}`}
+							/>
 
 							<p>This makes editing structured and easier to manage.</p>
 						</div>
@@ -1210,11 +1232,24 @@ Problem → problem texts`}
 							id='admin-label-map'
 							className='space-y-6 max-w-2xl sm:max-w-3xl leading-relaxed text-muted-foreground'
 						>
-							<h3 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground'>
+							<h3 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground flex items-center gap-2'>
 								labelMap
 							</h3>
 
 							<p>Controls how field names appear in the UI.</p>
+
+							<CodeBlock
+								code={`export const labelMap: Record<ContentKey, string> = {
+	hero_title: 'Hero Title',
+	hero_subtitle: 'Hero Subtitle',
+
+	demo_title: 'Demo Title',
+	demo_subtitle: 'Demo Subtitle',
+
+	problem_title: 'Problem Title',
+	problem_text: 'Problem Text',
+}`}
+							/>
 
 							<p>You can use any language.</p>
 						</div>
@@ -1223,11 +1258,24 @@ Problem → problem texts`}
 							id='admin-scroll-map'
 							className='space-y-6 max-w-2xl sm:max-w-3xl leading-relaxed text-muted-foreground'
 						>
-							<h3 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground'>
+							<h3 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground flex items-center gap-2'>
 								scrollMap
 							</h3>
 
 							<p>Links the editor with the preview.</p>
+
+							<CodeBlock
+								code={`const scrollToSection = (section: string) => {
+		const map: Record<string, string> = {
+			Hero: 'hero',
+			Demo: 'demo',
+			Problem: 'problem',
+		}
+		etc...
+}`}
+							/>
+
+							<CodeBlock code={`<section id='hero'> Your Content </section>`} />
 
 							<p>
 								When you open a section, the preview scrolls to the
@@ -1243,11 +1291,14 @@ Problem → problem texts`}
 								Important
 							</h3>
 
-							<p className='whitespace-pre-wrap'>
-								You do not need to write this from scratch. <br />
-								Just edit the file you copied. <br />
-								Change keys and labels as needed.
-							</p>
+							<div className='flex items-start gap-3 bg-blue-500/5 border border-blue-500/10 p-5 rounded-xl text-blue-600/90 dark:text-blue-400/80 text-sm'>
+								<Info className='h-5 w-5 shrink-0 mt-0.5' />
+								<p className='whitespace-pre-wrap leading-relaxed'>
+									You do not need to write this from scratch. {'\n'}
+									Just edit the file you copied. {'\n'}
+									Change keys and labels as needed.
+								</p>
+							</div>
 						</div>
 					</section>
 
@@ -1299,15 +1350,17 @@ Problem → problem texts`}
 								Open admin panel
 							</h3>
 
-							<pre className='bg-muted/40 border rounded-lg p-5 text-sm overflow-x-auto leading-relaxed text-primary/80'>
+							<div className='flex items-center gap-2.5 p-4 rounded-xl border bg-blue-400/5 border-blue-400/10 w-fit transition-colors hover:bg-blue-400/10'>
+								<Globe className='h-4 w-4 text-blue-400 dark:text-blue-300' />
 								<Link
 									href='http://localhost:3000/admin'
 									target='_blank'
 									rel='noopener noreferrer'
+									className='text-sm font-mono font-medium text-blue-400 dark:text-blue-300 cursor-pointer'
 								>
 									http://localhost:3000/admin
 								</Link>
-							</pre>
+							</div>
 						</div>
 					</section>
 
@@ -1325,43 +1378,32 @@ Problem → problem texts`}
 								Using admin panel
 							</h3>
 
-							<ul className='list-disc pl-6 space-y-2'>
-								<li>Edit text</li>
-								<li>Save changes</li>
-								<li>Reset to default</li>
-								<li>Upload images</li>
+							<ul className='space-y-3'>
+								{[
+									{ text: 'Live preview', icon: Eye },
+									{ text: 'Edit text', icon: Type },
+									{ text: 'Save changes', icon: Save },
+									{ text: 'Reset to default', icon: RotateCcw },
+									{ text: 'Upload images', icon: ImagePlus },
+								].map((item, i) => (
+									<li
+										key={i}
+										className='flex items-center gap-3 text-foreground/80'
+									>
+										<item.icon className='h-4 w-4 text-zinc-400' />
+										<span className='text-sm'>{item.text}</span>
+									</li>
+								))}
 							</ul>
 
 							<p>Works on both mobile and desktop.</p>
 						</div>
 					</section>
 
-					{/* 12. ADVANCED */}
-					<section id='advanced' className='space-y-16 scroll-mt-24'>
-						<h2 className='text-3xl sm:text-4xl font-semibold tracking-tight text-foreground'>
-							12. How It Works (Advanced)
-						</h2>
-
-						<div
-							id='advanced-info'
-							className='space-y-6 max-w-2xl sm:max-w-3xl leading-relaxed text-muted-foreground'
-						>
-							<h3 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground'>
-								Advanced
-							</h3>
-
-							<ul className='list-disc pl-6 space-y-2'>
-								<li>Uses fallback system</li>
-								<li>Updates instantly</li>
-								<li>No rebuild required</li>
-							</ul>
-						</div>
-					</section>
-
-					{/* 13. COMMON MISTAKES */}
+					{/* 12. COMMON MISTAKES */}
 					<section id='common-mistakes' className='space-y-16 scroll-mt-24'>
 						<h2 className='text-3xl sm:text-4xl font-semibold tracking-tight text-foreground'>
-							13. Common Mistakes
+							12. Common Mistakes
 						</h2>
 
 						<div
@@ -1372,18 +1414,27 @@ Problem → problem texts`}
 								Common mistakes
 							</h3>
 
-							<ul className='list-disc pl-6 space-y-2'>
-								<li>Text was not replaced with keys</li>
-								<li>Missing environment variables</li>
-								<li>Supabase is not configured</li>
+							<ul className='space-y-3 text-sm'>
+								<li className='flex items-start gap-2.5'>
+									<X className='h-4 w-4 mt-0.5 text-red-300' />
+									<span>Text was not replaced with keys</span>
+								</li>
+								<li className='flex items-start gap-2.5'>
+									<X className='h-4 w-4 mt-0.5 text-red-300' />
+									<span>Missing environment variables</span>
+								</li>
+								<li className='flex items-start gap-2.5'>
+									<X className='h-4 w-4 mt-0.5 text-red-300' />
+									<span>Supabase is not configured</span>
+								</li>
 							</ul>
 						</div>
 					</section>
 
-					{/* 14. FAQ */}
+					{/* 13. FAQ */}
 					<section id='faq' className='space-y-16 scroll-mt-24'>
 						<h2 className='text-3xl sm:text-4xl font-semibold tracking-tight text-foreground'>
-							14. FAQ
+							13. FAQ
 						</h2>
 
 						<div
@@ -1394,30 +1445,37 @@ Problem → problem texts`}
 								Questions
 							</h3>
 
-							<div className='space-y-3'>
-								<div>
-									<p className='font-medium'>
+							<div className='space-y-6'>
+								<div className='space-y-2'>
+									<p className='font-medium text-foreground italic'>
 										Q: Can I use this without Supabase?
 									</p>
-									<p>A: No</p>
+									<p className='pl-4 border-l-2 border-muted'>A: No</p>
 								</div>
 
-								<div>
-									<p className='font-medium'>Q: Is it secure?</p>
-									<p>A: It is protected by a password layer.</p>
+								<div className='space-y-2'>
+									<p className='font-medium text-foreground italic'>
+										Q: Is it secure?
+									</p>
+									<p className='pl-4 border-l-2 border-muted'>
+										A: It is protected by a password layer.
+									</p>
 								</div>
 							</div>
 						</div>
 					</section>
 
-					{/* 15. FINAL */}
-					<section id='final' className='space-y-16 scroll-mt-24'>
+					{/* 14. FINAL */}
+					<section id='final' className='space-y-16 scroll-mt-24 pb-24'>
 						<h2 className='text-3xl sm:text-4xl font-semibold tracking-tight text-foreground'>
-							15. Final
+							14. Final
 						</h2>
 
 						<div className='space-y-5 max-w-3xl leading-relaxed text-muted-foreground'>
-							<p>You are ready.</p>
+							<div className='flex items-center gap-3 text-emerald-600 dark:text-emerald-400 font-medium'>
+								<PartyPopper className='h-5 w-5' />
+								<span>You are ready.</span>
+							</div>
 
 							<p>You now have a fully editable website.</p>
 						</div>
