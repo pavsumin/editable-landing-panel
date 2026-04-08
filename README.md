@@ -69,7 +69,7 @@ SUPABASE_SERVICE_ROLE_KEY=your_key
 ADMIN_PASSWORD=your_password
 ```
 
-### What is ADMIN_PASSWORD?
+#### What is ADMIN_PASSWORD?
 
 This is the password used to access /admin.
 
@@ -80,7 +80,7 @@ This is the password used to access /admin.
 
 Warnings about public environment variables are expected.
 
-- NEXT*PUBLIC*\* → used in frontend
+- NEXT_PUBLIC\* → used in frontend
 - SERVICE_ROLE_KEY → used only on server
 
 This is normal and required for the system to work.
@@ -124,8 +124,6 @@ Your images will be stored in Supabase.
 Next.js blocks external images by default –
 this config allows them to load properly.
 
-# Core integration
-
 ## 5. Replace app/page.tsx
 
 You must replace your page.tsx with this logic:
@@ -144,9 +142,9 @@ export default async function Page() {
 
 ### Why this matters
 
-    •	disables cache → instant updates
-    •	connects UI with Supabase
-    •	enables live editing
+- disables cache → instant updates
+- connects UI with Supabase
+- enables live editing
 
 ## 6. Move your UI
 
@@ -219,9 +217,10 @@ components/pages/TemplatePage.tsx
 You must follow this structure exactly.
 
 It includes:
-• content typing
-• scroll sync (editor → preview)
-• required hooks
+
+- content typing
+- scroll sync (editor → preview)
+- required hooks
 
 ### Multi-page support
 
