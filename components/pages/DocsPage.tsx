@@ -14,6 +14,7 @@ import {
 	FileJson,
 	Folder,
 	Globe,
+	Info,
 	Moon,
 	Settings2,
 	ShieldCheck,
@@ -206,7 +207,7 @@ export default function DocsPage({ content }: Props) {
 								</div>
 							</div>
 
-							<div className='flex items-start gap-3 bg-muted/20 p-4 rounded-xl border border-border/50 text-sm'>
+							<div className='flex items-start gap-3 bg-muted/20 p-4 rounded-lg border border-border/50 text-sm'>
 								<ShieldCheck className='h-5 w-5 text-emerald-500 shrink-0 mt-0.5' />
 								<p>
 									<strong>Zero-downtime fallback:</strong> If a value is missing
@@ -343,7 +344,7 @@ export default function DocsPage({ content }: Props) {
 								How content flows
 							</h3>
 
-							<div className='space-y-4 text-sm text-muted-foreground'>
+							<div className='space-y-6 text-sm text-muted-foreground'>
 								<div className='flex items-center gap-3'>
 									<Database className='h-4 w-4 shrink-0' />
 									<span>
@@ -621,7 +622,7 @@ ADMIN_PASSWORD=your_password`}
 								settings.
 							</p>
 
-							<div className='space-y-4 pt-2'>
+							<div className='space-y-6 pt-2'>
 								<div className='flex flex-col gap-1'>
 									<p className='font-medium text-foreground'>Vercel:</p>
 									<p className='flex items-center gap-1.5 text-sm'>
@@ -642,7 +643,7 @@ ADMIN_PASSWORD=your_password`}
 								</div>
 							</div>
 
-							<div className='flex items-start gap-3 bg-amber-500/5 border border-amber-500/10 p-4 rounded-xl text-amber-600/90 dark:text-amber-400/80 text-sm'>
+							<div className='flex items-start gap-3 bg-amber-500/5 border border-amber-500/10 p-4 rounded-lg text-amber-600/90 dark:text-amber-400/80 text-sm'>
 								<AlertCircle className='h-5 w-5 shrink-0 mt-0.5' />
 								<p>
 									<strong>Warning:</strong> <br />
@@ -724,7 +725,7 @@ ADMIN_PASSWORD=your_password`}
 								))}
 							</div>
 
-							<div className='flex items-start gap-3 bg-amber-500/5 border border-amber-500/10 p-4 rounded-xl text-amber-600/90 dark:text-amber-400/80 text-sm'>
+							<div className='flex items-start gap-3 bg-amber-500/5 border border-amber-500/10 p-4 rounded-lg text-amber-600/90 dark:text-amber-400/80 text-sm'>
 								<AlertCircle className='h-5 w-5 shrink-0 mt-0.5' />
 								<p>
 									<strong>Important:</strong> Maintain the exact folder
@@ -746,8 +747,8 @@ ADMIN_PASSWORD=your_password`}
 								<code className='text-foreground'>app</code> directory:
 							</p>
 
-							<div className='flex items-center gap-2.5 p-3 rounded-xl border bg-muted/20 w-full sm:w-fit'>
-								<FileCode className='h-4 w-4 text-emerald-400/80' />
+							<div className='flex items-center gap-2.5 p-3 rounded-lg border bg-muted/20 w-full sm:w-fit'>
+								<FileCode className='h-4 w-4 text-blue-500/80' />
 								<code className='text-sm font-medium text-foreground'>
 									app/admin/page.tsx
 								</code>
@@ -793,72 +794,94 @@ ADMIN_PASSWORD=your_password`}
 
 						<div
 							id='why-structure'
-							className='space-y-6 max-w-2xl sm:max-w-3xl leading-relaxed text-muted-foreground'
+							className='space-y-6 max-w-3xl text-muted-foreground'
 						>
-							<h3 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground'>
-								Why we change structure
+							<h3 className='text-xl font-semibold tracking-tight text-foreground'>
+								Why change structure?
 							</h3>
-
-							<p>We separate logic from routing.</p>
-							<p>Next.js pages stay simple.</p>
-							<p>UI is moved into components.</p>
+							<ul className='space-y-3 text-sm'>
+								<li className='flex items-center gap-2'>
+									<div className='h-1.5 w-1.5 rounded-full bg-blue-400' />
+									<span>Separate logic fetching from routing</span>
+								</li>
+								<li className='flex items-center gap-2'>
+									<div className='h-1.5 w-1.5 rounded-full bg-blue-400' />
+									<span>Keep Next.js server components simple</span>
+								</li>
+								<li className='flex items-center gap-2'>
+									<div className='h-1.5 w-1.5 rounded-full bg-blue-400' />
+									<span>Enable live-preview sync in components</span>
+								</li>
+							</ul>
 						</div>
 
 						<div
 							id='move-page'
-							className='space-y-6 max-w-2xl sm:max-w-3xl leading-relaxed text-muted-foreground'
+							className='space-y-6 max-w-3xl text-muted-foreground'
 						>
-							<h3 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground'>
+							<h3 className='text-xl font-semibold tracking-tight text-foreground'>
 								Step 1. Move page
 							</h3>
-
-							<pre className='bg-muted/40 border rounded-lg p-5 text-sm overflow-x-auto leading-relaxed text-primary/80'>
-								{`app/page.tsx → components/pages/HomePage.tsx`}
-							</pre>
+							<p>Move your current page content to a new component:</p>
+							<div className='flex items-center gap-3 p-3 rounded-lg border bg-muted/20 text-sm font-mono w-fit'>
+								<span className='text-zinc-400'>app/page.tsx</span>
+								<ChevronRight size={14} className='text-zinc-300' />
+								<span className='text-foreground font-medium'>
+									components/pages/HomePage.tsx
+								</span>
+							</div>
 						</div>
 
 						<div
 							id='replace-page'
-							className='space-y-6 max-w-2xl sm:max-w-3xl leading-relaxed text-muted-foreground'
+							className='space-y-6 max-w-3xl text-muted-foreground'
 						>
-							<h3 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground'>
+							<h3 className='text-xl font-semibold tracking-tight text-foreground'>
 								Step 2. Replace page.tsx
 							</h3>
-
-							<p>This file should only import your page component.</p>
-
-							<pre className='bg-muted/40 border rounded-lg p-5 text-sm overflow-x-auto leading-relaxed text-primary/80'>
-								{`import HomePage from '@/components/pages/HomePage'
+							<p>
+								Now, update your{' '}
+								<code className='text-foreground font-medium'>
+									app/page.tsx
+								</code>{' '}
+								to fetch content:
+							</p>
+							<CodeBlock
+								code={`import HomePage from '@/components/pages/HomePage'
 import { getContent } from '@/lib/getContent'
 
 export const revalidate = 0
 
 export default async function Page() {
   const content = await getContent()
-
   return <HomePage content={content} />
 }`}
-							</pre>
+							/>
+
+							<p className='text-sm text-muted-foreground italic'>
+								export const revalidate = 0 // cache disabled for live updates
+							</p>
 						</div>
 
 						<div
 							id='move-ui'
-							className='space-y-6 max-w-2xl sm:max-w-3xl leading-relaxed text-muted-foreground'
+							className='space-y-6 max-w-3xl text-muted-foreground'
 						>
-							<h3 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground'>
-								Step 3. Move your UI
+							<h3 className='text-xl font-semibold tracking-tight text-foreground'>
+								Step 3. Use the template
 							</h3>
 
 							<p>Create:</p>
-
-							<pre className='bg-muted/40 border rounded-lg p-5 text-sm overflow-x-auto leading-relaxed text-primary/80'>
-								{`components/pages/HomePage.tsx`}
-							</pre>
-
+							<div className='flex items-center gap-2.5 p-3 rounded-lg border bg-muted/20 w-full sm:w-fit'>
+								<FileCode className='h-4 w-4 text-blue-500/80' />
+								<code className='text-sm font-medium text-foreground'>
+									components/pages/HomePage.tsx
+								</code>
+							</div>
 							<p>Paste the following template (required):</p>
 
-							<pre className='bg-muted/40 border rounded-lg p-5 text-sm overflow-x-auto leading-relaxed text-primary/80'>
-								{`'use client'
+							<CodeBlock
+								code={`'use client'
 
 import { ContentKey } from '@/lib/defaultContent'
 import { useEffect } from 'react'
@@ -897,36 +920,41 @@ export default function Home({ content }: Props) {
 
   return (
     <main>
-      <div>Your content goes here like this:</div>
       <h1>{c.hero_title}</h1>
     </main>
   )
 }`}
-							</pre>
+							/>
 
-							<p>Then paste your UI and logic if you have them.</p>
-
-							<p className='text-sm text-muted-foreground'>
-								You can also download this file from the repository:
-								components/pages/TemplatePage.tsx
+							<p className='text-sm flex items-start gap-2 bg-blue-500/5 border border-blue-500/10 p-4 rounded-lg text-blue-400/90 dark:text-blue-300/80'>
+								<Info className='h-5 w-5 shrink-0 mt-0.5' />
+								<span>
+									<strong>Tip:</strong> This template includes a required{' '}
+									<code>useEffect</code> for scroll synchronization. You can
+									also find it in <code>components/pages/TemplatePage.tsx</code>
+									.
+								</span>
 							</p>
 						</div>
 
 						<div
 							id='multi-page-structure'
-							className='space-y-6 max-w-2xl sm:max-w-3xl leading-relaxed text-muted-foreground'
+							className='space-y-6 max-w-3xl text-muted-foreground'
 						>
-							<h3 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground'>
+							<h3 className='text-xl font-semibold tracking-tight text-foreground'>
 								Multi-page websites
 							</h3>
-
-							<p>Repeat this for every page:</p>
-
-							<pre className='bg-muted/40 border rounded-lg p-5 text-sm overflow-x-auto leading-relaxed text-primary/80'>
-								{`about/page.tsx → components/pages/AboutPage.tsx`}
-							</pre>
+							<p>Repeat this pattern for any additional pages:</p>
+							<div className='flex items-center gap-3 p-3 rounded-lg border bg-muted/20 text-sm font-mono w-fit'>
+								<span className='text-zinc-400'>app/about/page.tsx</span>
+								<ChevronRight size={14} className='text-zinc-300' />
+								<span className='text-foreground font-medium'>
+									components/pages/AboutPage.tsx
+								</span>
+							</div>
 						</div>
 					</section>
+
 					{/* 6. MAKE CONTENT EDITABLE */}
 					<section
 						id='make-content-editable'
