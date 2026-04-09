@@ -239,11 +239,61 @@ export default function DocsPage({ content }: Props) {
 							</p>
 
 							<ul className='list-disc pl-6 space-y-2 text-muted-foreground'>
-								<li>Connect Supabase (database)</li>
-								<li>Add environment variables</li>
-								<li>Copy required files into your project</li>
-								<li>Replace text with content keys</li>
-								<li>Configure admin panel</li>
+								<li>
+									<Link
+										href='#supabase-setup'
+										className='underline decoration-primary/30 underline-offset-6'
+									>
+										Connect Supabase (database)
+									</Link>
+								</li>
+								<li>
+									<Link
+										href='#env-variables'
+										className='underline decoration-primary/30 underline-offset-6'
+									>
+										Add environment variables
+									</Link>
+								</li>
+								<li>
+									<Link
+										href='#install-files'
+										className='underline decoration-primary/30 underline-offset-6'
+									>
+										Copy required files into your project
+									</Link>
+								</li>
+								<li>
+									<Link
+										href='#install-files'
+										className='underline decoration-primary/30 underline-offset-6'
+									>
+										<li>
+											<Link
+												href='#install-files'
+												className='underline decoration-primary/30 underline-offset-6'
+											>
+												Copy required files into your project
+											</Link>
+										</li>
+									</Link>
+								</li>
+								<li>
+									<Link
+										href='#make-content-editable'
+										className='underline decoration-primary/30 underline-offset-6'
+									>
+										Replace text with content keys
+									</Link>
+								</li>
+								<li>
+									<Link
+										href='#admin-configuration'
+										className='underline decoration-primary/30 underline-offset-6'
+									>
+										Configure admin panel
+									</Link>
+								</li>
 							</ul>
 
 							<p>
