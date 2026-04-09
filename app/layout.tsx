@@ -20,6 +20,8 @@ export const viewport: Viewport = {
 }
 
 export const metadata = {
+	metadataBase: new URL('https://editable-landing-panel.vercel.app'),
+
 	title: 'Next.js Admin Panel — Edit Website Content Without CMS',
 	description:
 		'Add an admin panel to your Next.js website. Edit content without CMS, without redeploy, powered by Supabase.',
