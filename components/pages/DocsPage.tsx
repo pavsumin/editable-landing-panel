@@ -2,12 +2,16 @@
 
 import { CodeBlockCommand } from '@/components/code-block-command/code-block-command'
 
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { Sidebar } from '@/components/ui/sidebar'
 import { ContentKey } from '@/lib/defaultContent'
 import {
 	AlertCircle,
 	ArrowRight,
+	BookOpen,
 	Check,
 	ChevronRight,
+	Code,
 	Code2,
 	Database,
 	Eye,
@@ -15,12 +19,16 @@ import {
 	FileJson,
 	Folder,
 	Globe,
+	HelpCircle,
+	Home,
 	ImagePlus,
 	Info,
+	Menu,
 	Moon,
 	PartyPopper,
 	RotateCcw,
 	Save,
+	Settings,
 	Settings2,
 	ShieldCheck,
 	Sun,
@@ -41,6 +49,210 @@ type Props = {
 	content: Content
 }
 
+/* SIDEBAR CONTENT COMPONENT */
+function SidebarContentComponent({
+	isDark,
+	setIsDark,
+	activeSection,
+	scrollToSection,
+}: {
+	isDark: boolean
+	setIsDark: (dark: boolean) => void
+	activeSection: string
+	scrollToSection: (id: string) => void
+}) {
+	return (
+		<div className='flex flex-col h-full'>
+			{/* Logo */}
+			<div className='p-6 border-b border-border/40'>
+				<Link className='flex items-center gap-2' href='/'>
+					<div className='flex items-center justify-center'>
+						<Image
+							width={32}
+							height={32}
+							src={'/icon-dark.svg'}
+							alt={'Logo'}
+							className='hidden dark:block'
+						/>
+						<Image
+							width={32}
+							height={32}
+							src={'/icon.svg'}
+							alt={'Logo'}
+							className='block dark:hidden'
+						/>
+					</div>
+					<span className='font-bold text-xl'>Edit.</span>
+				</Link>
+			</div>
+
+			{/* Navigation */}
+			<div className='flex-1 overflow-y-auto p-4'>
+				<nav className='space-y-2'>
+					{[
+						{
+							id: 'start',
+							title: 'Getting Started',
+							icon: Home,
+							subsections: [
+								{ id: 'what-is-this', title: 'What is this' },
+								{ id: 'how-it-works', title: 'How it works' },
+								{ id: 'what-you-will-do', title: 'What you will do' },
+								{ id: 'before-you-start', title: 'Before you start' },
+							],
+						},
+						{
+							id: 'core-concept',
+							title: 'Core Concept',
+							icon: BookOpen,
+							subsections: [
+								{ id: 'content-system', title: 'Content System' },
+								{ id: 'content-flow', title: 'Content Flow' },
+								{ id: 'example', title: 'Example' },
+								{ id: 'mental-model', title: 'Mental Model' },
+							],
+						},
+						{
+							id: 'supabase-setup',
+							title: 'Supabase Setup',
+							icon: Database,
+							subsections: [
+								{ id: 'create-account', title: 'Create Account' },
+								{ id: 'storage', title: 'Storage' },
+								{ id: 'api-keys', title: 'API Keys' },
+							],
+						},
+						{
+							id: 'env-variables',
+							title: 'Environment Variables',
+							icon: Settings,
+							subsections: [
+								{ id: 'env-create-file', title: 'Create File' },
+								{ id: 'env-add-variables', title: 'Add Variables' },
+								{ id: 'admin-password', title: 'Admin Password' },
+								{ id: 'env-hosting', title: 'Hosting' },
+								{ id: 'env-warning', title: 'Warning' },
+							],
+						},
+						{
+							id: 'install-files',
+							title: 'Install Files',
+							icon: Code,
+							subsections: [],
+						},
+						{
+							id: 'project-structure',
+							title: 'Project Structure',
+							icon: Code,
+							subsections: [],
+						},
+						{
+							id: 'multi-page',
+							title: 'Multi Page',
+							icon: Code,
+							subsections: [],
+						},
+						{
+							id: 'next-config',
+							title: 'Next Config',
+							icon: Settings,
+							subsections: [],
+						},
+						{
+							id: 'admin-configuration',
+							title: 'Admin Configuration',
+							icon: Settings,
+							subsections: [],
+						},
+						{
+							id: 'run-project',
+							title: 'Run Project',
+							icon: Code,
+							subsections: [],
+						},
+						{
+							id: 'using-admin',
+							title: 'Using Admin',
+							icon: Settings,
+							subsections: [],
+						},
+						{
+							id: 'common-mistakes',
+							title: 'Common Mistakes',
+							icon: HelpCircle,
+							subsections: [],
+						},
+						{
+							id: 'faq',
+							title: 'FAQ',
+							icon: HelpCircle,
+							subsections: [],
+						},
+						{
+							id: 'final',
+							title: 'Final',
+							icon: BookOpen,
+							subsections: [],
+						},
+					].map((item) => {
+						const Icon = item.icon
+						const isActive = activeSection === item.id || item.subsections.some(sub => sub.id === activeSection)
+
+						return (
+							<div key={item.id}>
+								<button
+									onClick={() => scrollToSection(item.id)}
+									className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
+										isActive
+											? 'bg-primary/10 text-primary border border-primary/20'
+											: 'hover:bg-muted text-muted-foreground hover:text-foreground'
+									}`}
+								>
+									<Icon className='h-4 w-4' />
+									<span className='text-sm font-medium'>{item.title}</span>
+								</button>
+
+								{item.subsections.length > 0 && (
+									<div className='ml-7 mt-1 space-y-1'>
+										{item.subsections.map((sub) => (
+											<button
+												key={sub.id}
+												onClick={() => scrollToSection(sub.id)}
+												className={`w-full flex items-center px-3 py-1.5 rounded-md text-left text-xs transition-colors ${
+													activeSection === sub.id
+														? 'bg-primary/5 text-primary'
+														: 'hover:bg-muted/50 text-muted-foreground hover:text-foreground'
+												}`}
+											>
+												{sub.title}
+											</button>
+										))}
+									</div>
+								)}
+							</div>
+						)
+					})}
+				</nav>
+			</div>
+
+			{/* Theme Switcher */}
+			<div className='p-4 border-t border-border/40'>
+				<button
+					onClick={() => setIsDark(!isDark)}
+					className='w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted transition-colors'
+				>
+					{isDark ? (
+						<Sun className='h-4 w-4 text-yellow-500' />
+					) : (
+						<Moon className='h-4 w-4 text-blue-400' />
+					)}
+					<span className='text-sm'>Toggle theme</span>
+				</button>
+			</div>
+		</div>
+	)
+}
+
 /*  PAGE  */
 
 export default function DocsPage({ content }: Props) {
@@ -48,6 +260,48 @@ export default function DocsPage({ content }: Props) {
 		if (typeof window === 'undefined') return false
 		return window.matchMedia('(prefers-color-scheme: dark)').matches
 	})
+
+	const [sidebarOpen, setSidebarOpen] = useState(true)
+
+	const [activeSection, setActiveSection] = useState('start')
+
+	useEffect(() => {
+		const handleScroll = () => {
+			const sections = [
+				'start', 'what-is-this', 'how-it-works', 'what-you-will-do', 'before-you-start',
+				'core-concept', 'content-system', 'content-flow', 'example', 'mental-model',
+				'supabase-setup', 'create-account', 'storage', 'api-keys',
+				'env-variables', 'env-create-file', 'env-add-variables', 'admin-password', 'env-hosting', 'env-warning',
+				'install-files', 'project-structure', 'multi-page', 'next-config', 'admin-configuration',
+				'run-project', 'using-admin', 'common-mistakes', 'faq', 'final'
+			]
+
+			let current = 'start'
+			for (const section of sections) {
+				const element = document.getElementById(section)
+				if (element) {
+					const rect = element.getBoundingClientRect()
+					if (rect.top <= 100) {
+						current = section
+					}
+				}
+			}
+			setActiveSection(current)
+		}
+
+		window.addEventListener('scroll', handleScroll)
+		handleScroll()
+		return () => window.removeEventListener('scroll', handleScroll)
+	}, [])
+
+	const scrollToSection = (id: string) => {
+		const element = document.getElementById(id)
+		if (element) {
+			const yOffset = -80
+			const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset
+			window.scrollTo({ top: y, behavior: 'smooth' })
+		}
+	}
 
 	useEffect(() => {
 		document.documentElement.classList.toggle('dark', isDark)
@@ -80,42 +334,80 @@ export default function DocsPage({ content }: Props) {
 
 	return (
 		<div className='min-h-screen bg-background text-foreground'>
-			{/* HEADER */}
-			<header className='sticky top-0 z-50 border-b border-border/40 backdrop-blur-sm bg-background/95'>
-				<div className='max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between'>
-					<Link className='flex items-center gap-2' href='/'>
-						<div className='flex items-center justify-center'>
-							<Image
-								width={32}
-								height={32}
-								src={'/icon-dark.svg'}
-								alt={'Logo'}
-								className='hidden dark:block'
-							/>
-							<Image
-								width={32}
-								height={32}
-								src={'/icon.svg'}
-								alt={'Logo'}
-								className='block dark:hidden'
-							/>
-						</div>
-						<span className='font-bold text-xl'>Edit.</span>
-					</Link>
+			{/* SIDEBAR */}
+			<Sidebar
+				isOpen={sidebarOpen}
+				onToggle={() => setSidebarOpen(!sidebarOpen)}
+				isDark={isDark}
+				setIsDark={setIsDark}
+			/>
 
-					<button
-						onClick={() => setIsDark(prev => !prev)}
-						className='p-2 rounded-lg border border-border hover:bg-muted transition duration-300 cursor-pointer'
-						aria-label='Toggle theme'
-					>
-						<Moon className='hidden dark:block h-5 w-5 text-blue-400' />
-						<Sun className='block dark:hidden h-5 w-5 text-yellow-500' />
-					</button>
+			{/* HEADER */}
+			<header className={`sticky top-0 z-30 border-b border-border/40 backdrop-blur-sm bg-background/95 transition-all duration-300 ${
+				sidebarOpen ? 'md:ml-64' : 'md:ml-16'
+			}`}>
+				<div className='max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between'>
+					{/* Logo - only show when sidebar is closed on desktop */}
+					{!sidebarOpen && (
+						<Link className='flex items-center gap-2' href='/'>
+							<div className='flex items-center justify-center'>
+								<Image
+									width={32}
+									height={32}
+									src={'/icon-dark.svg'}
+									alt={'Logo'}
+									className='hidden dark:block'
+								/>
+								<Image
+									width={32}
+									height={32}
+									src={'/icon.svg'}
+									alt={'Logo'}
+									className='block dark:hidden'
+								/>
+							</div>
+							<span className='font-bold text-xl'>Edit.</span>
+						</Link>
+					)}
+
+					{/* Desktop: Theme switcher when sidebar is open, Mobile: Sidebar button */}
+					<div className='flex items-center gap-2'>
+						{sidebarOpen && (
+							<button
+								onClick={() => setIsDark(prev => !prev)}
+								className='hidden md:flex p-2 rounded-lg border border-border hover:bg-muted transition duration-300 cursor-pointer'
+								aria-label='Toggle theme'
+							>
+								<Moon className='hidden dark:block h-5 w-5 text-blue-400' />
+								<Sun className='block dark:hidden h-5 w-5 text-yellow-500' />
+							</button>
+						)}
+						{/* Mobile sidebar */}
+						<div className='md:hidden'>
+							<Sheet>
+								<SheetTrigger asChild>
+									<button className='p-2 rounded-lg border border-border hover:bg-muted transition-colors'>
+										<Menu className='h-5 w-5' />
+									</button>
+								</SheetTrigger>
+								<SheetContent side='right' className='w-64 p-0'>
+									<SidebarContentComponent
+										isDark={isDark}
+										setIsDark={setIsDark}
+										activeSection={activeSection}
+										scrollToSection={scrollToSection}
+									/>
+								</SheetContent>
+							</Sheet>
+						</div>
+					</div>
 				</div>
 			</header>
 
 			{/* MAIN CONTENT */}
-			<main className='max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16'>
+			<main className={`max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 transition-all duration-300 ${
+				sidebarOpen ? 'md:ml-64' : 'md:ml-16'
+			}`}>
 				<div className='space-y-24'>
 					{/* 0. START */}
 					<section id='start' className='space-y-16 scroll-mt-24'>
@@ -990,7 +1282,7 @@ export default function Home({ content }: Props) {
 							<div className='text-sm flex gap-3 bg-blue-500/5 border border-blue-500/10 p-4 rounded-xl text-blue-400/90 dark:text-blue-300/80'>
 								<Info className='h-5 w-5 shrink-0 mt-0.5' />
 								<div className='min-w-0 flex-1'>
-									<p className='leading-relaxed break-words'>
+									<p className='leading-relaxed wrap-break-word'>
 										<strong>Tip:</strong> This template includes a required{' '}
 										<code>useEffect</code> for scroll synchronization. You can
 										also find it in{' '}
