@@ -2,16 +2,19 @@
 
 import { CodeBlockCommand } from '@/components/code-block-command/code-block-command'
 
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import {
+	Sheet,
+	SheetContent,
+	SheetTitle,
+	SheetTrigger,
+} from '@/components/ui/sheet'
 import { Sidebar } from '@/components/ui/sidebar'
 import { ContentKey } from '@/lib/defaultContent'
 import {
 	AlertCircle,
 	ArrowRight,
-	BookOpen,
 	Check,
 	ChevronRight,
-	Code,
 	Code2,
 	Database,
 	Eye,
@@ -19,16 +22,13 @@ import {
 	FileJson,
 	Folder,
 	Globe,
-	HelpCircle,
-	Home,
 	ImagePlus,
 	Info,
-	Menu,
 	Moon,
+	PanelRight,
 	PartyPopper,
 	RotateCcw,
 	Save,
-	Settings,
 	Settings2,
 	ShieldCheck,
 	Sun,
@@ -55,45 +55,38 @@ function SidebarContentComponent({
 	setIsDark,
 	activeSection,
 	scrollToSection,
+	onClose,
 }: {
 	isDark: boolean
 	setIsDark: (dark: boolean) => void
 	activeSection: string
 	scrollToSection: (id: string) => void
+	onClose?: () => void
 }) {
+	const [expandedSections, setExpandedSections] = useState<Set<string>>(
+		new Set(['start', 'core-concept', 'supabase-setup', 'env-variables']),
+	)
+
+	const toggleSection = (id: string) => {
+		const newExpanded = new Set(expandedSections)
+		if (newExpanded.has(id)) {
+			newExpanded.delete(id)
+		} else {
+			newExpanded.add(id)
+		}
+		setExpandedSections(newExpanded)
+	}
+
 	return (
 		<div className='flex flex-col h-full'>
-			{/* Logo */}
-			<div className='p-6 border-b border-border/40'>
-				<Link className='flex items-center gap-2' href='/'>
-					<div className='flex items-center justify-center'>
-						<Image
-							width={32}
-							height={32}
-							src={'/icon-dark.svg'}
-							alt={'Logo'}
-							className='hidden dark:block'
-						/>
-						<Image
-							width={32}
-							height={32}
-							src={'/icon.svg'}
-							alt={'Logo'}
-							className='block dark:hidden'
-						/>
-					</div>
-					<span className='font-bold text-xl'>Edit.</span>
-				</Link>
-			</div>
-
+			{onClose && <SheetTitle className='sr-only'>Navigation</SheetTitle>}
 			{/* Navigation */}
-			<div className='flex-1 overflow-y-auto p-4'>
-				<nav className='space-y-2'>
+			<div className='px-6 py-4'>
+				<nav className='space-y-0'>
 					{[
 						{
 							id: 'start',
 							title: 'Getting Started',
-							icon: Home,
 							subsections: [
 								{ id: 'what-is-this', title: 'What is this' },
 								{ id: 'how-it-works', title: 'How it works' },
@@ -103,8 +96,7 @@ function SidebarContentComponent({
 						},
 						{
 							id: 'core-concept',
-							title: 'Core Concept',
-							icon: BookOpen,
+							title: 'Fundamental Concepts',
 							subsections: [
 								{ id: 'content-system', title: 'Content System' },
 								{ id: 'content-flow', title: 'Content Flow' },
@@ -115,7 +107,6 @@ function SidebarContentComponent({
 						{
 							id: 'supabase-setup',
 							title: 'Supabase Setup',
-							icon: Database,
 							subsections: [
 								{ id: 'create-account', title: 'Create Account' },
 								{ id: 'storage', title: 'Storage' },
@@ -125,7 +116,6 @@ function SidebarContentComponent({
 						{
 							id: 'env-variables',
 							title: 'Environment Variables',
-							icon: Settings,
 							subsections: [
 								{ id: 'env-create-file', title: 'Create File' },
 								{ id: 'env-add-variables', title: 'Add Variables' },
@@ -137,91 +127,100 @@ function SidebarContentComponent({
 						{
 							id: 'install-files',
 							title: 'Install Files',
-							icon: Code,
 							subsections: [],
 						},
 						{
 							id: 'project-structure',
 							title: 'Project Structure',
-							icon: Code,
 							subsections: [],
 						},
 						{
 							id: 'multi-page',
 							title: 'Multi Page',
-							icon: Code,
 							subsections: [],
 						},
 						{
 							id: 'next-config',
 							title: 'Next Config',
-							icon: Settings,
 							subsections: [],
 						},
 						{
 							id: 'admin-configuration',
 							title: 'Admin Configuration',
-							icon: Settings,
 							subsections: [],
 						},
 						{
 							id: 'run-project',
 							title: 'Run Project',
-							icon: Code,
 							subsections: [],
 						},
 						{
 							id: 'using-admin',
 							title: 'Using Admin',
-							icon: Settings,
 							subsections: [],
 						},
 						{
 							id: 'common-mistakes',
 							title: 'Common Mistakes',
-							icon: HelpCircle,
 							subsections: [],
 						},
 						{
 							id: 'faq',
 							title: 'FAQ',
-							icon: HelpCircle,
 							subsections: [],
 						},
 						{
 							id: 'final',
 							title: 'Final',
-							icon: BookOpen,
 							subsections: [],
 						},
-					].map((item) => {
-						const Icon = item.icon
-						const isActive = activeSection === item.id || item.subsections.some(sub => sub.id === activeSection)
+					].map(item => {
+						const isActive =
+							activeSection === item.id ||
+							item.subsections.some(sub => sub.id === activeSection)
+						const isExpanded = expandedSections.has(item.id)
+						const hasSubsections = item.subsections.length > 0
 
 						return (
 							<div key={item.id}>
 								<button
-									onClick={() => scrollToSection(item.id)}
-									className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
+									onClick={() => {
+										if (hasSubsections) {
+											toggleSection(item.id)
+										} else {
+											scrollToSection(item.id)
+											onClose?.()
+										}
+									}}
+									className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-left transition duration-300 cursor-pointer ${
 										isActive
-											? 'bg-primary/10 text-primary border border-primary/20'
-											: 'hover:bg-muted text-muted-foreground hover:text-foreground'
+											? 'bg-gray-100 dark:bg-zinc-900 text-zinc-900 dark:text-gray-100'
+											: 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-zinc-900 hover:text-zinc-900 dark:hover:text-gray-100'
 									}`}
 								>
-									<Icon className='h-4 w-4' />
-									<span className='text-sm font-medium'>{item.title}</span>
+									<span className='text-sm'>{item.title}</span>
+									{hasSubsections && (
+										<ChevronRight
+											className={`h-4 w-4 transition-transform ${
+												isExpanded ? 'rotate-90' : ''
+											}`}
+										/>
+									)}
 								</button>
 
-								{item.subsections.length > 0 && (
-									<div className='ml-7 mt-1 space-y-1'>
-										{item.subsections.map((sub) => (
+								{hasSubsections && isExpanded && (
+									<div className='ml-4 mt-1 space-y-0'>
+										{item.subsections.map(sub => (
 											<button
 												key={sub.id}
-												onClick={() => scrollToSection(sub.id)}
-												className={`w-full flex items-center px-3 py-1.5 rounded-md text-left text-xs transition-colors ${
+												onClick={() => {
+													scrollToSection(sub.id)
+													onClose?.()
+												}}
+												className={`w-full text-left px-3 py-1.5 rounded-md text-xs transition duration-300 cursor-pointer ${
 													activeSection === sub.id
-														? 'bg-primary/5 text-primary'
-														: 'hover:bg-muted/50 text-muted-foreground hover:text-foreground'
+														? 'text-zinc-900 dark:text-gray-100'
+														: 'text-gray-500 dark:text-gray-500 hover:text-zinc-900 dark:hover:text-gray-100'
 												}`}
 											>
 												{sub.title}
@@ -233,21 +232,6 @@ function SidebarContentComponent({
 						)
 					})}
 				</nav>
-			</div>
-
-			{/* Theme Switcher */}
-			<div className='p-4 border-t border-border/40'>
-				<button
-					onClick={() => setIsDark(!isDark)}
-					className='w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted transition-colors'
-				>
-					{isDark ? (
-						<Sun className='h-4 w-4 text-yellow-500' />
-					) : (
-						<Moon className='h-4 w-4 text-blue-400' />
-					)}
-					<span className='text-sm'>Toggle theme</span>
-				</button>
 			</div>
 		</div>
 	)
@@ -261,19 +245,43 @@ export default function DocsPage({ content }: Props) {
 		return window.matchMedia('(prefers-color-scheme: dark)').matches
 	})
 
-	const [sidebarOpen, setSidebarOpen] = useState(true)
+	const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
 	const [activeSection, setActiveSection] = useState('start')
 
 	useEffect(() => {
 		const handleScroll = () => {
 			const sections = [
-				'start', 'what-is-this', 'how-it-works', 'what-you-will-do', 'before-you-start',
-				'core-concept', 'content-system', 'content-flow', 'example', 'mental-model',
-				'supabase-setup', 'create-account', 'storage', 'api-keys',
-				'env-variables', 'env-create-file', 'env-add-variables', 'admin-password', 'env-hosting', 'env-warning',
-				'install-files', 'project-structure', 'multi-page', 'next-config', 'admin-configuration',
-				'run-project', 'using-admin', 'common-mistakes', 'faq', 'final'
+				'start',
+				'what-is-this',
+				'how-it-works',
+				'what-you-will-do',
+				'before-you-start',
+				'core-concept',
+				'content-system',
+				'content-flow',
+				'example',
+				'mental-model',
+				'supabase-setup',
+				'create-account',
+				'storage',
+				'api-keys',
+				'env-variables',
+				'env-create-file',
+				'env-add-variables',
+				'admin-password',
+				'env-hosting',
+				'env-warning',
+				'install-files',
+				'project-structure',
+				'multi-page',
+				'next-config',
+				'admin-configuration',
+				'run-project',
+				'using-admin',
+				'common-mistakes',
+				'faq',
+				'final',
 			]
 
 			let current = 'start'
@@ -281,7 +289,8 @@ export default function DocsPage({ content }: Props) {
 				const element = document.getElementById(section)
 				if (element) {
 					const rect = element.getBoundingClientRect()
-					if (rect.top <= 100) {
+					const threshold = 120
+					if (rect.top <= threshold) {
 						current = section
 					}
 				}
@@ -298,7 +307,8 @@ export default function DocsPage({ content }: Props) {
 		const element = document.getElementById(id)
 		if (element) {
 			const yOffset = -80
-			const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset
+			const y =
+				element.getBoundingClientRect().top + window.pageYOffset + yOffset
 			window.scrollTo({ top: y, behavior: 'smooth' })
 		}
 	}
@@ -336,67 +346,85 @@ export default function DocsPage({ content }: Props) {
 		<div className='min-h-screen bg-background text-foreground'>
 			{/* SIDEBAR */}
 			<Sidebar
-				isOpen={sidebarOpen}
-				onToggle={() => setSidebarOpen(!sidebarOpen)}
+				isOpen={true}
+				onToggle={() => {}}
 				isDark={isDark}
 				setIsDark={setIsDark}
+				activeSection={activeSection}
+				scrollToSection={scrollToSection}
 			/>
 
 			{/* HEADER */}
-			<header className={`sticky top-0 z-30 border-b border-border/40 backdrop-blur-sm bg-background/95 transition-all duration-300 ${
-				sidebarOpen ? 'md:ml-64' : 'md:ml-16'
-			}`}>
-				<div className='max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between'>
-					{/* Logo - only show when sidebar is closed on desktop */}
-					{!sidebarOpen && (
-						<Link className='flex items-center gap-2' href='/'>
-							<div className='flex items-center justify-center'>
-								<Image
-									width={32}
-									height={32}
-									src={'/icon-dark.svg'}
-									alt={'Logo'}
-									className='hidden dark:block'
-								/>
-								<Image
-									width={32}
-									height={32}
-									src={'/icon.svg'}
-									alt={'Logo'}
-									className='block dark:hidden'
-								/>
-							</div>
-							<span className='font-bold text-xl'>Edit.</span>
-						</Link>
-					)}
-
-					{/* Desktop: Theme switcher when sidebar is open, Mobile: Sidebar button */}
+			<header className='sticky top-0 z-30 border-b border-border/40 backdrop-blur-sm bg-background/95 md:ml-64'>
+				<div className='max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between md:justify-end'>
+					{/* Mobile Logo */}
+					<Link className='block md:hidden flex items-center gap-2' href='/'>
+						<div className='flex items-center justify-center'>
+							<Image
+								width={32}
+								height={32}
+								src={'/icon-dark.svg'}
+								alt={'Logo'}
+								className='hidden dark:block'
+							/>
+							<Image
+								width={32}
+								height={32}
+								src={'/icon.svg'}
+								alt={'Logo'}
+								className='block dark:hidden'
+							/>
+						</div>
+						<span className='font-bold text-xl'>Edit.</span>
+					</Link>
+					{/* Desktop: Theme switcher */}
 					<div className='flex items-center gap-2'>
-						{sidebarOpen && (
-							<button
-								onClick={() => setIsDark(prev => !prev)}
-								className='hidden md:flex p-2 rounded-lg border border-border hover:bg-muted transition duration-300 cursor-pointer'
-								aria-label='Toggle theme'
-							>
-								<Moon className='hidden dark:block h-5 w-5 text-blue-400' />
-								<Sun className='block dark:hidden h-5 w-5 text-yellow-500' />
-							</button>
-						)}
+						<button
+							onClick={() => setIsDark(prev => !prev)}
+							className='hidden md:flex p-2 rounded-lg border border-border hover:bg-muted transition duration-300 cursor-pointer cursor-pointer'
+							aria-label='Toggle theme'
+						>
+							<Moon className='hidden dark:block h-5 w-5 text-blue-400' />
+							<Sun className='block dark:hidden h-5 w-5 text-yellow-500' />
+						</button>
 						{/* Mobile sidebar */}
 						<div className='md:hidden'>
-							<Sheet>
+							<Sheet
+								open={mobileSidebarOpen}
+								onOpenChange={setMobileSidebarOpen}
+							>
 								<SheetTrigger asChild>
-									<button className='p-2 rounded-lg border border-border hover:bg-muted transition-colors'>
-										<Menu className='h-5 w-5' />
+									<button className='p-2 rounded-lg border border-border hover:bg-muted transition-colors cursor-pointer'>
+										<PanelRight className='h-5 w-5' />
 									</button>
 								</SheetTrigger>
-								<SheetContent side='right' className='w-64 p-0'>
-									<SidebarContentComponent
-										isDark={isDark}
-										setIsDark={setIsDark}
-										activeSection={activeSection}
-										scrollToSection={scrollToSection}
-									/>
+								<SheetContent side='right' className='w-64 p-0 flex flex-col'>
+									<div className='flex items-center justify-end p-4 gap-4'>
+										<button
+											onClick={() => setIsDark(prev => !prev)}
+											className='p-2 rounded-lg border border-border hover:bg-muted transition duration-300 cursor-pointer cursor-pointer'
+											aria-label='Toggle theme'
+										>
+											<Moon className='hidden dark:block h-5 w-5 text-blue-400' />
+											<Sun className='block dark:hidden h-5 w-5 text-yellow-500' />
+										</button>
+										<button
+											onClick={() => setMobileSidebarOpen(false)}
+											className='p-2 rounded-lg border border-border hover:bg-muted transition-colors cursor-pointer'
+											aria-label='Close sidebar'
+										>
+											<X className='h-5 w-5' />
+										</button>
+									</div>
+									<div className='flex-1 overflow-y-auto'>
+										<SidebarContentComponent
+											isDark={isDark}
+											setIsDark={setIsDark}
+											activeSection={activeSection}
+											scrollToSection={scrollToSection}
+											onClose={() => setMobileSidebarOpen(false)}
+										/>
+									</div>
 								</SheetContent>
 							</Sheet>
 						</div>
@@ -405,9 +433,7 @@ export default function DocsPage({ content }: Props) {
 			</header>
 
 			{/* MAIN CONTENT */}
-			<main className={`max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 transition-all duration-300 ${
-				sidebarOpen ? 'md:ml-64' : 'md:ml-16'
-			}`}>
+			<main className='max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 md:ml-64'>
 				<div className='space-y-24'>
 					{/* 0. START */}
 					<section id='start' className='space-y-16 scroll-mt-24'>
@@ -560,14 +586,7 @@ export default function DocsPage({ content }: Props) {
 										href='#install-files'
 										className='underline decoration-primary/30 underline-offset-6'
 									>
-										<li>
-											<Link
-												href='#install-files'
-												className='underline decoration-primary/30 underline-offset-6'
-											>
-												Copy required files into your project
-											</Link>
-										</li>
+										Copy required files into your project
 									</Link>
 								</li>
 								<li>

@@ -2,19 +2,16 @@
 
 import {
 	BookOpen,
-	ChevronLeft,
+	ChevronRight,
 	Code,
 	Database,
 	HelpCircle,
 	Home,
-	Menu,
-	Moon,
 	Settings,
-	Sun,
 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 interface SidebarProps {
 	isOpen: boolean
@@ -22,6 +19,8 @@ interface SidebarProps {
 	isDark: boolean
 	setIsDark: (dark: boolean) => void
 	mobileTrigger?: React.ReactNode
+	activeSection: string
+	scrollToSection: (id: string) => void
 }
 
 const navigation = [
@@ -142,10 +141,24 @@ function SidebarContent({
 	activeSection: string
 	scrollToSection: (id: string) => void
 }) {
+	const [expandedSections, setExpandedSections] = useState<Set<string>>(
+		new Set(['start', 'core-concept', 'supabase-setup', 'env-variables']),
+	)
+
+	const toggleSection = (id: string) => {
+		const newExpanded = new Set(expandedSections)
+		if (newExpanded.has(id)) {
+			newExpanded.delete(id)
+		} else {
+			newExpanded.add(id)
+		}
+		setExpandedSections(newExpanded)
+	}
+
 	return (
 		<div className='flex flex-col h-full'>
 			{/* Logo */}
-			<div className='p-6 border-b border-border/40'>
+			<div className='p-6'>
 				<Link className='flex items-center gap-2' href='/'>
 					<div className='flex items-center justify-center'>
 						<Image
@@ -168,38 +181,54 @@ function SidebarContent({
 			</div>
 
 			{/* Navigation */}
-			<div className='flex-1 overflow-y-auto p-4'>
-				<nav className='space-y-2'>
+			<div className='flex-1 overflow-y-auto px-6'>
+				<nav className='space-y-1'>
 					{navigation.map(item => {
-						const Icon = item.icon
 						const isActive =
 							activeSection === item.id ||
 							item.subsections.some(sub => sub.id === activeSection)
+						const isExpanded = expandedSections.has(item.id)
+						const hasSubsections = item.subsections.length > 0
 
 						return (
 							<div key={item.id}>
 								<button
-									onClick={() => scrollToSection(item.id)}
-									className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
+									onClick={() => {
+										if (hasSubsections) {
+											toggleSection(item.id)
+										} else {
+											scrollToSection(item.id)
+										}
+									}}
+									className={`w-full flex items-center justify-between py-2 px-3 rounded-md text-sm transition-colors cursor-pointer ${
 										isActive
-											? 'bg-primary/10 text-primary border border-primary/20'
-											: 'hover:bg-muted text-muted-foreground hover:text-foreground'
+											? 'bg-gray-100 dark:bg-zinc-800 text-zinc-900 dark:text-gray-100'
+											: 'text-gray-600 dark:text-gray-400 hover:text-zinc-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-zinc-900'
 									}`}
 								>
-									<Icon className='h-4 w-4' />
-									<span className='text-sm font-medium'>{item.title}</span>
+									<div className='flex items-center gap-3'>
+										{' '}
+										<span>{item.title}</span>
+									</div>
+									{hasSubsections && (
+										<ChevronRight
+											className={`h-4 w-4 transition-transform ${
+												isExpanded ? 'rotate-90' : ''
+											}`}
+										/>
+									)}
 								</button>
 
-								{item.subsections.length > 0 && (
+								{hasSubsections && isExpanded && (
 									<div className='ml-7 mt-1 space-y-1'>
 										{item.subsections.map(sub => (
 											<button
 												key={sub.id}
 												onClick={() => scrollToSection(sub.id)}
-												className={`w-full flex items-center px-3 py-1.5 rounded-md text-left text-xs transition-colors ${
+												className={`w-full text-left py-1.5 px-3 rounded-md text-xs transition-colors cursor-pointer ${
 													activeSection === sub.id
-														? 'bg-primary/5 text-primary'
-														: 'hover:bg-muted/50 text-muted-foreground hover:text-foreground'
+														? 'text-zinc-900 dark:text-gray-100 font-medium'
+														: 'text-gray-500 dark:text-gray-500 hover:text-zinc-900 dark:hover:text-gray-100'
 												}`}
 											>
 												{sub.title}
@@ -212,21 +241,6 @@ function SidebarContent({
 					})}
 				</nav>
 			</div>
-
-			{/* Theme Switcher */}
-			<div className='p-4 border-t border-border/40'>
-				<button
-					onClick={() => setIsDark(!isDark)}
-					className='w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted transition-colors'
-				>
-					{isDark ? (
-						<Sun className='h-4 w-4 text-yellow-500' />
-					) : (
-						<Moon className='h-4 w-4 text-blue-400' />
-					)}
-					<span className='text-sm'>Toggle theme</span>
-				</button>
-			</div>
 		</div>
 	)
 }
@@ -237,94 +251,19 @@ export function Sidebar({
 	isDark,
 	setIsDark,
 	mobileTrigger,
+	activeSection,
+	scrollToSection,
 }: SidebarProps) {
-	const [activeSection, setActiveSection] = useState('start')
-
-	useEffect(() => {
-		const handleScroll = () => {
-			const sections = navigation.flatMap(nav =>
-				nav.subsections.length > 0 ? nav.subsections : [nav],
-			)
-
-			let current = 'start'
-			for (const section of sections) {
-				const element = document.getElementById(section.id)
-				if (element) {
-					const rect = element.getBoundingClientRect()
-					if (rect.top <= 100) {
-						current = section.id
-					}
-				}
-			}
-			setActiveSection(current)
-		}
-
-		window.addEventListener('scroll', handleScroll)
-		handleScroll()
-		return () => window.removeEventListener('scroll', handleScroll)
-	}, [])
-
-	const scrollToSection = (id: string) => {
-		const element = document.getElementById(id)
-		if (element) {
-			const yOffset = -80
-			const y =
-				element.getBoundingClientRect().top + window.pageYOffset + yOffset
-			window.scrollTo({ top: y, behavior: 'smooth' })
-		}
-	}
-
 	return (
 		<>
 			{/* Desktop Sidebar */}
-			<div
-				className={`hidden md:flex fixed left-0 top-0 h-full bg-background border-r border-border/40 transition-all duration-300 z-40 ${
-					isOpen ? 'w-64' : 'w-16'
-				}`}
-			>
-				{isOpen ? (
-					<SidebarContent
-						isDark={isDark}
-						setIsDark={setIsDark}
-						activeSection={activeSection}
-						scrollToSection={scrollToSection}
-					/>
-				) : (
-					<div className='flex flex-col items-center py-6 space-y-4'>
-						<button
-							onClick={onToggle}
-							className='p-2 rounded-lg hover:bg-muted transition-colors'
-							aria-label='Open sidebar'
-						>
-							<Menu className='h-5 w-5' />
-						</button>
-						<Link className='flex items-center justify-center' href='/'>
-							<Image
-								width={32}
-								height={32}
-								src={'/icon-dark.svg'}
-								alt={'Logo'}
-								className='hidden dark:block'
-							/>
-							<Image
-								width={32}
-								height={32}
-								src={'/icon.svg'}
-								alt={'Logo'}
-								className='block dark:hidden'
-							/>
-						</Link>
-					</div>
-				)}
-				{isOpen && (
-					<button
-						onClick={onToggle}
-						className='absolute -right-3 top-6 p-1 bg-background border border-border rounded-full shadow-md hover:bg-muted transition-colors'
-						aria-label='Close sidebar'
-					>
-						<ChevronLeft className='h-4 w-4' />
-					</button>
-				)}
+			<div className='hidden md:flex fixed left-0 top-0 h-full bg-background border-r border-border/40 transition-all duration-300 z-40 w-64'>
+				<SidebarContent
+					isDark={isDark}
+					setIsDark={setIsDark}
+					activeSection={activeSection}
+					scrollToSection={scrollToSection}
+				/>
 			</div>
 
 			{/* Mobile Sidebar */}
