@@ -2,15 +2,21 @@
 
 import { CodeBlockCommand } from '@/components/code-block-command/code-block-command'
 
-import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
+import {
+	Sheet,
+	SheetContent,
+	SheetTitle,
+	SheetTrigger,
+} from '@/components/ui/sheet'
 import { Sidebar } from '@/components/ui/sidebar'
-import { DocsContent } from '@/lib/docsContent'
+import { ContentKey } from '@/lib/defaultContent'
 import {
 	AlertCircle,
 	ArrowRight,
 	Check,
 	ChevronRight,
 	Code2,
+	Command,
 	Database,
 	Eye,
 	FileCode,
@@ -40,7 +46,7 @@ import { CopyButton } from '../copy-button/copy-button'
 
 /*  TYPES  */
 
-type Content = DocsContent
+type Content = Record<ContentKey, string>
 
 type Props = {
 	content: Content
@@ -64,137 +70,40 @@ function SearchComponent({
 }) {
 	const searchSections = [
 		{ id: 'start', title: 'Getting Started', content: content.start || '' },
-		{
-			id: 'what-is-this',
-			title: 'What is this',
-			content: content['what-is-this'] || '',
-		},
-		{
-			id: 'how-it-works',
-			title: 'How it works',
-			content: content['how-it-works'] || '',
-		},
-		{
-			id: 'what-you-will-do',
-			title: 'What you will do',
-			content: content['what-you-will-do'] || '',
-		},
-		{
-			id: 'before-you-start',
-			title: 'Before you start',
-			content: content['before-you-start'] || '',
-		},
-		{
-			id: 'core-concept',
-			title: 'Core Concept',
-			content: content['core-concept'] || '',
-		},
-		{
-			id: 'content-system',
-			title: 'Content System',
-			content: content['content-system'] || '',
-		},
-		{
-			id: 'content-flow',
-			title: 'Content Flow',
-			content: content['content-flow'] || '',
-		},
+		{ id: 'what-is-this', title: 'What is this', content: content['what-is-this'] || '' },
+		{ id: 'how-it-works', title: 'How it works', content: content['how-it-works'] || '' },
+		{ id: 'what-you-will-do', title: 'What you will do', content: content['what-you-will-do'] || '' },
+		{ id: 'before-you-start', title: 'Before you start', content: content['before-you-start'] || '' },
+		{ id: 'core-concept', title: 'Core Concept', content: content['core-concept'] || '' },
+		{ id: 'content-system', title: 'Content System', content: content['content-system'] || '' },
+		{ id: 'content-flow', title: 'Content Flow', content: content['content-flow'] || '' },
 		{ id: 'example', title: 'Example', content: content.example || '' },
-		{
-			id: 'mental-model',
-			title: 'Mental Model',
-			content: content['mental-model'] || '',
-		},
-		{
-			id: 'supabase-setup',
-			title: 'Supabase Setup',
-			content: content['supabase-setup'] || '',
-		},
-		{
-			id: 'create-account',
-			title: 'Create Account',
-			content: content['create-account'] || '',
-		},
+		{ id: 'mental-model', title: 'Mental Model', content: content['mental-model'] || '' },
+		{ id: 'supabase-setup', title: 'Supabase Setup', content: content['supabase-setup'] || '' },
+		{ id: 'create-account', title: 'Create Account', content: content['create-account'] || '' },
 		{ id: 'storage', title: 'Storage', content: content.storage || '' },
 		{ id: 'api-keys', title: 'API Keys', content: content['api-keys'] || '' },
-		{
-			id: 'env-variables',
-			title: 'Environment Variables',
-			content: content['env-variables'] || '',
-		},
-		{
-			id: 'env-create-file',
-			title: 'Create File',
-			content: content['env-create-file'] || '',
-		},
-		{
-			id: 'env-add-variables',
-			title: 'Add Variables',
-			content: content['env-add-variables'] || '',
-		},
-		{
-			id: 'admin-password',
-			title: 'Admin Password',
-			content: content['admin-password'] || '',
-		},
-		{
-			id: 'env-hosting',
-			title: 'Hosting',
-			content: content['env-hosting'] || '',
-		},
-		{
-			id: 'env-warning',
-			title: 'Warning',
-			content: content['env-warning'] || '',
-		},
-		{
-			id: 'install-files',
-			title: 'Install Files',
-			content: content['install-files'] || '',
-		},
-		{
-			id: 'project-structure',
-			title: 'Project Structure',
-			content: content['project-structure'] || '',
-		},
-		{
-			id: 'multi-page',
-			title: 'Multi Page',
-			content: content['multi-page'] || '',
-		},
-		{
-			id: 'next-config',
-			title: 'Next Config',
-			content: content['next-config'] || '',
-		},
-		{
-			id: 'admin-configuration',
-			title: 'Admin Configuration',
-			content: content['admin-configuration'] || '',
-		},
-		{
-			id: 'run-project',
-			title: 'Run Project',
-			content: content['run-project'] || '',
-		},
-		{
-			id: 'using-admin',
-			title: 'Using Admin',
-			content: content['using-admin'] || '',
-		},
-		{
-			id: 'common-mistakes',
-			title: 'Common Mistakes',
-			content: content['common-mistakes'] || '',
-		},
+		{ id: 'env-variables', title: 'Environment Variables', content: content['env-variables'] || '' },
+		{ id: 'env-create-file', title: 'Create File', content: content['env-create-file'] || '' },
+		{ id: 'env-add-variables', title: 'Add Variables', content: content['env-add-variables'] || '' },
+		{ id: 'admin-password', title: 'Admin Password', content: content['admin-password'] || '' },
+		{ id: 'env-hosting', title: 'Hosting', content: content['env-hosting'] || '' },
+		{ id: 'env-warning', title: 'Warning', content: content['env-warning'] || '' },
+		{ id: 'install-files', title: 'Install Files', content: content['install-files'] || '' },
+		{ id: 'project-structure', title: 'Project Structure', content: content['project-structure'] || '' },
+		{ id: 'multi-page', title: 'Multi Page', content: content['multi-page'] || '' },
+		{ id: 'next-config', title: 'Next Config', content: content['next-config'] || '' },
+		{ id: 'admin-configuration', title: 'Admin Configuration', content: content['admin-configuration'] || '' },
+		{ id: 'run-project', title: 'Run Project', content: content['run-project'] || '' },
+		{ id: 'using-admin', title: 'Using Admin', content: content['using-admin'] || '' },
+		{ id: 'common-mistakes', title: 'Common Mistakes', content: content['common-mistakes'] || '' },
 		{ id: 'faq', title: 'FAQ', content: content.faq || '' },
 		{ id: 'final', title: 'Final', content: content.final || '' },
 	]
 
-	const filteredSections = searchSections.filter(
-		section =>
-			section.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			section.content.toLowerCase().includes(searchQuery.toLowerCase()),
+	const filteredSections = searchSections.filter(section =>
+		section.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+		section.content.toLowerCase().includes(searchQuery.toLowerCase())
 	)
 
 	const defaultQueries = [
@@ -212,32 +121,30 @@ function SearchComponent({
 		<>
 			{/* Search Modal */}
 			{isSearchOpen && (
-				<div
-					className='fixed inset-0 z-50 bg-background/50 px-4 sm:px-6'
+				<div 
+					className='fixed inset-0 z-50 bg-background/50'
 					onClick={() => {
 						setIsSearchOpen(false)
 						setSearchQuery('')
 					}}
 				>
-					<div
-						className='relative mx-auto mt-20 w-full max-w-2xl'
-						onClick={e => e.stopPropagation()}
+					<div 
+						className='fixed left-[50%] top-[20%] z-50 w-full max-w-2xl translate-x-[-50%]'
+						onClick={(e) => e.stopPropagation()}
 					>
 						<div className='bg-background border border-border rounded-lg shadow-2xl overflow-hidden'>
 							{/* Header */}
 							<div className='flex items-center justify-between p-4 border-b border-border'>
 								<div className='flex items-center gap-3'>
 									<Search className='h-5 w-5 text-muted-foreground' />
-									<h2 className='text-lg font-semibold'>
-										Search Documentation
-									</h2>
+									<h2 className='text-lg font-semibold'>Search Documentation</h2>
 								</div>
 								<button
 									onClick={() => {
 										setIsSearchOpen(false)
 										setSearchQuery('')
 									}}
-									className='p-1 rounded-md hover:bg-muted transition-colors cursor-pointer'
+									className='p-1 rounded-md hover:bg-muted transition-colors'
 								>
 									<X className='h-5 w-5' />
 								</button>
@@ -251,8 +158,8 @@ function SearchComponent({
 										type='text'
 										placeholder='Search for anything... (⌘K)'
 										value={searchQuery}
-										onChange={e => setSearchQuery(e.target.value)}
-										className='w-full pl-10 pr-4 py-3 text-sm bg-muted/50 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/70 focus:border-transparent'
+										onChange={(e) => setSearchQuery(e.target.value)}
+										className='w-full pl-10 pr-4 py-3 text-sm bg-muted/50 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent'
 										autoFocus
 									/>
 								</div>
@@ -726,48 +633,48 @@ export default function DocsPage({ content }: Props) {
 						>
 							<Search className='h-5 w-5' />
 						</button>
-						<button
-							onClick={() => setMobileSidebarOpen(true)}
-							className='p-2 rounded-lg border border-border hover:bg-muted transition-colors cursor-pointer'
-							aria-label='Open sidebar'
+						<Sheet
+							open={mobileSidebarOpen}
+							onOpenChange={setMobileSidebarOpen}
 						>
-							<PanelRight className='h-5 w-5' />
-						</button>
+							<SheetTrigger asChild>
+								<button className='p-2 rounded-lg border border-border hover:bg-muted transition-colors cursor-pointer'>
+									<PanelRight className='h-5 w-5' />
+								</button>
+							</SheetTrigger>
+								<SheetContent side='right' className='w-64 p-0 flex flex-col'>
+									<div className='flex items-center justify-end p-4 gap-4'>
+										<button
+											onClick={() => setIsDark(prev => !prev)}
+											className='p-2 rounded-lg border border-border hover:bg-muted transition duration-300 cursor-pointer cursor-pointer'
+											aria-label='Toggle theme'
+										>
+											<Moon className='hidden dark:block h-5 w-5 text-blue-400' />
+											<Sun className='block dark:hidden h-5 w-5 text-yellow-500' />
+										</button>
+										<button
+											onClick={() => setMobileSidebarOpen(false)}
+											className='p-2 rounded-lg border border-border hover:bg-muted transition-colors cursor-pointer'
+											aria-label='Close sidebar'
+										>
+											<X className='h-5 w-5' />
+										</button>
+									</div>
+									<div className='flex-1 overflow-y-auto'>
+										<SidebarContentComponent
+											isDark={isDark}
+											setIsDark={setIsDark}
+											activeSection={activeSection}
+											scrollToSection={scrollToSection}
+											onClose={() => setMobileSidebarOpen(false)}
+										/>
+									</div>
+								</SheetContent>
+							</Sheet>
+						</div>
 					</div>
 				</div>
 			</header>
-
-			{/* Mobile Sidebar */}
-			<Sheet open={mobileSidebarOpen} onOpenChange={setMobileSidebarOpen}>
-				<SheetContent side='right' className='w-64 p-0 flex flex-col'>
-					<div className='flex items-center justify-end p-4 gap-2'>
-						<button
-							onClick={() => setIsDark(prev => !prev)}
-							className='p-2 rounded-lg border border-border hover:bg-muted transition duration-300 cursor-pointer'
-							aria-label='Toggle theme'
-						>
-							<Moon className='hidden dark:block h-5 w-5 text-blue-400' />
-							<Sun className='block dark:hidden h-5 w-5 text-yellow-500' />
-						</button>
-						<button
-							onClick={() => setMobileSidebarOpen(false)}
-							className='p-2 rounded-lg border border-border hover:bg-muted transition-colors cursor-pointer'
-							aria-label='Close sidebar'
-						>
-							<X className='h-5 w-5' />
-						</button>
-					</div>
-					<div className='flex-1 overflow-y-auto'>
-						<SidebarContentComponent
-							isDark={isDark}
-							setIsDark={setIsDark}
-							activeSection={activeSection}
-							scrollToSection={scrollToSection}
-							onClose={() => setMobileSidebarOpen(false)}
-						/>
-					</div>
-				</SheetContent>
-			</Sheet>
 
 			{/* MAIN CONTENT */}
 			<main className='max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 md:ml-64'>

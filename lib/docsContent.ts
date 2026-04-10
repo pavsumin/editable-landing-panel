@@ -1,0 +1,36 @@
+export const docsContent = {
+	start: '',
+	'what-is-this': '',
+	'how-it-works': '',
+	'what-you-will-do': '',
+	'before-you-start': '',
+	'core-concept': '',
+	'content-system': '',
+	'content-flow': '',
+	'mental-model': '',
+	'supabase-setup': '',
+	'create-account': '',
+	'api-keys': '',
+	'env-variables': '',
+	'env-create-file': '',
+	'env-add-variables': '',
+	'admin-password': '',
+	'env-hosting': '',
+	'env-warning': '',
+	'install-files': '',
+	'project-structure': '',
+	'multi-page': '',
+	'next-config': '',
+	example: '',
+	storage: '',
+	faq: '',
+	final: '',
+	'admin-configuration': '',
+	'run-project': '',
+	'using-admin': '',
+	'common-mistakes': '',
+} as const
+
+export type DocsContentKey = keyof typeof docsContent
+export type DocsContent = Record<DocsContentKey, string>
+export const docsContentKeys = Object.keys(docsContent) as DocsContentKey[]

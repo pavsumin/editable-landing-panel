@@ -95,7 +95,7 @@ export default function RootLayout({
 			<body className={`${geistSans.className} min-h-full flex flex-col`}>
 				{children}
 				<Toaster />
-				<Script id='theme-init' strategy='beforeInteractive'>
+				<Script id='theme-init'>
 					{`
 						try {
 							const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
