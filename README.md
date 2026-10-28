@@ -4,7 +4,7 @@ A focused content editor for Next.js. Keep components in code, declare editable 
 
 This repository is a working multi-page example: `/`, `/about`, `/contact`, `/docs`, `/demo` and `/admin`. The demo uses the same editor with local browser state and cannot modify the live site.
 
-## Install with CLI (recommended)
+## Install with CLI (recommended) 
 
 Supported: TypeScript, Next.js 15/16 App Router, React 19, `app` or `src/app`, with `@/*` mapped to `./*` or `./src/*`. Installed components require neither Tailwind nor shadcn. Custom `basePath`, Pages Router, static export and JavaScript-only applications are outside the supported scope.
 
