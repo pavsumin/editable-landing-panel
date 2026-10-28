@@ -1,18 +1,16 @@
 import type { MetadataRoute } from 'next'
-
+import { panelConfig } from '@/panel/config'
 export default function sitemap(): MetadataRoute.Sitemap {
-	return [
-		{
-			url: 'https://editable-landing-panel.vercel.app',
-			lastModified: new Date(),
-			changeFrequency: 'weekly',
-			priority: 1,
-		},
-		{
-			url: 'https://editable-landing-panel.vercel.app/docs',
-			lastModified: new Date(),
-			changeFrequency: 'weekly',
-			priority: 0.8,
-		},
-	]
+  const base = process.env.PANEL_SITE_URL || 'http://localhost:3000'
+  return [
+    ...new Set(
+      panelConfig.pages
+        .filter((page) => page.id !== 'global')
+        .map((page) => page.path),
+    ),
+  ].map((path) => ({
+    url: new URL(path, base).href,
+    changeFrequency: 'weekly',
+    priority: path === '/' ? 1 : 0.7,
+  }))
 }

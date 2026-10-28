@@ -1,0 +1,900 @@
+{
+  "version": 1,
+  "pages": [
+    {
+      "id": "home",
+      "label": "Home",
+      "path": "/",
+      "sections": [
+        {
+          "id": "hero",
+          "label": "Hero",
+          "fields": [
+            {
+              "key": "hero_title",
+              "label": "Hero Title",
+              "type": "text",
+              "default": "Developers build. Clients edit.",
+              "maxLength": 5000
+            },
+            {
+              "key": "hero_subtitle",
+              "label": "Hero Subtitle",
+              "type": "textarea",
+              "default": "Build your website in code. Let clients safely update content without breaking anything or touching your logic.",
+              "maxLength": 5000
+            },
+            {
+              "key": "hero_cta_primary",
+              "label": "Primary CTA (GitHub)",
+              "type": "text",
+              "default": "GitHub",
+              "maxLength": 5000
+            },
+            {
+              "key": "hero_cta_secondary",
+              "label": "Secondary CTA (Docs)",
+              "type": "text",
+              "default": "Docs",
+              "maxLength": 5000
+            },
+            {
+              "key": "hero_image_light",
+              "label": "Hero Image (Light Theme)",
+              "type": "image",
+              "default": "/hero-image.webp",
+              "maxLength": 2048
+            },
+            {
+              "key": "hero_image_dark",
+              "label": "Hero Image (Dark Theme)",
+              "type": "image",
+              "default": "/hero-image-dark.webp",
+              "maxLength": 2048
+            }
+          ]
+        },
+        {
+          "id": "demo",
+          "label": "Demo",
+          "fields": [
+            {
+              "key": "demo_title",
+              "label": "Demo Title",
+              "type": "text",
+              "default": "Try it yourself",
+              "maxLength": 5000
+            },
+            {
+              "key": "demo_subtitle",
+              "label": "Demo Subtitle",
+              "type": "textarea",
+              "default": "Edit content and see changes instantly",
+              "maxLength": 5000
+            }
+          ]
+        },
+        {
+          "id": "problem",
+          "label": "Problem",
+          "fields": [
+            {
+              "key": "problem_title",
+              "label": "Problem Title",
+              "type": "text",
+              "default": "Right now, someone always loses",
+              "maxLength": 5000
+            },
+            {
+              "key": "problem_1_title",
+              "label": "Problem 1 Title",
+              "type": "text",
+              "default": "You build it right",
+              "maxLength": 5000
+            },
+            {
+              "key": "problem_1_text",
+              "label": "Problem 1 Text",
+              "type": "textarea",
+              "default": "Clean architecture, full control, perfect UX.",
+              "maxLength": 5000
+            },
+            {
+              "key": "problem_2_title",
+              "label": "Problem 2 Title",
+              "type": "text",
+              "default": "Client needs changes",
+              "maxLength": 5000
+            },
+            {
+              "key": "problem_2_text",
+              "label": "Problem 2 Text",
+              "type": "textarea",
+              "default": "Small edits become constant requests.",
+              "maxLength": 5000
+            },
+            {
+              "key": "problem_3_title",
+              "label": "Problem 3 Title",
+              "type": "text",
+              "default": "You become support",
+              "maxLength": 5000
+            },
+            {
+              "key": "problem_3_text",
+              "label": "Problem 3 Text",
+              "type": "textarea",
+              "default": "You spend time on repetitive updates instead of shipping.",
+              "maxLength": 5000
+            }
+          ]
+        },
+        {
+          "id": "solution",
+          "label": "Solution",
+          "fields": [
+            {
+              "key": "solution_title",
+              "label": "Solution Title",
+              "type": "text",
+              "default": "There is a better way",
+              "maxLength": 5000
+            },
+            {
+              "key": "solution_text",
+              "label": "Solution Text",
+              "type": "textarea",
+              "default": "Keep your code. Add a simple editing layer. Let clients update content without touching your logic.",
+              "maxLength": 5000
+            },
+            {
+              "key": "solution_dev_label",
+              "label": "Solution Dev Label",
+              "type": "text",
+              "default": "Developer",
+              "maxLength": 5000
+            },
+            {
+              "key": "solution_dev_title",
+              "label": "Solution Dev Title",
+              "type": "text",
+              "default": "Clean Code",
+              "maxLength": 5000
+            },
+            {
+              "key": "solution_edit_label",
+              "label": "Solution Edit Label",
+              "type": "text",
+              "default": "Edit layer",
+              "maxLength": 5000
+            },
+            {
+              "key": "solution_client_label",
+              "label": "Solution Client Label",
+              "type": "text",
+              "default": "Client",
+              "maxLength": 5000
+            },
+            {
+              "key": "solution_client_title",
+              "label": "Solution Client Title",
+              "type": "text",
+              "default": "Live Editing",
+              "maxLength": 5000
+            },
+            {
+              "key": "solution_logic_label",
+              "label": "Solution Logic Label",
+              "type": "text",
+              "default": "Logic protected",
+              "maxLength": 5000
+            },
+            {
+              "key": "solution_content_label",
+              "label": "Solution Content Label",
+              "type": "text",
+              "default": "Content synced",
+              "maxLength": 5000
+            }
+          ]
+        },
+        {
+          "id": "how",
+          "label": "How it works",
+          "fields": [
+            {
+              "key": "how_title",
+              "label": "How It Works Title",
+              "type": "text",
+              "default": "How it actually works",
+              "maxLength": 5000
+            },
+            {
+              "key": "how_1_title",
+              "label": "Step 1 Title",
+              "type": "text",
+              "default": "Define your content",
+              "maxLength": 5000
+            },
+            {
+              "key": "how_1_text",
+              "label": "Step 1 Text",
+              "type": "textarea",
+              "default": "Replace hardcoded text with content keys and provide default values in your codebase.",
+              "maxLength": 5000
+            },
+            {
+              "key": "how_2_title",
+              "label": "Step 2 Title",
+              "type": "text",
+              "default": "Sync with database",
+              "maxLength": 5000
+            },
+            {
+              "key": "how_2_text",
+              "label": "Step 2 Text",
+              "type": "textarea",
+              "default": "Content is stored in Supabase and overrides your default values when available.",
+              "maxLength": 5000
+            },
+            {
+              "key": "how_3_title",
+              "label": "Step 3 Title",
+              "type": "text",
+              "default": "Edit without code",
+              "maxLength": 5000
+            },
+            {
+              "key": "how_3_text",
+              "label": "Step 3 Text",
+              "type": "textarea",
+              "default": "Clients use a simple admin panel to update content safely in real-time.",
+              "maxLength": 5000
+            }
+          ]
+        },
+        {
+          "id": "flow",
+          "label": "Flow",
+          "fields": [
+            {
+              "key": "flow_badge",
+              "label": "Flow Badge",
+              "type": "text",
+              "default": "Behind the scenes",
+              "maxLength": 5000
+            },
+            {
+              "key": "flow_title",
+              "label": "Content Flow Title",
+              "type": "text",
+              "default": "Content flow",
+              "maxLength": 5000
+            },
+            {
+              "key": "flow_subtitle",
+              "label": "Content Flow Subtitle",
+              "type": "textarea",
+              "default": "From code to live updates in seconds",
+              "maxLength": 5000
+            },
+            {
+              "key": "flow_1_label",
+              "label": "Flow 1 Label",
+              "type": "text",
+              "default": "CODE",
+              "maxLength": 5000
+            },
+            {
+              "key": "flow_1_title",
+              "label": "Flow 1 Title",
+              "type": "text",
+              "default": "defaultContent",
+              "maxLength": 5000
+            },
+            {
+              "key": "flow_1_desc",
+              "label": "Flow 1 Description",
+              "type": "textarea",
+              "default": "Fallback values",
+              "maxLength": 5000
+            },
+            {
+              "key": "flow_2_label",
+              "label": "Flow 2 Label",
+              "type": "text",
+              "default": "DATABASE",
+              "maxLength": 5000
+            },
+            {
+              "key": "flow_2_title",
+              "label": "Flow 2 Title",
+              "type": "text",
+              "default": "Supabase",
+              "maxLength": 5000
+            },
+            {
+              "key": "flow_2_desc",
+              "label": "Flow 2 Description",
+              "type": "textarea",
+              "default": "Stores content",
+              "maxLength": 5000
+            },
+            {
+              "key": "flow_3_label",
+              "label": "Flow 3 Label",
+              "type": "text",
+              "default": "ADMIN",
+              "maxLength": 5000
+            },
+            {
+              "key": "flow_3_title",
+              "label": "Flow 3 Title",
+              "type": "text",
+              "default": "/admin",
+              "maxLength": 5000
+            },
+            {
+              "key": "flow_3_desc",
+              "label": "Flow 3 Description",
+              "type": "textarea",
+              "default": "Edit interface",
+              "maxLength": 5000
+            },
+            {
+              "key": "flow_4_label",
+              "label": "Flow 4 Label",
+              "type": "text",
+              "default": "WEBSITE",
+              "maxLength": 5000
+            },
+            {
+              "key": "flow_4_title",
+              "label": "Flow 4 Title",
+              "type": "text",
+              "default": "Live site",
+              "maxLength": 5000
+            },
+            {
+              "key": "flow_4_desc",
+              "label": "Flow 4 Description",
+              "type": "textarea",
+              "default": "Always up-to-date",
+              "maxLength": 5000
+            }
+          ]
+        },
+        {
+          "id": "features",
+          "label": "Features",
+          "fields": [
+            {
+              "key": "features_title",
+              "label": "Features Title",
+              "type": "text",
+              "default": "Built for real workflows",
+              "maxLength": 5000
+            },
+            {
+              "key": "feature_1",
+              "label": "Feature 1",
+              "type": "text",
+              "default": "No CMS complexity",
+              "maxLength": 5000
+            },
+            {
+              "key": "feature_2",
+              "label": "Feature 2",
+              "type": "text",
+              "default": "Works with your code",
+              "maxLength": 5000
+            },
+            {
+              "key": "feature_3",
+              "label": "Feature 3",
+              "type": "text",
+              "default": "Full developer control",
+              "maxLength": 5000
+            },
+            {
+              "key": "feature_4",
+              "label": "Feature 4",
+              "type": "text",
+              "default": "Fast setup",
+              "maxLength": 5000
+            },
+            {
+              "key": "feature_5",
+              "label": "Feature 5",
+              "type": "text",
+              "default": "Self-hosted",
+              "maxLength": 5000
+            },
+            {
+              "key": "feature_6",
+              "label": "Feature 6",
+              "type": "text",
+              "default": "Open source",
+              "maxLength": 5000
+            }
+          ]
+        },
+        {
+          "id": "final",
+          "label": "Final",
+          "fields": [
+            {
+              "key": "final_title",
+              "label": "Final Title",
+              "type": "text",
+              "default": "Stop rebuilding admin panels",
+              "maxLength": 5000
+            },
+            {
+              "key": "final_subtitle",
+              "label": "Final Subtitle",
+              "type": "textarea",
+              "default": "Ship faster. Keep control. Let clients edit safely.",
+              "maxLength": 5000
+            },
+            {
+              "key": "final_cta",
+              "label": "Final Button Text",
+              "type": "text",
+              "default": "Get started",
+              "maxLength": 5000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "about",
+      "label": "About",
+      "path": "/about",
+      "sections": [
+        {
+          "id": "about",
+          "label": "About the project",
+          "fields": [
+            {
+              "key": "about.title",
+              "label": "Title",
+              "type": "text",
+              "default": "Your code. A simpler editing workflow.",
+              "maxLength": 180
+            },
+            {
+              "key": "about.description",
+              "label": "Description",
+              "type": "textarea",
+              "default": "An open-source editing layer for websites built with Next.js. Define editable fields, keep your components, and give clients a focused editor.",
+              "maxLength": 5000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "contact",
+      "label": "Contact",
+      "path": "/contact",
+      "sections": [
+        {
+          "id": "contact",
+          "label": "Contact details",
+          "fields": [
+            {
+              "key": "contact.title",
+              "label": "Title",
+              "type": "text",
+              "default": "Let’s build something useful.",
+              "maxLength": 180
+            },
+            {
+              "key": "contact.description",
+              "label": "Description",
+              "type": "textarea",
+              "default": "Explore the repository, try the editor, or adapt this multi-page example to your next website.",
+              "maxLength": 5000
+            },
+            {
+              "key": "contact.link",
+              "label": "Project URL",
+              "type": "url",
+              "default": "https://github.com/pavsumin/editable-landing-panel",
+              "maxLength": 2048
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "docs",
+      "label": "Documentation",
+      "path": "/docs",
+      "sections": [
+        {
+          "id": "overview",
+          "label": "Choose your starting point",
+          "fields": [
+            {
+              "key": "docs.overview.title",
+              "label": "Heading",
+              "type": "text",
+              "default": "Choose your starting point",
+              "maxLength": 200
+            },
+            {
+              "key": "docs.overview.body",
+              "label": "Explanation",
+              "type": "textarea",
+              "default": "You are reading both the setup guide and the reference for version 0.2.0. To add the editor to an existing Next.js app, follow Install → Database → Environment → Integrate. To deploy this project's own website, follow Deploy on Vercel and the migration checklist. To distribute the CLI, read Distribution. The optional shared AI service has a separate operator guide; ordinary CLI users do not need to deploy it.\n\nThe editor changes only declared content fields. Your components and application logic remain in code. Defaults are in editable-panel.config.json and saved overrides are in Supabase. The public demo is a browser-only sandbox. No claim is made here that a hosted service or npm version is already live: deployment and npm publication are separate actions.",
+              "maxLength": 12000
+            }
+          ]
+        },
+        {
+          "id": "requirements",
+          "label": "Requirements and supported scope",
+          "fields": [
+            {
+              "key": "docs.requirements.title",
+              "label": "Heading",
+              "type": "text",
+              "default": "Requirements and supported scope",
+              "maxLength": 200
+            },
+            {
+              "key": "docs.requirements.body",
+              "label": "Explanation",
+              "type": "textarea",
+              "default": "Use Node.js 22.13 or newer (the checks run on Node 24). The installer accepts TypeScript App Router projects on Next.js 15/16 with React 19 and @/* mapped to ./* or ./src/*. It supports app and src/app. The independently compiled installation fixture uses Next.js 16.2.1; other versions should be verified in your project.\n\nThe installed editor has scoped CSS and requires neither Tailwind nor shadcn. It adds @supabase/supabase-js 2.x, sharp and server-only when missing. Existing pages are not rewritten. Pages Router, custom basePath, static export and JavaScript-only apps are outside the supported scope. The two app directories must not coexist.",
+              "maxLength": 12000
+            }
+          ]
+        },
+        {
+          "id": "installation",
+          "label": "Install with CLI (recommended)",
+          "fields": [
+            {
+              "key": "docs.installation.title",
+              "label": "Heading",
+              "type": "text",
+              "default": "Install with CLI (recommended)",
+              "maxLength": 200
+            },
+            {
+              "key": "docs.installation.body",
+              "label": "Explanation",
+              "type": "textarea",
+              "default": "Recommended setup: run the CLI from the root of your existing Next.js project. The official download is hosted at https://editable-landing-panel.vercel.app. The archive becomes available after deploying this version; it does not require an npm account or a permanent CLI installation.\n\nFirst review --dry-run. Then --yes applies the plan and installs missing dependencies with the detected package manager. --preset multipage adds isolated routes /panel-example, /panel-example/about and /panel-example/contact; minimal adds only the first example. Your existing homepage stays intact. After installation, configure the database and environment before opening /admin. Until then, example routes display defaults but real admin login fails closed.",
+              "maxLength": 12000
+            }
+          ]
+        },
+        {
+          "id": "database",
+          "label": "Create or upgrade the database",
+          "fields": [
+            {
+              "key": "docs.database.title",
+              "label": "Heading",
+              "type": "text",
+              "default": "Create or upgrade the database",
+              "maxLength": 200
+            },
+            {
+              "key": "docs.database.body",
+              "label": "Explanation",
+              "type": "textarea",
+              "default": "Each installed website normally uses its own Supabase project. Create a project, open SQL Editor, paste the generated supabase/migrations/202610280001_panel_security.sql and run it. This creates or upgrades the content table, timestamp trigger and shared login-throttle function. It enables RLS, removes public mutation privileges and grants read-only public access to published content.\n\nIMPORTANT FOR THIS PROJECT: apply migration 001 to the existing Supabase database too before deploying the new admin. It is not only a template for future users. Existing key/value content is preserved; no content is seeded over it. Back up first and review the migration, because it replaces policies on the dedicated content table. An existing images bucket is not overwritten, so inspect its write policies separately. Migration 002 is needed only if you host shared AI.\n\nA service-role Data API key cannot execute SQL. Vercel environment variables do not apply migrations. Use Dashboard SQL Editor or your authorized SQL migration connection. Installation cannot silently create a new Supabase account/project.",
+              "maxLength": 12000
+            }
+          ]
+        },
+        {
+          "id": "environment",
+          "label": "Configure environment variables",
+          "fields": [
+            {
+              "key": "docs.environment.title",
+              "label": "Heading",
+              "type": "text",
+              "default": "Configure environment variables",
+              "maxLength": 200
+            },
+            {
+              "key": "docs.environment.body",
+              "label": "Explanation",
+              "type": "textarea",
+              "default": "In an installed application, copy values from .env.panel.example into .env.local. For this repository, use .env.example. Set the same server variables in Vercel before production deployment. Never commit the files containing real values. Shell variables take precedence over .env.local, which takes precedence over .env in the CLI.\n\nADMIN_PASSWORD must contain at least 16 characters; use a long random password. PANEL_SITE_URL must be your exact production origin, including https://. Locally use http://localhost:3000. Changing ADMIN_PASSWORD revokes all signed sessions. ADMIN_SESSION_SECRET is optional. NEXT_PUBLIC identifies browser-safe values; never add that prefix to a service-role key, password, session secret or Gemini key.",
+              "maxLength": 12000
+            }
+          ]
+        },
+        {
+          "id": "integration",
+          "label": "Connect existing components",
+          "fields": [
+            {
+              "key": "docs.integration.title",
+              "label": "Heading",
+              "type": "text",
+              "default": "Connect existing components",
+              "maxLength": 200
+            },
+            {
+              "key": "docs.integration.body",
+              "label": "Explanation",
+              "type": "textarea",
+              "default": "Read values in your Server Component and pass them only to the sections needing them. Keep database queries, authentication and other server logic in their current server components. A small Client Component can use usePreviewContent for unsaved preview. You do not have to turn the whole website into a client component.\n\nUse section IDs matching the config so the editor can scroll preview to the relevant section. Normal visitors receive published values; the preview hook accepts validated messages only from a same-origin parent inside an explicit ?preview=true iframe. If using next/image, add your exact Supabase public-images host/path to your app's next.config; the installer does not rewrite that config. Plain img previews need no Next image-host setting.",
+              "maxLength": 12000
+            }
+          ]
+        },
+        {
+          "id": "content",
+          "label": "Configuration reference",
+          "fields": [
+            {
+              "key": "docs.content.title",
+              "label": "Heading",
+              "type": "text",
+              "default": "Configuration reference",
+              "maxLength": 200
+            },
+            {
+              "key": "docs.content.body",
+              "label": "Explanation",
+              "type": "textarea",
+              "default": "The configuration is versioned JSON; it is read by the website, editor and CLI. Every field has a globally unique key, label, supported type, default string and maxLength (1–20000). Page and section IDs use lowercase letters, digits and hyphens. Paths are root-relative routes. Duplicate keys/IDs, executable URLs and unsupported definitions fail validation.\n\nUse namespaced keys such as about.title in new projects. Existing hero_title and other legacy keys remain supported in this repository. A page whose ID is global contributes shared fields to every page read. A config entry does not create a Next.js route. Default values are a fallback, not a seed operation that overwrites the database.",
+              "maxLength": 12000
+            }
+          ]
+        },
+        {
+          "id": "pages",
+          "label": "Pages, shared content and editor behavior",
+          "fields": [
+            {
+              "key": "docs.pages.title",
+              "label": "Heading",
+              "type": "text",
+              "default": "Pages, shared content and editor behavior",
+              "maxLength": 200
+            },
+            {
+              "key": "docs.pages.body",
+              "label": "Explanation",
+              "type": "textarea",
+              "default": "Select a page in /admin to change the visible fields and preview route together. Selection is remembered in the URL. Field search matches labels and keys. Switching pages or leaving with unsaved edits asks for confirmation. Add the route in Next.js and its page definition in config to support another existing page.\n\nText drafts preview immediately in integrated client sections. Save changes publishes a validated batch; failures retain the draft. Reset immediately removes one stored override after confirmation. Uploads are server-checked and create an immutable image URL, then Save changes publishes that URL. Discarding after upload may leave an orphaned file; cleanup is manual to avoid breaking backups.\n\nAlready-open visitor pages need refresh to see later publications. There is no visitor realtime subscription, individual editor role system or conflict resolution: simultaneous edits are last-write-wins. The /demo sandbox uses browser-only state and resets on reload.",
+              "maxLength": 12000
+            }
+          ]
+        },
+        {
+          "id": "commands",
+          "label": "CLI command reference",
+          "fields": [
+            {
+              "key": "docs.commands.title",
+              "label": "Heading",
+              "type": "text",
+              "default": "CLI command reference",
+              "maxLength": 200
+            },
+            {
+              "key": "docs.commands.body",
+              "label": "Explanation",
+              "type": "textarea",
+              "default": "The package is named editable-landing-panel; its executable is elp. npx --package=<tarball> elp runs without a permanent installation. All commands support --cwd and --json. No-output-file overwrite is allowed. --dry-run prevents file/database writes, but an explicit ai --dry-run still calls the provider to generate its preview.\n\nExit code 0 means success; 1 means failure. init --ai returns 2 if installation completed but the optional AI proposal failed. In that case the installed editor remains usable and AI can be retried separately. JSON output includes the installation result and AI result as one document.",
+              "maxLength": 12000
+            }
+          ]
+        },
+        {
+          "id": "cli-content",
+          "label": "Imports, defaults and backups",
+          "fields": [
+            {
+              "key": "docs.cli-content.title",
+              "label": "Heading",
+              "type": "text",
+              "default": "Imports, defaults and backups",
+              "maxLength": 200
+            },
+            {
+              "key": "docs.cli-content.body",
+              "label": "Explanation",
+              "type": "textarea",
+              "default": "An import can contain {\"values\":{\"home.title\":\"New title\"}} or a plain key/value object. The entire batch is validated before changes. --defaults changes only the matching default strings in editable-panel.config.json. --remote makes one atomic upsert and does not delete unspecified keys. Choose exactly one target: --defaults, --remote or --out.\n\nDatabase overrides take precedence over local defaults. Updating a default does not replace a client’s saved value; reset that field in the editor or use an explicit remote import if you want to replace it. Export --remote merges defaults with stored values; it is a portable snapshot, not an exact override-only database backup. Make a database backup separately before changing permissions or migrations.",
+              "maxLength": 12000
+            }
+          ]
+        },
+        {
+          "id": "ai",
+          "label": "AI-assisted setup: shared service or own key",
+          "fields": [
+            {
+              "key": "docs.ai.title",
+              "label": "Heading",
+              "type": "text",
+              "default": "AI-assisted setup: shared service or own key",
+              "maxLength": 200
+            },
+            {
+              "key": "docs.ai.body",
+              "label": "Explanation",
+              "type": "textarea",
+              "default": "AI is optional. A normal init works without a model, key or shared endpoint. init --ai brief.txt uses Gemini to prepare copy for the declared fields after installing the deterministic preset. It writes panel-content.proposal.json, never arbitrary source-code edits or a database publication. Review the proposal, then apply it to local defaults or publish through a separate explicit import.\n\nWithout GEMINI_API_KEY, the CLI calls the shared server at the project’s published Vercel URL. Your common key stays on that server and is never shipped in the package. The service becomes available only after its operator enables it and applies migration 002. A local GEMINI_API_KEY takes precedence and is sent only to Google, never to the shared server. GEMINI_MODEL defaults to gemini-3.5-flash-lite in both modes. Use ELP_AI_URL or --ai-url to point to another trusted deployment.\n\nShared protection allows up to 3 requests per client-IP/day and 20 total/day (UTC). These are application budgets, not a promise of Google quota. Upstream 429 or unavailable service produces instructions for an own key; installation still works without AI. Never assume a free tier is unlimited or permanently available.\n\nWhen --page is omitted, AI uses the first configured page plus shared fields. Run it for other pages separately when needed.",
+              "maxLength": 12000
+            }
+          ]
+        },
+        {
+          "id": "own-key",
+          "label": "Switch to your own free-tier Gemini key",
+          "fields": [
+            {
+              "key": "docs.own-key.title",
+              "label": "Heading",
+              "type": "text",
+              "default": "Switch to your own free-tier Gemini key",
+              "maxLength": 200
+            },
+            {
+              "key": "docs.own-key.body",
+              "label": "Explanation",
+              "type": "textarea",
+              "default": "Open Google AI Studio, create/select your project and obtain an API key for the Gemini Developer API. Confirm the model is available and the project is on the intended free tier; a key itself does not guarantee free unlimited usage. Add the key to your target project’s .env.local (not .env.panel.example, not NEXT_PUBLIC). Keep it out of Git. Run the same CLI command again: it automatically uses your key instead of the shared service.\n\nThe brief and selected text-field definitions/defaults are transmitted for generation. The CLI does not upload source files, Supabase keys or admin passwords. In shared mode the operator’s server processes the brief before forwarding to Google. Review provider data-use terms before submitting client confidential material. Do not put secrets into a brief.",
+              "maxLength": 12000
+            }
+          ]
+        },
+        {
+          "id": "vercel",
+          "label": "Deploy this project on Vercel",
+          "fields": [
+            {
+              "key": "docs.vercel.title",
+              "label": "Heading",
+              "type": "text",
+              "default": "Deploy this project on Vercel",
+              "maxLength": 200
+            },
+            {
+              "key": "docs.vercel.body",
+              "label": "Explanation",
+              "type": "textarea",
+              "default": "Import this repository into Vercel with its Next.js framework preset and Node 24. Keep the repository root as the project root. Use the package.json build command: pnpm build. It generates the CLI assets and public download tarball before building Next.js. Do not replace it with bare next build if you want the downloadable CLI.\n\nBefore using the new admin, back up the existing database and apply migration 001. To host shared AI too, apply migration 002. Then add the environment variables below, set your domain and redeploy. Vercel does not run SQL migrations just because an env key is present. No Gemini key is needed in this Codex environment to prepare the code; you provide it only in your Vercel settings.\n\nAfter deployment, open /docs, download the CLI, test /admin login/save/reset/upload, then test an AI proposal from a client without a local key and with its own key. Ordinary users install into their own project and configure their own Supabase; they do not receive access to this website’s database.",
+              "maxLength": 12000
+            }
+          ]
+        },
+        {
+          "id": "shared-ai",
+          "label": "Shared AI operator reference",
+          "fields": [
+            {
+              "key": "docs.shared-ai.title",
+              "label": "Heading",
+              "type": "text",
+              "default": "Shared AI operator reference",
+              "maxLength": 200
+            },
+            {
+              "key": "docs.shared-ai.body",
+              "label": "Explanation",
+              "type": "textarea",
+              "default": "The shared endpoint is POST /api/editable-panel/assist. It accepts bounded JSON containing brief and text-field definitions. It cannot query website content, accept arbitrary Gemini models from callers, forward your API key, use tools, execute code or publish generated text. Server-side model/key settings control provider access. It is public intentionally for CLI clients; CORS/Origin checks are not bot authentication.\n\nEnable it only after migration 002. The function atomically reserves the per-IP and global daily budgets in Supabase before contacting Google; failures consume reservations too. Quota state is shared by all Vercel instances. Raw IPs are HMAC-hashed with PANEL_AI_RATE_SECRET, and the function trusts Vercel’s platform IP header. Missing protection or trusted IP fails closed. Outside Vercel, only enable PANEL_TRUST_PROXY behind a proxy that overwrites forwarded headers.\n\nThe global cap limits successful generation reservations but does not prevent someone from exhausting the shared allowance or sending many rejected requests. Use Vercel Firewall/request limits and provider billing controls appropriate to public traffic. On a paid Gemini project, a small number of requests can still cost money: application limits do not make a paid API free. Disable immediately with PANEL_AI_ENABLED=false if necessary.\n\nPANEL_AI_RATE_SECRET is a private random server secret, not a password for users and not a Gemini credential. Add it only in Vercel Environment Variables for the shared-service deployment (Production, and Preview only if you enable the service there). It signs HMAC fingerprints of client IPs before the quota function records them, so the database stores no raw IPs. Use a cryptographically random value of at least 32 characters and keep it stable. Rotating it changes per-client fingerprints; the global daily cap remains. Generate 32 random bytes as 64 hex characters with the command below.",
+              "maxLength": 12000
+            }
+          ]
+        },
+        {
+          "id": "distribution",
+          "label": "CLI distribution: Vercel download or npm",
+          "fields": [
+            {
+              "key": "docs.distribution.title",
+              "label": "Heading",
+              "type": "text",
+              "default": "CLI distribution: Vercel download or npm",
+              "maxLength": 200
+            },
+            {
+              "key": "docs.distribution.body",
+              "label": "Explanation",
+              "type": "textarea",
+              "default": "You do not have to create an npm account for the website-hosted download path. pnpm build creates public/downloads/editable-landing-panel-0.2.0.tgz from a fixed list of runtime assets, code and documentation. Vercel serves it from your domain. npx --package=<HTTPS download> elp init is a real installation command, not an example of an already-published registry package.\n\nFor the shorter npx editable-landing-panel@0.2.0 init command, an owner must separately publish packages/cli to npm with a permitted package name and authenticated npm account. Deploying on Vercel does not publish to npm. The project executable is elp in either case. The build bakes your configured HTTPS PANEL_SITE_URL into the downloadable CLI’s shared endpoint. After changing domains, rebuild and re-download; already downloaded CLI copies can override the URL with ELP_AI_URL or --ai-url.",
+              "maxLength": 12000
+            }
+          ]
+        },
+        {
+          "id": "api",
+          "label": "HTTP API reference",
+          "fields": [
+            {
+              "key": "docs.api.title",
+              "label": "Heading",
+              "type": "text",
+              "default": "HTTP API reference",
+              "maxLength": 200
+            },
+            {
+              "key": "docs.api.body",
+              "label": "Explanation",
+              "type": "textarea",
+              "default": "The website editor uses a same-origin signed cookie, not the old x-admin-password header. Session cookies are scoped to /api/editable-panel and never contain the password. Mutations require the configured Origin. Content reads for the editor require a session; public pages use the server reader and public read-only database access. All API responses disable caching.\n\nLegacy /api/login, /api/content, /api/get-content and /api/upload endpoints are removed in this version. Custom clients using them must migrate. The shared AI endpoint is separate: it is public with database-backed budgets and does not grant content-editing access.",
+              "maxLength": 12000
+            }
+          ]
+        },
+        {
+          "id": "security",
+          "label": "Security and honest production limits",
+          "fields": [
+            {
+              "key": "docs.security.title",
+              "label": "Heading",
+              "type": "text",
+              "default": "Security and honest production limits",
+              "maxLength": 200
+            },
+            {
+              "key": "docs.security.body",
+              "label": "Explanation",
+              "type": "textarea",
+              "default": "The baseline migration explicitly enables RLS and revokes public write privileges, including TRUNCATE. Run verify.sql and review actual storage policies: an existing bucket’s public/private flag alone does not prove safe write permissions. All rows in content are public published values; never store credentials or drafts there.\n\nUse HTTPS, a unique long password and exact PANEL_SITE_URL. Login throttling is database-backed and fails closed if unavailable. The default login bucket is shared across clients; opt into trusted-IP handling only behind an overwriting proxy. This is one shared administrator, not an enterprise access-control system. No per-user roles, content revisions, conflict detection or individual-token revocation are provided. Logout removes this browser’s cookie; password rotation revokes every token. An already copied valid token otherwise lasts until its eight-hour expiry.\n\nA successful local build/test is not certification of your live database, Vercel firewall or a penetration test. Configure backups, platform limits and monitoring before opening a public shared service.",
+              "maxLength": 12000
+            }
+          ]
+        },
+        {
+          "id": "operations",
+          "label": "Troubleshooting and verification",
+          "fields": [
+            {
+              "key": "docs.operations.title",
+              "label": "Heading",
+              "type": "text",
+              "default": "Troubleshooting and verification",
+              "maxLength": 200
+            },
+            {
+              "key": "docs.operations.body",
+              "label": "Explanation",
+              "type": "textarea",
+              "default": "Run doctor after setting environment and applying SQL. Public pages log a warning and fall back to config on database read failures; the editor reports errors rather than pretending a failed read succeeded. Remote diagnostics inspect content and bucket metadata and make an empty anonymous upsert probe; no rows are inserted, but SQL inspection is still needed to prove every permission.\n\nLogin 503: check migration 001, database access and a password of at least 16 characters. Production Origin 403/503: check PANEL_SITE_URL against the exact scheme/host you use. Shared AI 503: check enable flag, key, rate secret, migration 002 and trusted platform IP. Shared AI 429: use your own key or retry after the daily window; increasing account limits is not automatically free. init conflicts: inspect the reported existing path/route rather than forcing an overwrite. Upload errors: check bucket permissions and supported JPEG/PNG/WebP/AVIF size ≤5 MB / 40 MP.\n\nConcurrent editors are last-write-wins. Export before bulk changes, inspect orphaned uploads manually, and do not remove files still referenced by backups.",
+              "maxLength": 12000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "global",
+      "label": "Shared content",
+      "path": "/about",
+      "sections": [
+        {
+          "id": "footer",
+          "label": "Footer",
+          "fields": [
+            {
+              "key": "global.footer",
+              "label": "Footer text",
+              "type": "text",
+              "default": "Built with Editable Landing Panel · MIT licensed",
+              "maxLength": 240
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

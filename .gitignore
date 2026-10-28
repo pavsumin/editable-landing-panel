@@ -1,7 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
+node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -41,3 +41,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Generated release and browser artifacts
+packages/cli/assets/
+packages/cli/lib/
+packages/cli/README.md
+packages/cli/LICENSE
+*.tgz
+playwright-report/
+test-results/
+
+# Built by cli:pack and served by Vercel
+/public/downloads/*.tgz

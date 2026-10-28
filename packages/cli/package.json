@@ -1,0 +1,31 @@
+{
+  "name": "editable-landing-panel",
+  "version": "0.2.0",
+  "description": "Install and manage a focused Next.js content editor",
+  "type": "module",
+  "bin": {
+    "elp": "bin/elp.mjs"
+  },
+  "files": [
+    "bin",
+    "lib",
+    "assets",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "dependencies": {
+    "typescript": "^5.9.3"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pavsumin/editable-landing-panel.git",
+    "directory": "packages/cli"
+  },
+  "scripts": {
+    "prepack": "node ../../scripts/build-cli.mjs"
+  }
+}

@@ -1,408 +1,181 @@
 # Editable Landing Panel
 
-![Banner](/public/og-image.png)
+A focused content editor for Next.js. Keep components in code, declare editable fields once, and let clients preview and publish text and images. Supabase stores overrides; your configuration provides defaults.
 
-Add a simple admin panel to your Next.js website – without CMS complexity.
+This repository is a working multi-page example: `/`, `/about`, `/contact`, `/docs`, `/demo` and `/admin`. The demo uses the same editor with local browser state and cannot modify the live site.
 
-Let clients update content. Keep your code clean.
+## Install with CLI (recommended)
 
-[Get Started](https://github.com/pavsumin/editable-landing-panel?tab=readme-ov-file#installation)
+Supported: TypeScript, Next.js 15/16 App Router, React 19, `app` or `src/app`, with `@/*` mapped to `./*` or `./src/*`. Installed components require neither Tailwind nor shadcn. Custom `basePath`, Pages Router, static export and JavaScript-only applications are outside the supported scope.
 
-## Overview
+**The public npm package is not published by this iteration. No npm account is required for the Vercel-hosted download.** `pnpm build` prepares the archive before compiling Next.js. After deploying this version, run from the target application:
 
-Editable Landing Panel adds a lightweight editing layer on top of your existing website.
-
-- You keep full control over code
-- Clients get a simple UI to update content
-- No CMS, no schemas, no builders
-
-## Features
-
-- Real-time content editing (no cache)
-- Live preview while editing
-- Works on desktop and mobile
-- Secure admin access (password protected)
-- Image upload with auto optimization (WebP)
-- Works with any Next.js project
-
-## How it works
-
-```
-defaultContent (fallback)
-        ↓
-Supabase (stores updates)
-        ↓
-getContent()
-        ↓
-UI → {c.hero_title}
-        ↓
-Admin → updates content
+```sh
+npx --package=https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.2.0.tgz elp init --preset multipage --dry-run --json
+npx --package=https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.2.0.tgz elp init --preset multipage --yes
+# Optional permanent installation:
+npm install --global https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.2.0.tgz
+elp --help
 ```
 
-# Installation
+Use `pnpm cli:pack` for a local archive under public/downloads, then `npx --package=/absolute/path/file.tgz elp ...`. For the shorter `npx editable-landing-panel@0.2.0 init`, an authorized owner must separately publish packages/cli to npm. Vercel deployment does not publish packages.
 
-## 1. Create Supabase project (first)
+The installer adds /admin, /api/editable-panel/{session,content,upload}, scoped runtime files, config, an env example and migration 001. Example routes live under /panel-example, preserving the existing homepage. Conflicts are refused before writing; repeat runs preserve edited config. Use --no-install to manage dependencies yourself.
 
-Go to Supabase and create a new project.
+Apply migration 001, set your own Supabase variables and run `elp doctor --remote`. This project's existing database also needs migration 001 before the upgraded admin is deployed. Migration 002 is only for hosting the optional shared AI endpoint. Integration does not automatically rewrite arbitrary JSX or move business logic.
 
-### Create table:
+## Included
 
-```
-create table content (
-  key text primary key,
-  value text
-);
-```
+- One versioned `editable-panel.config.json` for pages, sections, labels, types, defaults and validation. Existing `hero_title` keys remain compatible.
+- Responsive editor, page selector, field search, unsaved live preview, explicit batch saving and reset. Failed saves retain drafts.
+- Server-validated image uploads: up to 5 MB and 40 megapixels, re-encoded to WebP, rotated, stripped of metadata and bounded to 1600 pixels.
+- Expiring signed HttpOnly sessions, origin checks, a shared database login throttle, explicit RLS and grants.
+- CLI installation, diagnostics, JSON schema, content export/import and optional Gemini copy proposals. AI never publishes or rewrites arbitrary code.
+- Minimal and multi-page presets, scoped CSS, MIT license and CI.
 
-### Create storage:
+Saved content appears on new requests. Already open visitor pages do not have a realtime subscription. Unsaved preview requires the preview hook in the relevant client section; other components can remain server-rendered.
 
-- Bucket name: images
-- Public: enabled
+## Run this repository
 
-## 2. Environment variables
+Requires Node.js >=22.13; CI uses Node 24. Package manager: pnpm 11.25.0.
 
-Create .env.local:
-
-```
-NEXT_PUBLIC_SUPABASE_URL=your_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key
-SUPABASE_SERVICE_ROLE_KEY=your_key
-
-ADMIN_PASSWORD=your_password
+```sh
+pnpm install
+cp .env.example .env.local
+pnpm dev
 ```
 
-#### What is ADMIN_PASSWORD?
+Without credentials, public pages render configured defaults and `/demo` works. The real editor requires Supabase, its migration and a strong password. Configure locally and in hosting:
 
-This is the password used to access /admin.
-
-- You (or your client) will enter this password to edit content
-- Without it – admin panel is inaccessible
-
-### Env warnings
-
-Warnings about public environment variables are expected.
-
-- NEXT_PUBLIC\* → used in frontend
-- SERVICE_ROLE_KEY → used only on server
-
-This is normal and required for the system to work.
-
-## 3. Copy required files
-
-Download this repository as ZIP or copy manually:
-
-- app/api/\*
-- lib/\*
-- components/ui/\*
-- app/admin/page.tsx
-
-Place them into your project with the same structure.
-
-## 4. Configure Next.js images
-
-Open:
-
-```
-next.config.ts
+```dotenv
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-public-key
+SUPABASE_SERVICE_ROLE_KEY=your-server-key
+ADMIN_PASSWORD=at-least-16-random-characters
+PANEL_SITE_URL=https://editable-landing-panel.vercel.app
 ```
 
-Add:
+Use `PANEL_SITE_URL=http://localhost:3000` locally. It is required for production mutation checks and is used for canonical URLs, sitemap and robots. Never expose admin, service-role, session or AI secrets through `NEXT_PUBLIC_*`. Analytics is disabled unless `NEXT_PUBLIC_GA_ID` is set. System fonts remove external font downloads from builds.
 
-```
-images: {
-  remotePatterns: [
+Apply [the migration](supabase/migrations/202610280001_panel_security.sql) in Supabase SQL Editor. It preserves keys/values and is repeatable. It owns policies on the dedicated `public.content` table: review it if that table serves another application. Every content row is public; never store secrets or unpublished drafts there. Existing storage bucket settings/policies are preserved for separate review. Run [verify.sql](supabase/verify.sql) to inspect effective privileges after migration.
+
+Login fails closed until its throttle migration is applied. A service-role Data API key cannot execute SQL migrations.
+
+## Declare content once
+
+```json
+{
+  "version": 1,
+  "pages": [
     {
-      protocol: 'https',
-      hostname: '**.supabase.co',
-    },
-  ],
+      "id": "home",
+      "label": "Home",
+      "path": "/",
+      "sections": [
+        {
+          "id": "hero",
+          "label": "Hero",
+          "fields": [
+            {
+              "key": "home.title",
+              "label": "Title",
+              "type": "text",
+              "default": "Welcome",
+              "maxLength": 180
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }
 ```
 
-### Why this is required
+Keys are globally unique; use page prefixes for new projects. Types: `text`, `textarea`, `image`, `url`. URLs must be HTTPS or root-relative; SVG image URLs are rejected. A page with ID `global` contributes shared fields to page reads. Config entries do not create Next.js routes.
 
-Your images will be stored in Supabase.
+Read values on the server:
 
-Next.js blocks external images by default –
-this config allows them to load properly.
-
-## 5. Replace app/page.tsx
-
-You must replace your page.tsx with this logic:
-
-```
-import HomePage from '@/components/pages/HomePage'
-import { getContent } from '@/lib/getContent'
-
+```tsx
+import { readContent } from '@/panel/server'
+import Hero from './Hero'
 export const revalidate = 0
-
 export default async function Page() {
-  const content = await getContent()
-  return <HomePage content={content} />
+  const { values } = await readContent('home')
+  return <Hero content={values} />
 }
 ```
 
-### Why this matters
+Opt a client section into unsaved preview:
 
-- disables cache → instant updates
-- connects UI with Supabase
-- enables live editing
-
-## 6. Move your UI
-
-Create:
-
-```
-components/pages/HomePage.tsx
-```
-
-Move your entire page UI there.
-
-Use the template:
-
-```
+```tsx
 'use client'
-
-import { ContentKey } from '@/lib/defaultContent'
-import { useEffect } from 'react'
-
-type Content = Record<ContentKey, string>
-
-type Props = {
-	content: Content
-}
-
-export default function Home({ content }: Props) {
-	useEffect(() => {
-		const handler = (e: MessageEvent) => {
-			if (e.data?.type !== 'scroll-to') return
-
-			const id = e.data.id
-			if (!id) return
-
-			const el = document.getElementById(id)
-			if (!el) return
-
-			const yOffset = -80
-			const y =
-				el.getBoundingClientRect().top + window.pageYOffset + yOffset
-
-			window.scrollTo({
-				top: y,
-				behavior: 'smooth',
-			})
-		}
-
-		window.addEventListener('message', handler)
-		return () => window.removeEventListener('message', handler)
-	}, [])
-
-	const c = content
-
-	return (
-		<main>
-			{/* your content */}
-			<h1>{c.hero_title}</h1>
-		</main>
-	)
+import { usePreviewContent } from '@/panel/PreviewBridge'
+export default function Hero({ content }: { content: Record<string, string> }) {
+  const c = usePreviewContent(content)
+  return (
+    <section id="hero">
+      <h1>{c['home.title']}</h1>
+    </section>
+  )
 }
 ```
 
-Or copy it from this repo:
+Messages are accepted only from the same-origin parent in an explicit preview iframe. The editor uses one iframe for desktop and mobile. For `next/image`, allow the exact Supabase storage hostname/path in your target Next.js config; the installer does not rewrite that file.
 
-```
-components/pages/TemplatePage.tsx
-```
+## Terminal and AI workflows
 
-### Important
-
-You must follow this structure exactly.
-
-It includes:
-
-- content typing
-- scroll sync (editor → preview)
-- required hooks
-
-### Multi-page support
-
-If your website has multiple pages:
-
-Repeat the same process for each page.
-
-Example:
-
-```
-app/about/page.tsx
-→ components/pages/AboutPage.tsx
+```sh
+elp pages list --json
+elp schema --json
+elp content export --remote --out backup.json
+elp content import changes.json --remote --dry-run
+elp content import changes.json --remote --yes
 ```
 
-## 7. Make content editable
+Imports validate the entire batch before one atomic upsert and never delete unspecified keys. Exports contain merged values, not the exact set of override rows. Restore them with a reviewed import. Local imports can write an explicit `--out` proposal or update config defaults with `--defaults --yes`. Neither changes saved database overrides.
 
-Replace static text with keys.
+Codex/Claude can consume the schema and prepare imports without another AI account. With no local Gemini key the CLI uses the deployed shared service. A local GEMINI_API_KEY takes priority and goes only to Google; GEMINI_MODEL optionally overrides the default gemini-3.5-flash-lite:
 
-Before:
-
-```
-<h1>Welcome</h1>
-```
-
-After:
-
-```
-<h1>{c.hero_title}</h1>
+```sh
+elp ai brief.txt --page home
+elp ai brief.txt --page home --out proposal.json --yes
+elp content import proposal.json --remote --dry-run
 ```
 
-### Important
+AI sends field definitions and your brief to Google, requests structured JSON, validates it and shows a diff. It never publishes. Review provider availability, quotas and data-use terms before sending confidential material. `ai --dry-run` still calls Google but does not write a file.
 
-If you want something editable – it must be a key.
+See [CLI reference](docs/CLI.md) and `/docs` for full instructions.
 
-## 8. Define content
+## Verification and production scope
 
-File:
-
-```
-lib/defaultContent.ts
-```
-
-Example:
-
-```
-hero_title: 'Welcome to my website'
+```sh
+pnpm check       # CLI assets, lint, Next types, unit/API/SQL/CLI tests
+pnpm build
+pnpm test:e2e    # Local mock Supabase; never your live database
+node scripts/smoke-install.mjs
 ```
 
-### Images
+Browser tests need `pnpm exec playwright install chromium` or `PLAYWRIGHT_CHROMIUM_EXECUTABLE=/path/to/chromium`. Database tests use local PGlite. Restricted environments may require permission for subprocesses and local ports.
 
-```
-hero_image_light: '/hero.webp'
-```
+This is a single shared-admin editor: no per-user roles, individual token revocation, database drafts, revision history or conflict detection. Concurrent editors use last-write-wins. Password rotation revokes all sessions; logout clears the browser cookie but cannot invalidate a copied token before expiry.
 
-```
-<Image src={c.hero_image_light} />
-```
+Use HTTPS, a long unique password and the correct origin. Login has a conservative shared limit of 10 attempts per 15 minutes across instances. Enable `PANEL_TRUST_PROXY` only behind a proxy that overwrites `x-forwarded-for`. Add hosting limits for volumetric attacks and abusive authenticated uploads. Orphaned files are retained deliberately: inspect references and backups before cleanup.
 
-### Image behavior
+Production readiness requires applying/verifying the live migration, reviewing storage policies and testing hosting. Local checks cannot certify remote permissions. See [security notes](docs/SECURITY.md) and [iteration report](docs/IMPLEMENTATION_REPORT.md).
 
-Images uploaded via admin are:
+MIT © Pavel Sumin. See [LICENSE](LICENSE).
 
-- compressed
-- converted to WebP
-- optimized automatically
+## Optional AI help during installation
 
-No manual optimization needed.
-
-## Admin configuration
-
-File:
-
-```
-app/admin/page.tsx
+```sh
+elp init --preset multipage --ai brief.txt --yes
+# Review the proposal, then change local defaults:
+elp content import panel-content.proposal.json --defaults --dry-run
+elp content import panel-content.proposal.json --defaults --yes
 ```
 
-### sections
+AI writes a proposal, never publishes. Without --page it uses the first configured page plus shared fields. Shared quota failure prints instructions for a personal key; the installed editor still works without AI.
 
-Groups fields into blocks inside admin UI.
+To host the shared service in this repository, apply migration 002 and configure Vercel with GEMINI_API_KEY, optional GEMINI_MODEL, PANEL_AI_ENABLED=true and a random PANEL_AI_RATE_SECRET of at least 32 characters. The default model is gemini-3.5-flash-lite. Users of an installed editor only need migration 001 and their own Supabase.
 
-Example:
-
-```
-export const sections = {
-	Hero: [
-		'hero_title',
-		'hero_subtitle',
-	],
-	Problem: [
-		'problem_title',
-		'problem_1_title',
-	],
-	Solution: [
-		'solution_title',
-		'solution_text',
-	],
-   etc.
-}
-```
-
-This makes editing structured and clear.
-
-### labelMap
-
-Controls how fields are displayed in UI.
-
-```
-export const labelMap: Record<ContentKey, string> = {
-	hero_title: 'Main Title',
-	hero_subtitle: 'Support Title',
-   Etc.
-}
-```
-
-You can name fields however you want (any language).
-
-### scroll mapping
-
-Links editor with preview.
-
-```
-const scrollToSection = (section: string) => {
-		const map: Record<string, string> = {
-			Hero: 'hero',
-			Problem: 'problem',
-			Solution: 'solution',
-etc.
-}
-```
-
-Each section must have a matching id:
-
-```
-<section id=‘hero’>
-  Content
-</section>
-```
-
-#### Important
-
-You don’t need to build this file from scratch.
-
-Just open the app/admin/page.tsx you copied from this repository and:
-
-- update keys (hero_title, etc.)
-- adjust sections
-- rename labels in labelMap
-- match section IDs for scroll
-
-Everything else is already implemented and ready to use.
-
-### Notes
-
-- Same key = same content everywhere
-- Use unique keys if content differs
-- One Supabase project per website
-
-### Setup time
-
-- ~30–60 minutes manually
-- faster with AI
-
-### Documentation
-
-If you want a full step-by-step guide:
-
-→ [/docs](https://editable-landing-panel.vercel.app/docs)
-
-### Tech stack
-
-- Next.js
-- TypeScript
-- Supabase
-- Tailwind CSS
-- shadcn/ui
-
-### License
-
-MIT — free to use and modify
-
-### Author
-
-[Pavel Sumin](https://pavelsumin.com)
+The build embeds the public HTTPS PANEL_SITE_URL into the downloaded CLI's shared endpoint; no private keys are included. Shared budgets are 3/client/day and 20 total/day (UTC), not a guarantee of free provider quota. A local own key bypasses the shared operator and its allowance. See /docs, docs/CLI.md and docs/SECURITY.md.

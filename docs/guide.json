@@ -1,0 +1,250 @@
+[
+  {
+    "id": "overview",
+    "title": "Choose your starting point",
+    "group": "Start here",
+    "body": "You are reading both the setup guide and the reference for version 0.2.0. To add the editor to an existing Next.js app, follow Install → Database → Environment → Integrate. To deploy this project's own website, follow Deploy on Vercel and the migration checklist. To distribute the CLI, read Distribution. The optional shared AI service has a separate operator guide; ordinary CLI users do not need to deploy it.\n\nThe editor changes only declared content fields. Your components and application logic remain in code. Defaults are in editable-panel.config.json and saved overrides are in Supabase. The public demo is a browser-only sandbox. No claim is made here that a hosted service or npm version is already live: deployment and npm publication are separate actions."
+  },
+  {
+    "id": "requirements",
+    "title": "Requirements and supported scope",
+    "group": "Start here",
+    "body": "Use Node.js 22.13 or newer (the checks run on Node 24). The installer accepts TypeScript App Router projects on Next.js 15/16 with React 19 and @/* mapped to ./* or ./src/*. It supports app and src/app. The independently compiled installation fixture uses Next.js 16.2.1; other versions should be verified in your project.\n\nThe installed editor has scoped CSS and requires neither Tailwind nor shadcn. It adds @supabase/supabase-js 2.x, sharp and server-only when missing. Existing pages are not rewritten. Pages Router, custom basePath, static export and JavaScript-only apps are outside the supported scope. The two app directories must not coexist."
+  },
+  {
+    "id": "installation",
+    "title": "Install with CLI (recommended)",
+    "group": "Setup",
+    "body": "Recommended setup: run the CLI from the root of your existing Next.js project. The official download is hosted at https://editable-landing-panel.vercel.app. The archive becomes available after deploying this version; it does not require an npm account or a permanent CLI installation.\n\nFirst review --dry-run. Then --yes applies the plan and installs missing dependencies with the detected package manager. --preset multipage adds isolated routes /panel-example, /panel-example/about and /panel-example/contact; minimal adds only the first example. Your existing homepage stays intact. After installation, configure the database and environment before opening /admin. Until then, example routes display defaults but real admin login fails closed.",
+    "code": "# No npm publication is required for this website-hosted tarball:\nnpx --package=https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.2.0.tgz elp init --preset multipage --dry-run --json\nnpx --package=https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.2.0.tgz elp init --preset multipage --yes\n\n# Optional global installation from the same download:\nnpm install --global https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.2.0.tgz\nelp --help"
+  },
+  {
+    "id": "database",
+    "title": "Create or upgrade the database",
+    "group": "Setup",
+    "body": "Each installed website normally uses its own Supabase project. Create a project, open SQL Editor, paste the generated supabase/migrations/202610280001_panel_security.sql and run it. This creates or upgrades the content table, timestamp trigger and shared login-throttle function. It enables RLS, removes public mutation privileges and grants read-only public access to published content.\n\nIMPORTANT FOR THIS PROJECT: apply migration 001 to the existing Supabase database too before deploying the new admin. It is not only a template for future users. Existing key/value content is preserved; no content is seeded over it. Back up first and review the migration, because it replaces policies on the dedicated content table. An existing images bucket is not overwritten, so inspect its write policies separately. Migration 002 is needed only if you host shared AI.\n\nA service-role Data API key cannot execute SQL. Vercel environment variables do not apply migrations. Use Dashboard SQL Editor or your authorized SQL migration connection. Installation cannot silently create a new Supabase account/project.",
+    "code": "# After applying migration 001 and configuring environment:\nelp doctor --remote --json\n# Also run supabase/verify.sql from the repository in SQL Editor.\n# Expected content permissions: public SELECT only, no INSERT/UPDATE/DELETE/TRUNCATE."
+  },
+  {
+    "id": "environment",
+    "title": "Configure environment variables",
+    "group": "Setup",
+    "body": "In an installed application, copy values from .env.panel.example into .env.local. For this repository, use .env.example. Set the same server variables in Vercel before production deployment. Never commit the files containing real values. Shell variables take precedence over .env.local, which takes precedence over .env in the CLI.\n\nADMIN_PASSWORD must contain at least 16 characters; use a long random password. PANEL_SITE_URL must be your exact production origin, including https://. Locally use http://localhost:3000. Changing ADMIN_PASSWORD revokes all signed sessions. ADMIN_SESSION_SECRET is optional. NEXT_PUBLIC identifies browser-safe values; never add that prefix to a service-role key, password, session secret or Gemini key.",
+    "code": "NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co\nNEXT_PUBLIC_SUPABASE_ANON_KEY=your-public-key\nSUPABASE_SERVICE_ROLE_KEY=your-server-only-key\nADMIN_PASSWORD=at-least-16-random-characters\nPANEL_SITE_URL=https://editable-landing-panel.vercel.app\n# Optional: Gemini key belonging to THIS CLI user\nGEMINI_API_KEY=\nGEMINI_MODEL=gemini-3.5-flash-lite",
+    "table": {
+      "headers": ["Variable", "Where / purpose"],
+      "rows": [
+        [
+          "NEXT_PUBLIC_SUPABASE_URL",
+          "Application and CLI: your Supabase project URL"
+        ],
+        ["NEXT_PUBLIC_SUPABASE_ANON_KEY", "Public published-content reads"],
+        [
+          "SUPABASE_SERVICE_ROLE_KEY",
+          "Server API and local remote-import commands only"
+        ],
+        ["ADMIN_PASSWORD", "Shared admin sign-in, minimum 16 characters"],
+        [
+          "PANEL_SITE_URL",
+          "Exact HTTPS origin in production; metadata and origin checks"
+        ],
+        ["GEMINI_API_KEY", "Optional local own-key AI or operator server key"],
+        ["GEMINI_MODEL", "Optional; defaults to gemini-3.5-flash-lite"],
+        [
+          "PANEL_AI_ENABLED / PANEL_AI_RATE_SECRET",
+          "Only the operator hosting the shared AI endpoint"
+        ]
+      ]
+    }
+  },
+  {
+    "id": "integration",
+    "title": "Connect existing components",
+    "group": "Setup",
+    "body": "Read values in your Server Component and pass them only to the sections needing them. Keep database queries, authentication and other server logic in their current server components. A small Client Component can use usePreviewContent for unsaved preview. You do not have to turn the whole website into a client component.\n\nUse section IDs matching the config so the editor can scroll preview to the relevant section. Normal visitors receive published values; the preview hook accepts validated messages only from a same-origin parent inside an explicit ?preview=true iframe. If using next/image, add your exact Supabase public-images host/path to your app's next.config; the installer does not rewrite that config. Plain img previews need no Next image-host setting.",
+    "code": "// app/page.tsx (server)\nimport { readContent } from '@/panel/server'\nimport Hero from './Hero'\nexport const revalidate = 0\nexport default async function Page() {\n  return <Hero content={(await readContent('home')).values} />\n}\n\n// app/Hero.tsx (client)\n'use client'\nimport { usePreviewContent } from '@/panel/PreviewBridge'\nexport default function Hero({ content }: { content: Record<string, string> }) {\n  const c = usePreviewContent(content)\n  return <section id=\"hero\"><h1>{c['home.title']}</h1></section>\n}"
+  },
+  {
+    "id": "content",
+    "title": "Configuration reference",
+    "group": "Reference",
+    "body": "The configuration is versioned JSON; it is read by the website, editor and CLI. Every field has a globally unique key, label, supported type, default string and maxLength (1–20000). Page and section IDs use lowercase letters, digits and hyphens. Paths are root-relative routes. Duplicate keys/IDs, executable URLs and unsupported definitions fail validation.\n\nUse namespaced keys such as about.title in new projects. Existing hero_title and other legacy keys remain supported in this repository. A page whose ID is global contributes shared fields to every page read. A config entry does not create a Next.js route. Default values are a fallback, not a seed operation that overwrites the database.",
+    "code": "{\n  \"version\": 1,\n  \"pages\": [{\n    \"id\": \"home\", \"label\": \"Home\", \"path\": \"/\",\n    \"sections\": [{\n      \"id\": \"hero\", \"label\": \"Hero\",\n      \"fields\": [{\n        \"key\": \"home.title\", \"label\": \"Title\", \"type\": \"text\",\n        \"default\": \"Welcome\", \"maxLength\": 180\n      }]\n    }]\n  }]\n}",
+    "table": {
+      "headers": ["Type", "Behavior"],
+      "rows": [
+        ["text", "Single-line editor; plain text, not HTML"],
+        ["textarea", "Multiline plain text"],
+        [
+          "url",
+          "HTTPS or root-relative path; no executable protocols or embedded credentials"
+        ],
+        [
+          "image",
+          "Image upload; server emits WebP. SVG image URLs are rejected."
+        ]
+      ]
+    }
+  },
+  {
+    "id": "pages",
+    "title": "Pages, shared content and editor behavior",
+    "group": "Reference",
+    "body": "Select a page in /admin to change the visible fields and preview route together. Selection is remembered in the URL. Field search matches labels and keys. Switching pages or leaving with unsaved edits asks for confirmation. Add the route in Next.js and its page definition in config to support another existing page.\n\nText drafts preview immediately in integrated client sections. Save changes publishes a validated batch; failures retain the draft. Reset immediately removes one stored override after confirmation. Uploads are server-checked and create an immutable image URL, then Save changes publishes that URL. Discarding after upload may leave an orphaned file; cleanup is manual to avoid breaking backups.\n\nAlready-open visitor pages need refresh to see later publications. There is no visitor realtime subscription, individual editor role system or conflict resolution: simultaneous edits are last-write-wins. The /demo sandbox uses browser-only state and resets on reload."
+  },
+  {
+    "id": "commands",
+    "title": "CLI command reference",
+    "group": "Reference",
+    "body": "The package is named editable-landing-panel; its executable is elp. npx --package=<tarball> elp runs without a permanent installation. All commands support --cwd and --json. No-output-file overwrite is allowed. --dry-run prevents file/database writes, but an explicit ai --dry-run still calls the provider to generate its preview.\n\nExit code 0 means success; 1 means failure. init --ai returns 2 if installation completed but the optional AI proposal failed. In that case the installed editor remains usable and AI can be retried separately. JSON output includes the installation result and AI result as one document.",
+    "code": "elp init --preset multipage --dry-run --json\nelp init --preset multipage --yes\nelp doctor --remote --json\nelp pages list --json\nelp schema --json\nelp content export --remote --out backup.json\nelp content import proposal.json --defaults --dry-run\nelp content import proposal.json --defaults --yes\nelp content import proposal.json --remote --dry-run\nelp content import proposal.json --remote --yes\nelp ai brief.txt --page home --out proposal.json --yes",
+    "table": {
+      "headers": ["Command / flag", "Effect"],
+      "rows": [
+        [
+          "init",
+          "Adds isolated runtime, config, example routes, environment example and SQL"
+        ],
+        [
+          "init --ai brief.txt",
+          "After installation, optionally generates panel-content.proposal.json"
+        ],
+        [
+          "--no-install",
+          "Adds dependency declarations but skips package-manager execution"
+        ],
+        [
+          "doctor --remote",
+          "Read diagnostics plus an empty anonymous write probe; no content rows changed"
+        ],
+        [
+          "content import --defaults --yes",
+          "Changes defaults in local JSON only; does not replace saved DB overrides"
+        ],
+        [
+          "content import --remote --yes",
+          "Publishes changed values to this user’s Supabase; needs service-role key"
+        ],
+        [
+          "content import --out file --yes",
+          "Writes a reviewed proposal file; no application/database change"
+        ],
+        [
+          "ai --ai-url https://…",
+          "Selects another shared server if no local Gemini key is present"
+        ]
+      ]
+    }
+  },
+  {
+    "id": "cli-content",
+    "title": "Imports, defaults and backups",
+    "group": "Reference",
+    "body": "An import can contain {\"values\":{\"home.title\":\"New title\"}} or a plain key/value object. The entire batch is validated before changes. --defaults changes only the matching default strings in editable-panel.config.json. --remote makes one atomic upsert and does not delete unspecified keys. Choose exactly one target: --defaults, --remote or --out.\n\nDatabase overrides take precedence over local defaults. Updating a default does not replace a client’s saved value; reset that field in the editor or use an explicit remote import if you want to replace it. Export --remote merges defaults with stored values; it is a portable snapshot, not an exact override-only database backup. Make a database backup separately before changing permissions or migrations."
+  },
+  {
+    "id": "ai",
+    "title": "AI-assisted setup: shared service or own key",
+    "group": "AI workflows",
+    "body": "AI is optional. A normal init works without a model, key or shared endpoint. init --ai brief.txt uses Gemini to prepare copy for the declared fields after installing the deterministic preset. It writes panel-content.proposal.json, never arbitrary source-code edits or a database publication. Review the proposal, then apply it to local defaults or publish through a separate explicit import.\n\nWithout GEMINI_API_KEY, the CLI calls the shared server at the project’s published Vercel URL. Your common key stays on that server and is never shipped in the package. The service becomes available only after its operator enables it and applies migration 002. A local GEMINI_API_KEY takes precedence and is sent only to Google, never to the shared server. GEMINI_MODEL defaults to gemini-3.5-flash-lite in both modes. Use ELP_AI_URL or --ai-url to point to another trusted deployment.\n\nShared protection allows up to 3 requests per client-IP/day and 20 total/day (UTC). These are application budgets, not a promise of Google quota. Upstream 429 or unavailable service produces instructions for an own key; installation still works without AI. Never assume a free tier is unlimited or permanently available.\n\nWhen --page is omitted, AI uses the first configured page plus shared fields. Run it for other pages separately when needed.",
+    "code": "# Optional help while installing:\nelp init --preset multipage --ai brief.txt --yes\n# Review the generated file, then change local defaults:\nelp content import panel-content.proposal.json --defaults --dry-run\nelp content import panel-content.proposal.json --defaults --yes\n# Or generate a fresh proposal separately:\nelp ai brief.txt --page home --out proposal.json --yes",
+    "links": [
+      {
+        "label": "Gemini model documentation",
+        "url": "https://ai.google.dev/gemini-api/docs/models/gemini-3.5-flash-lite"
+      },
+      {
+        "label": "Current API pricing and free-tier conditions",
+        "url": "https://ai.google.dev/gemini-api/docs/pricing"
+      }
+    ]
+  },
+  {
+    "id": "own-key",
+    "title": "Switch to your own free-tier Gemini key",
+    "group": "AI workflows",
+    "body": "Open Google AI Studio, create/select your project and obtain an API key for the Gemini Developer API. Confirm the model is available and the project is on the intended free tier; a key itself does not guarantee free unlimited usage. Add the key to your target project’s .env.local (not .env.panel.example, not NEXT_PUBLIC). Keep it out of Git. Run the same CLI command again: it automatically uses your key instead of the shared service.\n\nThe brief and selected text-field definitions/defaults are transmitted for generation. The CLI does not upload source files, Supabase keys or admin passwords. In shared mode the operator’s server processes the brief before forwarding to Google. Review provider data-use terms before submitting client confidential material. Do not put secrets into a brief.",
+    "code": "# .env.local on the CLI user's machine\nGEMINI_API_KEY=your-own-key\nGEMINI_MODEL=gemini-3.5-flash-lite\n\n# No extra account in this project and no redeploy needed for local CLI:\nelp ai brief.txt --page home --out proposal.json --yes",
+    "links": [
+      {
+        "label": "Get an API key in Google AI Studio",
+        "url": "https://aistudio.google.com/api-keys"
+      },
+      {
+        "label": "Rate limits",
+        "url": "https://ai.google.dev/gemini-api/docs/rate-limits"
+      }
+    ]
+  },
+  {
+    "id": "vercel",
+    "title": "Deploy this project on Vercel",
+    "group": "Operate this project",
+    "body": "Import this repository into Vercel with its Next.js framework preset and Node 24. Keep the repository root as the project root. Use the package.json build command: pnpm build. It generates the CLI assets and public download tarball before building Next.js. Do not replace it with bare next build if you want the downloadable CLI.\n\nBefore using the new admin, back up the existing database and apply migration 001. To host shared AI too, apply migration 002. Then add the environment variables below, set your domain and redeploy. Vercel does not run SQL migrations just because an env key is present. No Gemini key is needed in this Codex environment to prepare the code; you provide it only in your Vercel settings.\n\nAfter deployment, open /docs, download the CLI, test /admin login/save/reset/upload, then test an AI proposal from a client without a local key and with its own key. Ordinary users install into their own project and configure their own Supabase; they do not receive access to this website’s database.",
+    "code": "# Required website/admin env in Vercel:\nNEXT_PUBLIC_SUPABASE_URL=...\nNEXT_PUBLIC_SUPABASE_ANON_KEY=...\nSUPABASE_SERVICE_ROLE_KEY=...\nADMIN_PASSWORD=...\nPANEL_SITE_URL=https://editable-landing-panel.vercel.app\n\n# Also enable shared AI (optional):\nGEMINI_API_KEY=your-server-key\nGEMINI_MODEL=gemini-3.5-flash-lite\nPANEL_AI_ENABLED=true\nPANEL_AI_RATE_SECRET=a-random-secret-of-at-least-32-characters\n# Generate that secret locally with:\n# node -e \"console.log(require('node:crypto').randomBytes(32).toString('hex'))\""
+  },
+  {
+    "id": "shared-ai",
+    "title": "Shared AI operator reference",
+    "group": "Operate this project",
+    "body": "The shared endpoint is POST /api/editable-panel/assist. It accepts bounded JSON containing brief and text-field definitions. It cannot query website content, accept arbitrary Gemini models from callers, forward your API key, use tools, execute code or publish generated text. Server-side model/key settings control provider access. It is public intentionally for CLI clients; CORS/Origin checks are not bot authentication.\n\nEnable it only after migration 002. The function atomically reserves the per-IP and global daily budgets in Supabase before contacting Google; failures consume reservations too. Quota state is shared by all Vercel instances. Raw IPs are HMAC-hashed with PANEL_AI_RATE_SECRET, and the function trusts Vercel’s platform IP header. Missing protection or trusted IP fails closed. Outside Vercel, only enable PANEL_TRUST_PROXY behind a proxy that overwrites forwarded headers.\n\nThe global cap limits successful generation reservations but does not prevent someone from exhausting the shared allowance or sending many rejected requests. Use Vercel Firewall/request limits and provider billing controls appropriate to public traffic. On a paid Gemini project, a small number of requests can still cost money: application limits do not make a paid API free. Disable immediately with PANEL_AI_ENABLED=false if necessary.\n\nPANEL_AI_RATE_SECRET is a private random server secret, not a password for users and not a Gemini credential. Add it only in Vercel Environment Variables for the shared-service deployment (Production, and Preview only if you enable the service there). It signs HMAC fingerprints of client IPs before the quota function records them, so the database stores no raw IPs. Use a cryptographically random value of at least 32 characters and keep it stable. Rotating it changes per-client fingerprints; the global daily cap remains. Generate 32 random bytes as 64 hex characters with the command below.",
+    "code": "node -e \"console.log(require('node:crypto').randomBytes(32).toString('hex'))\""
+  },
+  {
+    "id": "distribution",
+    "title": "CLI distribution: Vercel download or npm",
+    "group": "Operate this project",
+    "body": "You do not have to create an npm account for the website-hosted download path. pnpm build creates public/downloads/editable-landing-panel-0.2.0.tgz from a fixed list of runtime assets, code and documentation. Vercel serves it from your domain. npx --package=<HTTPS download> elp init is a real installation command, not an example of an already-published registry package.\n\nFor the shorter npx editable-landing-panel@0.2.0 init command, an owner must separately publish packages/cli to npm with a permitted package name and authenticated npm account. Deploying on Vercel does not publish to npm. The project executable is elp in either case. The build bakes your configured HTTPS PANEL_SITE_URL into the downloadable CLI’s shared endpoint. After changing domains, rebuild and re-download; already downloaded CLI copies can override the URL with ELP_AI_URL or --ai-url.",
+    "code": "# Prepare a downloadable CLI locally (no npm publication):\npnpm cli:pack\n# After Vercel deployment:\nnpx --package=https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.2.0.tgz elp --help\n\n# OPTIONAL registry distribution, by an authorized npm owner:\npnpm cli:build\ncd packages/cli\nnpm login\nnpm publish --access public\n# Only after successful publication:\nnpx editable-landing-panel@0.2.0 init --preset multipage --yes"
+  },
+  {
+    "id": "api",
+    "title": "HTTP API reference",
+    "group": "Reference",
+    "body": "The website editor uses a same-origin signed cookie, not the old x-admin-password header. Session cookies are scoped to /api/editable-panel and never contain the password. Mutations require the configured Origin. Content reads for the editor require a session; public pages use the server reader and public read-only database access. All API responses disable caching.\n\nLegacy /api/login, /api/content, /api/get-content and /api/upload endpoints are removed in this version. Custom clients using them must migrate. The shared AI endpoint is separate: it is public with database-backed budgets and does not grant content-editing access.",
+    "table": {
+      "headers": ["Endpoint", "Purpose"],
+      "rows": [
+        ["GET /api/editable-panel/session", "Return authenticated boolean"],
+        [
+          "POST /api/editable-panel/session",
+          "JSON {password}; issue cookie after throttle check"
+        ],
+        ["DELETE /api/editable-panel/session", "Clear current browser cookie"],
+        [
+          "GET /api/editable-panel/content?page=home",
+          "Authenticated values for selected page and shared fields"
+        ],
+        [
+          "POST /api/editable-panel/content",
+          "JSON {values:{key:string}}; validated atomic upsert"
+        ],
+        [
+          "DELETE /api/editable-panel/content",
+          "JSON {key}; remove one registered override"
+        ],
+        [
+          "POST /api/editable-panel/upload",
+          "Multipart file; validated WebP URL"
+        ],
+        [
+          "POST /api/editable-panel/assist",
+          "Optional public copy proposal; never edits content"
+        ]
+      ]
+    }
+  },
+  {
+    "id": "security",
+    "title": "Security and honest production limits",
+    "group": "Operations",
+    "body": "The baseline migration explicitly enables RLS and revokes public write privileges, including TRUNCATE. Run verify.sql and review actual storage policies: an existing bucket’s public/private flag alone does not prove safe write permissions. All rows in content are public published values; never store credentials or drafts there.\n\nUse HTTPS, a unique long password and exact PANEL_SITE_URL. Login throttling is database-backed and fails closed if unavailable. The default login bucket is shared across clients; opt into trusted-IP handling only behind an overwriting proxy. This is one shared administrator, not an enterprise access-control system. No per-user roles, content revisions, conflict detection or individual-token revocation are provided. Logout removes this browser’s cookie; password rotation revokes every token. An already copied valid token otherwise lasts until its eight-hour expiry.\n\nA successful local build/test is not certification of your live database, Vercel firewall or a penetration test. Configure backups, platform limits and monitoring before opening a public shared service."
+  },
+  {
+    "id": "operations",
+    "title": "Troubleshooting and verification",
+    "group": "Operations",
+    "body": "Run doctor after setting environment and applying SQL. Public pages log a warning and fall back to config on database read failures; the editor reports errors rather than pretending a failed read succeeded. Remote diagnostics inspect content and bucket metadata and make an empty anonymous upsert probe; no rows are inserted, but SQL inspection is still needed to prove every permission.\n\nLogin 503: check migration 001, database access and a password of at least 16 characters. Production Origin 403/503: check PANEL_SITE_URL against the exact scheme/host you use. Shared AI 503: check enable flag, key, rate secret, migration 002 and trusted platform IP. Shared AI 429: use your own key or retry after the daily window; increasing account limits is not automatically free. init conflicts: inspect the reported existing path/route rather than forcing an overwrite. Upload errors: check bucket permissions and supported JPEG/PNG/WebP/AVIF size ≤5 MB / 40 MP.\n\nConcurrent editors are last-write-wins. Export before bulk changes, inspect orphaned uploads manually, and do not remove files still referenced by backups.",
+    "code": "elp doctor --remote --json\npnpm check\npnpm build\npnpm test:e2e\nnode scripts/smoke-install.mjs"
+  }
+]
