@@ -329,7 +329,7 @@ test('mobile docs contain long paths and form controls avoid iOS focus zoom', as
   ).toBeGreaterThanOrEqual(16)
 })
 
-test('public footers have privacy controls without product or author attribution', async ({
+test('public footers retain author credit and privacy controls without product attribution', async ({
   page,
 }) => {
   for (const route of [
@@ -341,7 +341,11 @@ test('public footers have privacy controls without product or author attribution
   ]) {
     await page.goto(route)
     const footer = page.locator('footer').last()
-    await expect(footer).not.toContainText(/built (with|by)|powered by/i)
+    await expect(footer).not.toContainText(/built with|powered by/i)
+    await expect(footer).toContainText('Built by Pavel Sumin')
+    await expect(
+      footer.getByRole('link', { name: 'Pavel Sumin' }),
+    ).toHaveAttribute('href', 'https://pavelsumin.com/')
     await expect(
       footer.getByRole('link', { name: 'Privacy & cookies' }),
     ).toBeVisible()

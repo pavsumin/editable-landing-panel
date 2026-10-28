@@ -2,7 +2,7 @@
 
 import DemoPage from '@/components/lazy-demo'
 import { useSiteTheme } from '@/lib/theme'
-import { PrivacyLinks } from '@/components/site-chrome'
+import { AuthorCredit, PrivacyLinks } from '@/components/site-chrome'
 import { usePreviewContent } from '@/panel/PreviewBridge'
 import { ContentKey } from '@/lib/defaultContent'
 import {
@@ -440,6 +440,7 @@ export default function Home({ content }: Props) {
         id="footer"
         className="text-center text-sm text-muted-foreground py-10"
       >
+        <AuthorCredit />
         <PrivacyLinks />
       </footer>
     </div>

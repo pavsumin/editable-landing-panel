@@ -2,7 +2,12 @@
 
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { ChevronRight, Search, PanelRight } from 'lucide-react'
-import { Brand, ThemeButton, PrivacyLinks } from '@/components/site-chrome'
+import {
+  Brand,
+  ThemeButton,
+  AuthorCredit,
+  PrivacyLinks,
+} from '@/components/site-chrome'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import guide from '@/docs/guide.json'
@@ -269,6 +274,7 @@ export default function DocsPage({
       </Dialog>
       <DocsArticle c={c} siteUrl={siteUrl} />
       <footer className="md:ml-64 py-8">
+        <AuthorCredit />
         <PrivacyLinks />
       </footer>
     </div>

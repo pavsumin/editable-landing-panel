@@ -69,9 +69,26 @@ export function PrivacyLinks() {
   )
 }
 
+export function AuthorCredit() {
+  return (
+    <p className="text-center text-sm text-muted-foreground">
+      Built by{' '}
+      <a
+        href="https://pavelsumin.com/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-blue-400 hover:text-blue-500 transition-colors underline"
+      >
+        Pavel Sumin
+      </a>
+    </p>
+  )
+}
+
 export function SiteFooter() {
   return (
     <footer className="text-center text-sm text-muted-foreground py-10">
+      <AuthorCredit />
       <PrivacyLinks />
     </footer>
   )
