@@ -284,8 +284,8 @@ const DocsArticle = memo(function DocsArticle({
 }) {
   const [copied, setCopied] = useState('')
   return (
-    <main className="max-w-6xl px-4 sm:px-6 py-12 sm:py-16 md:ml-64">
-      <div className="max-w-3xl space-y-24">
+    <main className="min-w-0 max-w-6xl px-4 sm:px-6 py-12 sm:py-16 md:ml-64">
+      <div className="min-w-0 w-full max-w-3xl space-y-24 [overflow-wrap:anywhere]">
         <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
           Next.js Admin Panel Documentation
         </h1>
@@ -305,7 +305,7 @@ const DocsArticle = memo(function DocsArticle({
               {c[`docs.${section.id}.body`]}
             </p>
             {section.table && (
-              <div className="overflow-auto rounded-xl border">
+              <div className="min-w-0 max-w-full overflow-x-auto rounded-xl border">
                 <table className="w-full text-sm text-left">
                   <thead className="bg-muted">
                     <tr>
@@ -331,7 +331,7 @@ const DocsArticle = memo(function DocsArticle({
               </div>
             )}
             {section.code && (
-              <div className="rounded-xl bg-muted overflow-hidden">
+              <div className="min-w-0 max-w-full rounded-xl bg-muted overflow-hidden">
                 <div className="flex justify-end p-2">
                   <button
                     className="text-xs border rounded-md px-3 py-1"
@@ -352,7 +352,7 @@ const DocsArticle = memo(function DocsArticle({
                     {copied === section.id ? 'Copied' : 'Copy commands'}
                   </button>
                 </div>
-                <pre className="px-5 pb-5 overflow-auto text-xs leading-6">
+                <pre className="max-w-full px-5 pb-5 overflow-x-auto text-xs leading-6">
                   <code>
                     {section.code.replaceAll('https://YOUR_DOMAIN', siteUrl)}
                   </code>

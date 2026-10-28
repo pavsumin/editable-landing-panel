@@ -72,7 +72,6 @@ export function PrivacyLinks() {
 export function SiteFooter() {
   return (
     <footer className="text-center text-sm text-muted-foreground py-10">
-      <span>Built with Edit.</span>
       <PrivacyLinks />
     </footer>
   )

@@ -18,6 +18,24 @@ No npm account is needed for this download path. The shorter `npx editable-landi
 
 `init` adds `/admin`, `/api/editable-panel/{session,content,upload}`, scoped runtime files, config, an env example and migration 001. `minimal` adds `/panel-example`; `multipage` also adds `/panel-example/about` and `/panel-example/contact`. Your existing homepage is never replaced. Conflicting files, route groups and symlink destinations are refused before changes. Unchanged repeated installs are safe, edited config is preserved, and the selected preset is remembered. Use `--no-install` to skip package-manager execution; dependency declarations are still added. Automatic source upgrades are not implemented.
 
+## What is automated, and what remains
+
+The CLI installs the editor/API/runtime, adds missing dependencies, generates the
+preset config, example routes, environment template and SQL migration. It checks
+conflicts and can diagnose the configured project. It does not provision Supabase,
+execute SQL through a Data API key, fill private environment values or deploy.
+
+For an existing website, a developer still declares its fields and connects its
+components to the shared reader and optional preview hook. The installer preserves
+the existing homepage and does not infer arbitrary JSX layouts. A coding assistant
+can perform this integration using the documented API and config.
+
+Optional Gemini assistance takes a brief and declared text fields, then produces a
+validated JSON proposal. It does not integrate components, change database policies
+or publish content. Review the proposal and explicitly import it into config
+with `--defaults --yes` or publish it with `--remote --yes`. Use `--page` to generate
+copy for additional pages. The editor itself works without AI.
+
 ## Database and environment
 
 Apply generated `supabase/migrations/202610280001_panel_security.sql` in Supabase SQL Editor before login. It preserves content but takes ownership of the dedicated content table's policies. Review if another application uses that table. Existing storage settings/policies need separate inspection. Data API keys cannot execute SQL migrations.

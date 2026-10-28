@@ -82,7 +82,7 @@ const shared = {
     {
       id: 'footer',
       label: 'Footer',
-      fields: [field('global.footer', 'Footer', 'Your website. Your code.')],
+      fields: [field('global.footer', 'Footer', '')],
     },
   ],
 }

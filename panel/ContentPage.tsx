@@ -28,9 +28,6 @@ export default function ContentPage({
         </nav>
       </header>
       <main id={page} className="max-w-4xl mx-auto px-6 py-28 space-y-8">
-        <span className="text-xs uppercase tracking-widest text-muted-foreground">
-          Built with the multi-page preset
-        </span>
         <h1 className="text-5xl md:text-7xl font-semibold tracking-tight">
           {c[`${page}.title`]}
         </h1>
@@ -53,7 +50,6 @@ export default function ContentPage({
         id="footer"
         className="border-t p-6 text-center text-sm text-muted-foreground"
       >
-        {c['global.footer']}
         <PrivacyLinks />
       </footer>
     </div>

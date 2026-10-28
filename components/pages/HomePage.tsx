@@ -440,16 +440,6 @@ export default function Home({ content }: Props) {
         id="footer"
         className="text-center text-sm text-muted-foreground py-10"
       >
-        <p>{c['global.footer']}</p>
-        Built by{' '}
-        <a
-          className="text-blue-400 hover:text-blue-500 transition duration-300 underline"
-          href="https://pavelsumin.com/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Pavel Sumin
-        </a>
         <PrivacyLinks />
       </footer>
     </div>

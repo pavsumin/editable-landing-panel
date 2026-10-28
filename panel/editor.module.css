@@ -474,3 +474,12 @@
 .panel[data-demo] .toolbar {
   justify-content: flex-end;
 }
+
+/* Also applies to installations that do not include this website's global CSS. */
+@media (max-width: 767px), (hover: none) and (pointer: coarse) {
+  .panel input,
+  .panel textarea,
+  .panel select {
+    font-size: max(16px, 1em);
+  }
+}

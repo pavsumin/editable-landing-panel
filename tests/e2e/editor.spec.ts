@@ -271,3 +271,79 @@ test('public metadata has distinct canonicals and preview is not indexed', async
     /noindex/,
   )
 })
+
+test('mobile docs contain long paths and form controls avoid iOS focus zoom', async ({
+  page,
+}) => {
+  await page.goto('/docs')
+  for (const width of [320, 375, 390, 767]) {
+    await page.setViewportSize({ width, height: 844 })
+    await expect
+      .poll(() => page.evaluate(() => document.documentElement.scrollWidth))
+      .toBe(width)
+    await expect
+      .poll(() => page.evaluate(() => document.body.scrollWidth))
+      .toBe(width)
+  }
+  await page.getByRole('button', { name: 'Search documentation' }).click()
+  const search = page.getByRole('searchbox', { name: 'Search documentation' })
+  expect(
+    await search.evaluate((element) =>
+      parseFloat(getComputedStyle(element).fontSize),
+    ),
+  ).toBeGreaterThanOrEqual(16)
+  await search.fill('supabase/migrations/202610280001_panel_security.sql')
+  await expect(
+    page
+      .getByRole('dialog')
+      .getByRole('button')
+      .filter({ hasText: 'Create or upgrade the database' }),
+  ).toBeVisible()
+  await page.keyboard.press('Escape')
+  await page.goto('/admin')
+  const password = page.getByLabel('Admin password')
+  expect(
+    await password.evaluate((element) =>
+      parseFloat(getComputedStyle(element).fontSize),
+    ),
+  ).toBeGreaterThanOrEqual(16)
+  await password.fill('browser-test-password-very-strong')
+  await page.getByRole('button', { name: 'Enter', exact: true }).click()
+  await expect(page.getByLabel('PAGE', { exact: true })).toBeVisible()
+  const controls = page.locator(
+    'input:visible, textarea:visible, select:visible',
+  )
+  for (const control of await controls.all())
+    expect(
+      await control.evaluate((element) =>
+        parseFloat(getComputedStyle(element).fontSize),
+      ),
+    ).toBeGreaterThanOrEqual(16)
+  await page
+    .getByRole('button', { name: 'Edit Hero Title', exact: true })
+    .click()
+  expect(
+    await page
+      .getByLabel('Hero Title', { exact: true })
+      .evaluate((element) => parseFloat(getComputedStyle(element).fontSize)),
+  ).toBeGreaterThanOrEqual(16)
+})
+
+test('public footers have privacy controls without product or author attribution', async ({
+  page,
+}) => {
+  for (const route of [
+    '/',
+    '/about',
+    '/contact',
+    '/privacy',
+    '/not-a-real-page',
+  ]) {
+    await page.goto(route)
+    const footer = page.locator('footer').last()
+    await expect(footer).not.toContainText(/built (with|by)|powered by/i)
+    await expect(
+      footer.getByRole('link', { name: 'Privacy & cookies' }),
+    ).toBeVisible()
+  }
+})

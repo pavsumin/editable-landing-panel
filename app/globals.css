@@ -165,3 +165,12 @@ html.dark {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Prevent focus zoom on iOS while keeping pinch-to-zoom available. */
+@media (max-width: 767px), (hover: none) and (pointer: coarse) {
+  input,
+  textarea,
+  select {
+    font-size: max(16px, 1em) !important;
+  }
+}

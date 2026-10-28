@@ -889,7 +889,7 @@
               "key": "global.footer",
               "label": "Footer text",
               "type": "text",
-              "default": "Built with Editable Landing Panel · MIT licensed",
+              "default": "",
               "maxLength": 240
             }
           ]
