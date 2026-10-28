@@ -45,3 +45,15 @@ Only a bounded brief and 1–64 text field definitions are accepted. No tool exe
 This public endpoint is not bot authentication: an attacker can exhaust its shared allowance, and rejected requests still consume hosting/database resources. Configure platform abuse controls and provider billing limits. Google free-tier availability is not guaranteed by the application. CLI clients can supply a local key, sent directly to Google. No key is passed to the shared service in that mode.
 
 Vercel build packages the CLI for public download and embeds only the public site origin. A changed domain requires re-downloading or overriding ELP_AI_URL in existing clients. All private environment values remain server-side.
+
+## Visitor privacy
+
+Google Analytics initializes only on public, non-preview pages after explicit
+acceptance. Acceptance and rejection are stored locally for up to 180 days; a new
+property ID or expiry requires a new choice. Missing/blocked storage keeps
+analytics disabled on the next page load. Cookie settings allows withdrawal,
+disables collection, clears accessible analytics cookies and reloads to unload
+the Google runtime. The login cookie is essential and is not cleared by rejecting
+analytics. `/privacy` describes Vercel, Supabase, analytics and optional Gemini
+processing. Fork operators must replace the policy's operator/contact information
+and review their own retention settings. Fonts are served locally.

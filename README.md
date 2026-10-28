@@ -57,7 +57,7 @@ ADMIN_PASSWORD=at-least-16-random-characters
 PANEL_SITE_URL=https://editable-landing-panel.vercel.app
 ```
 
-Use `PANEL_SITE_URL=http://localhost:3000` locally. It is required for production mutation checks and is used for canonical URLs, sitemap and robots. Never expose admin, service-role, session or AI secrets through `NEXT_PUBLIC_*`. Analytics is disabled unless `NEXT_PUBLIC_GA_ID` is set. System fonts remove external font downloads from builds.
+Use `PANEL_SITE_URL=http://localhost:3000` locally. It is required for production mutation checks and is used for canonical URLs, sitemap and robots. Never expose admin, service-role, session or AI secrets through `NEXT_PUBLIC_*`. Analytics requires `NEXT_PUBLIC_GA_ID` and explicit visitor consent; rejecting it keeps Google scripts unloaded. Visitors can change their choice in Cookie settings. `/privacy` explains storage and providers; forks must adapt the operator/contact details. Geist fonts are self-hosted, with no external font downloads during builds or browsing.
 
 Apply [the migration](supabase/migrations/202610280001_panel_security.sql) in Supabase SQL Editor. It preserves keys/values and is repeatable. It owns policies on the dedicated `public.content` table: review it if that table serves another application. Every content row is public; never store secrets or unpublished drafts there. Existing storage bucket settings/policies are preserved for separate review. Run [verify.sql](supabase/verify.sql) to inspect effective privileges after migration.
 

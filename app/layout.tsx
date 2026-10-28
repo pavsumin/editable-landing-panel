@@ -1,5 +1,5 @@
 import { Toaster } from '@/components/ui/toaster'
-import { GoogleAnalytics } from '@next/third-parties/google'
+import PrivacyControls from '@/components/privacy-controls'
 import { Viewport } from 'next'
 import Script from 'next/script'
 import './globals.css'
@@ -76,6 +76,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         {children}
         <Toaster />
+        <PrivacyControls gaId={process.env.NEXT_PUBLIC_GA_ID} />
         <Script id="theme-init">
           {`
 						try {
@@ -85,10 +86,6 @@ export default function RootLayout({
 					`}
         </Script>
       </body>
-      {process.env.NEXT_PUBLIC_GA_ID &&
-        /^G-[A-Z0-9]+$/.test(process.env.NEXT_PUBLIC_GA_ID) && (
-          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
-        )}
     </html>
   )
 }

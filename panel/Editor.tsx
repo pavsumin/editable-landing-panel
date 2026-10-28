@@ -41,6 +41,7 @@ export default function Editor({ config, demo = false }: Props) {
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   const [dark, setDark] = useState(false)
+  const [themeReady, setThemeReady] = useState(false)
   const [mobileMode, setMobileMode] = useState('edit')
   const [sectionId, setSectionId] = useState(config.pages[0].sections[0].id)
   const iframe = useRef<HTMLIFrameElement>(null)
@@ -48,6 +49,20 @@ export default function Editor({ config, demo = false }: Props) {
   const page =
     config.pages.find((item) => item.id === pageId) || config.pages[0]
   const current = { ...values, ...drafts }
+
+  useEffect(() => {
+    setDark(document.documentElement.classList.contains('dark'))
+    setThemeReady(true)
+    // Follow the host theme initialization without changing the host page.
+    const observer = new MutationObserver(() =>
+      setDark(document.documentElement.classList.contains('dark')),
+    )
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    })
+    return () => observer.disconnect()
+  }, [demo])
 
   const sync = useCallback(() => {
     iframe.current?.contentWindow?.postMessage(
@@ -66,8 +81,12 @@ export default function Editor({ config, demo = false }: Props) {
 
   useEffect(() => {
     if (demo) return
-    localStorage.removeItem('admin-auth')
-    localStorage.removeItem('admin-password')
+    try {
+      localStorage.removeItem('admin-auth')
+      localStorage.removeItem('admin-password')
+    } catch {
+      /* Cookie sessions work even when local storage is blocked. */
+    }
     const id = new URLSearchParams(window.location.search).get('page')
     if (config.pages.some((page) => page.id === id)) setPageId(id!)
     request('session')
@@ -152,8 +171,10 @@ export default function Editor({ config, demo = false }: Props) {
           ? 'Saved in this demo only. Reload to reset.'
           : 'All changes saved.',
       )
+      return true
     } catch (error) {
       setError((error as Error).message)
+      return false
     } finally {
       setBusy(false)
     }
@@ -226,8 +247,10 @@ export default function Editor({ config, demo = false }: Props) {
         edit(field.key, result.url)
         setMessage('Image uploaded. Save changes to publish it.')
       }
+      return true
     } catch (error) {
       setError((error as Error).message)
+      return false
     } finally {
       setBusy(false)
     }
@@ -260,12 +283,13 @@ export default function Editor({ config, demo = false }: Props) {
     return (
       <div className={styles.panel}>
         <form className={styles.login} onSubmit={login}>
-          <span className={styles.eyebrow}>EDITABLE PANEL</span>
-          <h1>Welcome back.</h1>
-          <p>Sign in to manage your website content.</p>
-          <label htmlFor="panel-password">Admin password</label>
+          <h1>Admin</h1>
+          <label className={styles.srOnly} htmlFor="panel-password">
+            Admin password
+          </label>
           <input
             id="panel-password"
+            placeholder="Password"
             type="password"
             autoComplete="current-password"
             value={password}
@@ -274,7 +298,7 @@ export default function Editor({ config, demo = false }: Props) {
             disabled={busy}
           />
           <button className={styles.primary} disabled={busy}>
-            {busy ? 'Signing in…' : 'Sign in →'}
+            {busy ? 'Signing in…' : 'Enter'}
           </button>
           {error && (
             <p role="alert" className={styles.error}>
@@ -287,25 +311,39 @@ export default function Editor({ config, demo = false }: Props) {
     )
 
   return (
-    <div className={styles.panel} data-theme={dark ? 'dark' : 'light'}>
+    <div
+      className={styles.panel}
+      data-demo={demo || undefined}
+      data-theme={themeReady ? (dark ? 'dark' : 'light') : undefined}
+    >
       <header className={styles.header}>
-        <div>
-          <span className={styles.eyebrow}>
-            {demo ? 'INTERACTIVE SANDBOX' : 'CONTENT WORKSPACE'}
-          </span>
-          <h1>{demo ? 'Try the editor.' : 'Make it yours.'}</h1>
-          <p>
-            {demo
-              ? 'Same editor. Local changes only; reload to reset.'
-              : 'Edit with confidence. Preview before you publish.'}
-          </p>
-        </div>
+        <h1>{demo ? 'Demo' : 'Editor'}</h1>
         <div className={styles.actions}>
           <button
             onClick={() => setDark(!dark)}
             aria-label="Toggle editor theme"
           >
-            {dark ? '☀ Light' : '◐ Dark'}
+            <svg
+              aria-hidden="true"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className={dark ? styles.moon : styles.sun}
+            >
+              {dark ? (
+                <path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z" />
+              ) : (
+                <>
+                  <circle cx="12" cy="12" r="4" />
+                  <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" />
+                </>
+              )}
+            </svg>
           </button>
           {!demo && (
             <button
@@ -419,7 +457,7 @@ export default function Editor({ config, demo = false }: Props) {
                   className={styles.sectionTitle}
                   aria-expanded={sectionId === section.id || !!query}
                   onClick={() => {
-                    setSectionId(section.id)
+                    setSectionId(sectionId === section.id ? '' : section.id)
                     iframe.current?.contentWindow?.postMessage(
                       {
                         channel: 'editable-panel-v1',
@@ -431,90 +469,43 @@ export default function Editor({ config, demo = false }: Props) {
                   }}
                 >
                   {section.label}
-                  <span>{fields.length} fields ↗</span>
+                  <span
+                    aria-hidden="true"
+                    className={styles.chevron}
+                    data-open={sectionId === section.id || !!query}
+                  >
+                    ⌄
+                  </span>
                 </button>
                 {(sectionId === section.id || query) &&
                   fields.map((field) => (
-                    <div className={styles.field} key={field.key}>
-                      <div className={styles.fieldHeading}>
-                        <label htmlFor={`field-${field.key}`}>
-                          {field.label}
-                        </label>
-                        <button
-                          disabled={busy || !loaded}
-                          onClick={() => reset(field)}
-                          aria-label={`Reset ${field.label}`}
-                        >
-                          Reset
-                        </button>
-                      </div>
-                      {field.type === 'image' ? (
-                        <>
-                          <div className={styles.image}>
-                            {current[field.key] && (
-                              <img src={current[field.key]} alt={field.label} />
-                            )}
-                          </div>
-                          <input
-                            id={`field-${field.key}`}
-                            type="file"
-                            accept="image/jpeg,image/png,image/webp,image/avif"
-                            disabled={busy || !loaded}
-                            onChange={(event) => {
-                              void upload(field, event.target.files?.[0])
-                              event.target.value = ''
-                            }}
-                          />
-                          <p className={styles.hint}>
-                            JPEG, PNG, WebP or AVIF · up to 5 MB
-                          </p>
-                        </>
-                      ) : field.type === 'textarea' ? (
-                        <textarea
-                          id={`field-${field.key}`}
-                          rows={3}
-                          value={current[field.key] || ''}
-                          maxLength={field.maxLength}
-                          disabled={busy || !loaded}
-                          onChange={(event) =>
-                            edit(field.key, event.target.value)
-                          }
-                        />
-                      ) : (
-                        <input
-                          id={`field-${field.key}`}
-                          type="text"
-                          value={current[field.key] || ''}
-                          maxLength={field.maxLength}
-                          disabled={busy || !loaded}
-                          onChange={(event) =>
-                            edit(field.key, event.target.value)
-                          }
-                        />
-                      )}
-                      <code className={styles.hint}>{field.key}</code>
-                    </div>
+                    <FieldCard
+                      key={field.key}
+                      field={field}
+                      value={current[field.key] || ''}
+                      disabled={busy || !loaded}
+                      onEdit={(value) => edit(field.key, value)}
+                      onReset={() => reset(field)}
+                      onSave={save}
+                      onUpload={(file) => upload(field, file)}
+                      errorMessage={error}
+                    />
                   ))}
               </section>
             )
           })}
         </div>
         <aside className={styles.preview}>
-          <div className={styles.previewBar}>
-            <span>● Live preview</span>
-            <span>{demo ? 'Sandbox' : page.path}</span>
-          </div>
           {demo ? (
             <div className={styles.demoPreview}>
-              <span className={styles.eyebrow}>YOUR NEXT IDEA</span>
               <h2>{current['demo.title']}</h2>
               <p>{current['demo.description']}</p>
               {current['demo.image'] && (
                 <img src={current['demo.image']} alt="Demo illustration" />
               )}
-              <button className={styles.primary}>
+              <span className={styles.demoButton}>
                 {current['demo.button']}
-              </button>
+              </span>
             </div>
           ) : (
             <iframe
@@ -525,6 +516,196 @@ export default function Editor({ config, demo = false }: Props) {
             />
           )}
         </aside>
+      </div>
+    </div>
+  )
+}
+
+function FieldCard({
+  field,
+  value,
+  disabled,
+  onEdit,
+  onReset,
+  onSave,
+  onUpload,
+  errorMessage,
+}: {
+  field: Field
+  value: string
+  disabled: boolean
+  onEdit: (value: string) => void
+  onReset: () => void
+  onSave: () => Promise<boolean>
+  onUpload: (file?: File) => Promise<boolean | undefined>
+  errorMessage: string
+}) {
+  const [editing, setEditing] = useState(false)
+  const [file, setFile] = useState<File>()
+  const [preview, setPreview] = useState('')
+  const dialog = useRef<HTMLDialogElement>(null)
+  const input = useRef<HTMLTextAreaElement>(null)
+  const fileInput = useRef<HTMLInputElement>(null)
+  useEffect(() => {
+    if (editing) input.current?.focus()
+  }, [editing])
+  const imageUrl = useRef('')
+  useEffect(
+    () => () => {
+      if (imageUrl.current) URL.revokeObjectURL(imageUrl.current)
+    },
+    [],
+  )
+  function chooseFile(next?: File) {
+    if (imageUrl.current) URL.revokeObjectURL(imageUrl.current)
+    imageUrl.current = next ? URL.createObjectURL(next) : ''
+    setFile(next)
+    setPreview(imageUrl.current)
+  }
+  const openImage = () => {
+    chooseFile()
+    dialog.current?.showModal()
+  }
+  return (
+    <div className={styles.field} data-editing={editing}>
+      <label htmlFor={`field-${field.key}`} className={styles.fieldLabel}>
+        {field.label}
+      </label>
+      {field.type === 'image' ? (
+        <>
+          <button
+            className={styles.image}
+            disabled={disabled}
+            onClick={openImage}
+            aria-label={`Preview ${field.label}`}
+          >
+            {value ? (
+              <img src={value} alt={field.label} />
+            ) : (
+              <span>Choose an image</span>
+            )}
+          </button>
+          <dialog
+            ref={dialog}
+            className={styles.imageDialog}
+            aria-labelledby={`image-title-${field.key}`}
+          >
+            <h2 id={`image-title-${field.key}`}>Upload image</h2>
+            <button
+              className={styles.dropzone}
+              onClick={() => fileInput.current?.click()}
+              onDragOver={(event) => event.preventDefault()}
+              onDrop={(event) => {
+                event.preventDefault()
+                chooseFile(event.dataTransfer.files[0])
+              }}
+            >
+              {(preview || value) && (
+                <img src={preview || value} alt="Image preview" />
+              )}
+              <span>Drop image here</span>
+              <small>
+                or click to upload · JPEG, PNG, WebP, AVIF · up to 5 MB
+              </small>
+            </button>
+            <input
+              ref={fileInput}
+              id={`field-${field.key}`}
+              className={styles.srOnly}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/avif"
+              onChange={(event) => {
+                chooseFile(event.target.files?.[0])
+                event.target.value = ''
+              }}
+            />
+            {errorMessage && (
+              <p role="alert" className={styles.error}>
+                {errorMessage}
+              </p>
+            )}
+            <div className={styles.dialogActions}>
+              <button
+                disabled={disabled}
+                onClick={() => dialog.current?.close()}
+              >
+                Cancel
+              </button>
+              <button
+                className={styles.primary}
+                disabled={disabled || !file}
+                onClick={async () => {
+                  if (await onUpload(file)) dialog.current?.close()
+                }}
+              >
+                {disabled ? 'Uploading…' : 'Use image'}
+              </button>
+            </div>
+          </dialog>
+        </>
+      ) : editing ? (
+        <div className={styles.inputWrap}>
+          <textarea
+            ref={input}
+            id={`field-${field.key}`}
+            rows={field.type === 'textarea' ? 4 : 2}
+            value={value}
+            maxLength={field.maxLength}
+            disabled={disabled}
+            onChange={(event) => onEdit(event.target.value)}
+          />
+          {value && (
+            <button
+              className={styles.clear}
+              aria-label={`Clear ${field.label}`}
+              disabled={disabled}
+              onClick={() => {
+                onEdit('')
+                input.current?.focus()
+              }}
+            >
+              ×
+            </button>
+          )}
+        </div>
+      ) : (
+        <button
+          className={styles.value}
+          disabled={disabled}
+          onClick={() => setEditing(true)}
+          aria-label={`Edit value for ${field.label}`}
+        >
+          {value || 'Click to add text'}
+        </button>
+      )}
+      <div className={styles.fieldActions}>
+        {editing ? (
+          <button
+            disabled={disabled}
+            onClick={async () => {
+              if (await onSave()) setEditing(false)
+            }}
+          >
+            Save
+          </button>
+        ) : (
+          <button
+            disabled={disabled}
+            aria-label={`Edit ${field.label}`}
+            onClick={() =>
+              field.type === 'image' ? openImage() : setEditing(true)
+            }
+          >
+            Edit
+          </button>
+        )}
+        <button
+          disabled={disabled}
+          onClick={onReset}
+          aria-label={`Reset ${field.label}`}
+        >
+          Reset
+        </button>
       </div>
     </div>
   )

@@ -3,11 +3,11 @@
 ## Current status
 
 The local release candidate passes the final production build, 25 automated checks,
-three browser scenarios, and a clean-project installation/build from the actual
+nine browser scenarios, and a clean-project installation/build from the actual
 packed download. The earlier subprocess-review limitation was resolved and the
 previously pending CLI cases have now run.
 
-The user will configure Vercel and Gemini directly. No secret is needed in this
+The user reports configuring Vercel, Gemini and applying the migrations directly. No secret is needed in this
 Codex environment to prepare the release. Live Supabase permissions, migrations,
 Google responses and hosting configuration are **not verified remotely**. No live
 content was modified, no SQL was applied remotely, no npm package was published and
@@ -26,8 +26,8 @@ no site was deployed during this work.
 - Preview checks parent/source/origin/channel and validates values. It never saves.
 - Public demo uses the same editor with browser-only state. About, Contact and the
   editable documentation demonstrate multi-page integration.
-- `/docs` now provides 18 task/reference sections, grouped navigation, mobile section
-  jumping, full-text/table/code search, copyable commands, environment/command/API
+- `/docs` now provides 18 task/reference sections, grouped navigation, a restored fixed sidebar with collapsible groups, a mobile drawer, keyboard
+  search, full-text/table/code search, copyable commands, environment/command/API
   tables and deployment instructions. Download commands use the configured domain.
   A test checks its defaults against the maintained guide and its API method list
   against actual route handlers.
@@ -45,7 +45,7 @@ no site was deployed during this work.
   Whole batches are checked before one atomic upsert.
 - Uploads enforce a streamed size bound and decoded pixel bound, ignore source MIME
   claims/filenames, re-encode to WebP, strip metadata and use immutable UUID names.
-- Server-only database code isolates service-role credentials. Analytics is opt-in;
+- Server-only database code isolates service-role credentials. Analytics requires explicit visitor consent;
   exact image host/path restrictions and baseline response headers are configured.
 - Local PostgreSQL tests include inherited PUBLIC grants, repeat migrations, public
   mutation/RPC denial, throttle exhaustion/reset and server writes.
@@ -99,15 +99,44 @@ no site was deployed during this work.
 - ESLint and diff whitespace checks passed.
 - 25 local checks passed: 7 core/session/body, 5 API, 2 provider/payload, 8 CLI,
   2 PostgreSQL migration suites, and 1 documentation consistency check.
-- 3 browser scenarios passed on system Chromium with local mock Supabase: demo
-  preview/reset; login/preview/failed-save retention/page switching/logout; mobile
-  editor/documentation search. Initial preview waits for cold dev compilation.
+- 9 browser scenarios on system Chromium with local mock Supabase: demo edits and
+  per-field saving; authenticated previews/failed-save retention/page switching/
+  logout; mobile editor/search; restored desktop layout and keyboard search;
+  mobile docs drawer/privacy/404; image dialog validation and local upload;
+  analytics acceptance/rejection/persistence/withdrawal; expired consent plus
+  admin/preview exclusions; unavailable browser storage. Google scripts are mocked
+  and request counts prove they stay unloaded before acceptance and after rejection.
 - Clean fixture installed the actual packed CLI into src/app and compiled it on
   Next.js 16.2.1 without allowJs or Tailwind/shadcn configuration. The fixture reuses
   session dependencies via a symlink: this proves generated-source portability,
   not a fresh registry dependency resolution on every OS/version.
 - Tests use fake provider keys/local databases and never mutate the live project.
   Actual Google generation with the owner's model/key must be checked after deploy.
+
+## Interface restoration and visitor privacy
+
+- Restored the pre-refactor neutral editor appearance: original login, preview on
+  the left, rounded field cards on the right, click-to-edit text, field Save/Reset,
+  image upload dialog, section accordions, mobile Edit/Preview and theme controls.
+  Page selection, validated batch writes, retained failed drafts, signed sessions
+  and the shared runtime/CLI architecture remain in place. The scope is visual
+  restoration over the maintained implementation rather than restoring old APIs.
+- Restored the documentation's fixed 256px sidebar/logo, collapsible navigation,
+  active section, mobile drawer, theme controls and modal search with Ctrl/Cmd+K.
+  Current instructions, command copying, tables and content integration remain.
+- Restored Geist/Geist Mono as self-hosted, licensed font files; no Google Fonts
+  connection is required at build time or while browsing.
+- Added explicit analytics acceptance/rejection and persistent preferences with a
+  180-day limit, property scoping, fail-closed handling of unavailable storage,
+  cross-tab preference synchronization and a Cookie settings entry point.
+  Withdrawal disables collection, clears accessible GA cookies and reloads to
+  unload Google's runtime. The essential admin cookie is unaffected.
+- Added `/privacy`, provider/storage/AI disclosures and privacy links. Forks need
+  their own operator/contact information and provider retention review.
+- Added a responsive, theme-aware custom 404 using the homepage's typography,
+  branding, buttons and neutral palette. Unknown routes retain HTTP 404 status.
+- No new environment variables, dependencies or SQL migrations are required for
+  this follow-up. Existing NEXT_PUBLIC_GA_ID enables analytics only after consent.
 
 ## Required deployment steps
 

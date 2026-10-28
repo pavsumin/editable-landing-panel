@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { PrivacyLinks } from '@/components/site-chrome'
 import { usePreviewContent } from './PreviewBridge'
 
 export default function ContentPage({
@@ -53,6 +54,7 @@ export default function ContentPage({
         className="border-t p-6 text-center text-sm text-muted-foreground"
       >
         {c['global.footer']}
+        <PrivacyLinks />
       </footer>
     </div>
   )

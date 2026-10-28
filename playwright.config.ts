@@ -30,6 +30,7 @@ export default defineConfig({
         ADMIN_PASSWORD: 'browser-test-password-very-strong',
         PANEL_SITE_URL: 'http://127.0.0.1:3100',
         NEXT_TELEMETRY_DISABLED: '1',
+        NEXT_PUBLIC_GA_ID: 'G-TEST12345',
       },
     },
   ],

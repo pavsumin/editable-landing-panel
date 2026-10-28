@@ -1,6 +1,7 @@
 'use client'
 
 import DemoPage from '@/app/demo/page'
+import { PrivacyLinks } from '@/components/site-chrome'
 import { usePreviewContent } from '@/panel/PreviewBridge'
 import { ContentKey } from '@/lib/defaultContent'
 import {
@@ -450,6 +451,7 @@ export default function Home({ content }: Props) {
         >
           Pavel Sumin
         </a>
+        <PrivacyLinks />
       </footer>
     </div>
   )
