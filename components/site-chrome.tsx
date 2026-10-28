@@ -3,27 +3,9 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { Moon, Sun } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useSiteTheme } from '@/lib/theme'
+export { useSiteTheme } from '@/lib/theme'
 import { CookieSettingsButton } from './privacy-controls'
-
-export function useSiteTheme() {
-  const [dark, setDark] = useState(false)
-  useEffect(() => {
-    const sync = () =>
-      setDark(document.documentElement.classList.contains('dark'))
-    sync()
-    const observer = new MutationObserver(sync)
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class'],
-    })
-    return () => observer.disconnect()
-  }, [])
-  return {
-    dark,
-    toggleTheme: () => document.documentElement.classList.toggle('dark'),
-  }
-}
 
 export function Brand() {
   return (

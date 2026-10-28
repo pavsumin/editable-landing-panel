@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import Script from 'next/script'
 
 export const metadata: Metadata = {
   title: 'Documentation | Next.js Admin Panel',
@@ -50,10 +49,9 @@ export default function DocsLayout({
 }) {
   return (
     <>
-      <Script
+      <script
         id="schema-docs"
         type="application/ld+json"
-        strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             '@context': 'https://schema.org',

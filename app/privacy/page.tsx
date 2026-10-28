@@ -66,12 +66,13 @@ export default function PrivacyPage() {
               The administrator’s elp-session cookie keeps the editor signed in
               for up to eight hours. It is HttpOnly, SameSite=Strict and Secure
               in production, and contains a signed session token rather than the
-              password. Browser local storage under edit-cookie-consent-v1
-              remembers your acceptance or rejection, timestamp and analytics
-              property for up to 180 days. If browser storage is unavailable,
-              your selection applies to the current page and may be requested
-              again. Demo edits and unsaved drafts stay in browser memory and
-              are reset on reload.
+              password. Browser local storage under edit-theme remembers your
+              chosen light or dark appearance until you clear it. Browser local
+              storage under edit-cookie-consent-v1 remembers your acceptance or
+              rejection, timestamp and analytics property for up to 180 days. If
+              browser storage is unavailable, your selection applies to the
+              current page and may be requested again. Demo edits and unsaved
+              drafts stay in browser memory and are reset on reload.
             </p>
           </section>
           <section>

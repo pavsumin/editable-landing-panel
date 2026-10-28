@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { ChevronRight, Search, PanelRight } from 'lucide-react'
 import { Brand, ThemeButton, PrivacyLinks } from '@/components/site-chrome'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
@@ -18,17 +18,26 @@ export default function DocsPage({
   siteUrl: string
 }) {
   const c = usePreviewContent(content)
-  const sections = guide
   const [query, setQuery] = useState('')
   const [searchOpen, setSearchOpen] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [active, setActive] = useState(guide[0].id)
   const [expanded, setExpanded] = useState<string[]>(groups)
-  const [copied, setCopied] = useState('')
-  const results = guide.filter((section) =>
-    `${c[`docs.${section.id}.title`]} ${c[`docs.${section.id}.body`]} ${section.code || ''} ${JSON.stringify(section.table || '')}`
-      .toLowerCase()
-      .includes(query.toLowerCase()),
+  const pending = useRef<string | null>(null)
+  const index = useMemo(
+    () =>
+      guide.map((section) => ({
+        section,
+        text: `${c[`docs.${section.id}.title`]} ${c[`docs.${section.id}.body`]} ${section.code || ''} ${JSON.stringify(section.table || '')}`.toLowerCase(),
+      })),
+    [c],
+  )
+  const results = useMemo(
+    () =>
+      index
+        .filter((item) => item.text.includes(query.trim().toLowerCase()))
+        .map((item) => item.section),
+    [index, query],
   )
   useEffect(() => {
     const keydown = (event: KeyboardEvent) => {
@@ -37,47 +46,69 @@ export default function DocsPage({
         setSearchOpen((open) => !open)
       }
     }
-    let frame = 0
-    const scroll = () => {
-      cancelAnimationFrame(frame)
-      frame = requestAnimationFrame(() => {
-        let current = guide[0].id
-        for (const section of guide) {
-          if (
-            (document.getElementById(section.id)?.getBoundingClientRect().top ??
-              Infinity) <= 140
-          )
-            current = section.id
-        }
-        setActive(current)
-      })
+    const syncHash = () => {
+      const id = window.location.hash.slice(1)
+      const section = guide.find((section) => section.id === id)
+      if (section) {
+        setActive(id)
+        setExpanded((current) =>
+          current.includes(section.group)
+            ? current
+            : [...current, section.group],
+        )
+      }
     }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
+        const id = visible[0]?.target.closest('section')?.id
+        if (id) setActive(id)
+      },
+      { rootMargin: '-80px 0px -60% 0px' },
+    )
+    document
+      .querySelectorAll('main section > h2')
+      .forEach((heading) => observer.observe(heading))
+    syncHash()
     window.addEventListener('keydown', keydown)
-    window.addEventListener('scroll', scroll, { passive: true })
-    scroll()
+    window.addEventListener('hashchange', syncHash)
     return () => {
+      observer.disconnect()
       window.removeEventListener('keydown', keydown)
-      window.removeEventListener('scroll', scroll)
-      cancelAnimationFrame(frame)
+      window.removeEventListener('hashchange', syncHash)
     }
   }, [])
-  function navigate(id: string) {
-    setSearchOpen(false)
-    setMobileOpen(false)
+  function jump(id: string) {
+    document
+      .getElementById(id)
+      ?.scrollIntoView({ behavior: 'instant', block: 'start' })
+    if (window.location.hash !== `#${id}`)
+      window.history.pushState(null, '', `#${id}`)
     setActive(id)
     const group = guide.find((section) => section.id === id)!.group
     setExpanded((current) =>
       current.includes(group) ? current : [...current, group],
     )
-    // Let the modal release scroll locking before moving to the document section.
-    window.setTimeout(() => {
-      document.getElementById(id)?.scrollIntoView({
-        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
-          ? 'instant'
-          : 'smooth',
-      })
-      window.history.replaceState(null, '', `#${id}`)
-    }, 0)
+  }
+  function navigate(id: string) {
+    if (searchOpen || mobileOpen) {
+      pending.current = id
+      setSearchOpen(false)
+      setMobileOpen(false)
+    } else jump(id)
+  }
+  function afterClose(event: Event) {
+    if (!pending.current) return
+    event.preventDefault()
+    const id = pending.current
+    pending.current = null
+    requestAnimationFrame(() => {
+      jump(id)
+      const heading = document.querySelector<HTMLElement>(`#${id} h2`)
+      heading?.focus({ preventScroll: true })
+    })
   }
   const navigation = (
     <nav className="space-y-1" aria-label="Guide sections">
@@ -168,6 +199,7 @@ export default function DocsPage({
           side="right"
           className="w-72 p-0 flex flex-col"
           aria-describedby={undefined}
+          onCloseAutoFocus={afterClose}
         >
           <SheetTitle className="sr-only">Documentation navigation</SheetTitle>
           <div className="p-6 pr-12">
@@ -186,6 +218,7 @@ export default function DocsPage({
         <DialogContent
           className="p-0 overflow-hidden max-w-2xl gap-0"
           aria-describedby={undefined}
+          onCloseAutoFocus={afterClose}
         >
           <div className="p-4 border-b">
             <DialogTitle>Search Documentation</DialogTitle>
@@ -234,100 +267,116 @@ export default function DocsPage({
           </div>
         </DialogContent>
       </Dialog>
-      <main className="max-w-6xl px-4 sm:px-6 py-12 sm:py-16 md:ml-64">
-        <div className="max-w-3xl space-y-24">
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
-            Next.js Admin Panel Documentation
-          </h1>
-          {sections.map((section) => (
-            <section
-              id={section.id}
-              key={section.id}
-              className="scroll-mt-28 space-y-5"
-            >
-              <h2 className="text-xl sm:text-2xl font-semibold tracking-tight">
-                {c[`docs.${section.id}.title`]}
-              </h2>
-              <p className="text-muted-foreground leading-relaxed whitespace-pre-line max-w-3xl">
-                {c[`docs.${section.id}.body`]}
-              </p>
-              {section.table && (
-                <div className="overflow-auto rounded-xl border">
-                  <table className="w-full text-sm text-left">
-                    <thead className="bg-muted">
-                      <tr>
-                        {section.table.headers.map((header) => (
-                          <th className="p-3" key={header}>
-                            {header}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {section.table.rows.map((row, index) => (
-                        <tr className="border-t" key={index}>
-                          {row.map((cell, column) => (
-                            <td className="p-3 align-top" key={column}>
-                              {cell}
-                            </td>
-                          ))}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-              {section.code && (
-                <div className="rounded-xl bg-muted overflow-hidden">
-                  <div className="flex justify-end p-2">
-                    <button
-                      className="text-xs border rounded-md px-3 py-1"
-                      onClick={async () => {
-                        try {
-                          await navigator.clipboard.writeText(
-                            section.code!.replaceAll(
-                              'https://YOUR_DOMAIN',
-                              siteUrl,
-                            ),
-                          )
-                          setCopied(section.id)
-                        } catch {
-                          setCopied('failed')
-                        }
-                      }}
-                    >
-                      {copied === section.id ? 'Copied' : 'Copy commands'}
-                    </button>
-                  </div>
-                  <pre className="px-5 pb-5 overflow-auto text-xs leading-6">
-                    <code>
-                      {section.code.replaceAll('https://YOUR_DOMAIN', siteUrl)}
-                    </code>
-                  </pre>
-                </div>
-              )}
-              {section.links && (
-                <div className="flex flex-wrap gap-4 text-sm">
-                  {section.links.map((link) => (
-                    <a
-                      className="underline text-blue-600 dark:text-blue-400"
-                      key={link.url}
-                      href={link.url}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      {link.label} ↗
-                    </a>
-                  ))}
-                </div>
-              )}
-            </section>
-          ))}
-        </div>
-      </main>
+      <DocsArticle c={c} siteUrl={siteUrl} />
       <footer className="md:ml-64 py-8">
         <PrivacyLinks />
       </footer>
     </div>
   )
 }
+
+const DocsArticle = memo(function DocsArticle({
+  c,
+  siteUrl,
+}: {
+  c: Record<string, string>
+  siteUrl: string
+}) {
+  const [copied, setCopied] = useState('')
+  return (
+    <main className="max-w-6xl px-4 sm:px-6 py-12 sm:py-16 md:ml-64">
+      <div className="max-w-3xl space-y-24">
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
+          Next.js Admin Panel Documentation
+        </h1>
+        {guide.map((section) => (
+          <section
+            id={section.id}
+            key={section.id}
+            className="scroll-mt-28 space-y-5"
+          >
+            <h2
+              tabIndex={-1}
+              className="text-xl sm:text-2xl font-semibold tracking-tight"
+            >
+              {c[`docs.${section.id}.title`]}
+            </h2>
+            <p className="text-muted-foreground leading-relaxed whitespace-pre-line max-w-3xl">
+              {c[`docs.${section.id}.body`]}
+            </p>
+            {section.table && (
+              <div className="overflow-auto rounded-xl border">
+                <table className="w-full text-sm text-left">
+                  <thead className="bg-muted">
+                    <tr>
+                      {section.table.headers.map((header) => (
+                        <th className="p-3" key={header}>
+                          {header}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {section.table.rows.map((row, index) => (
+                      <tr className="border-t" key={index}>
+                        {row.map((cell, column) => (
+                          <td className="p-3 align-top" key={column}>
+                            {cell}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            {section.code && (
+              <div className="rounded-xl bg-muted overflow-hidden">
+                <div className="flex justify-end p-2">
+                  <button
+                    className="text-xs border rounded-md px-3 py-1"
+                    onClick={async () => {
+                      try {
+                        await navigator.clipboard.writeText(
+                          section.code!.replaceAll(
+                            'https://YOUR_DOMAIN',
+                            siteUrl,
+                          ),
+                        )
+                        setCopied(section.id)
+                      } catch {
+                        setCopied('failed')
+                      }
+                    }}
+                  >
+                    {copied === section.id ? 'Copied' : 'Copy commands'}
+                  </button>
+                </div>
+                <pre className="px-5 pb-5 overflow-auto text-xs leading-6">
+                  <code>
+                    {section.code.replaceAll('https://YOUR_DOMAIN', siteUrl)}
+                  </code>
+                </pre>
+              </div>
+            )}
+            {section.links && (
+              <div className="flex flex-wrap gap-4 text-sm">
+                {section.links.map((link) => (
+                  <a
+                    className="underline text-blue-600 dark:text-blue-400"
+                    key={link.url}
+                    href={link.url}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {link.label} ↗
+                  </a>
+                ))}
+              </div>
+            )}
+          </section>
+        ))}
+      </div>
+    </main>
+  )
+})

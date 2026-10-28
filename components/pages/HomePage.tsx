@@ -1,6 +1,7 @@
 'use client'
 
-import DemoPage from '@/app/demo/page'
+import DemoPage from '@/components/lazy-demo'
+import { useSiteTheme } from '@/lib/theme'
 import { PrivacyLinks } from '@/components/site-chrome'
 import { usePreviewContent } from '@/panel/PreviewBridge'
 import { ContentKey } from '@/lib/defaultContent'
@@ -17,7 +18,7 @@ import {
 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ReactNode, useEffect, useState } from 'react'
+import { ReactNode } from 'react'
 import { FaGithub } from 'react-icons/fa'
 
 /*  TYPES  */
@@ -42,14 +43,7 @@ type Props = {
 /*  PAGE  */
 
 export default function Home({ content }: Props) {
-  const [isDark, setIsDark] = useState(() => {
-    if (typeof window === 'undefined') return false
-    return window.matchMedia('(prefers-color-scheme: dark)').matches
-  })
-
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', isDark)
-  }, [isDark])
+  const { toggleTheme } = useSiteTheme()
 
   const c = usePreviewContent(content)
 
@@ -79,7 +73,7 @@ export default function Home({ content }: Props) {
           </Link>
 
           <button
-            onClick={() => setIsDark((prev) => !prev)}
+            onClick={toggleTheme}
             className="p-2 rounded-lg border border-border hover:bg-muted transition duration-300 cursor-pointer"
             aria-label="Toggle theme"
           >
@@ -105,17 +99,18 @@ export default function Home({ content }: Props) {
                 href="https://github.com/pavsumin/editable-landing-panel"
                 className="flex items-center gap-2 bg-primary dark:bg-white text-primary-foreground px-6 py-3 rounded-xl hover:scale-102 transition duration-300"
                 target="_blank"
+                rel="noopener noreferrer"
               >
                 <FaGithub />
                 {c.hero_cta_primary}
               </a>
 
-              <a
+              <Link
                 href="/docs"
                 className="border px-6 py-3 rounded-lg hover:bg-muted transition"
               >
                 {c.hero_cta_secondary}
-              </a>
+              </Link>
             </div>
           </div>
 
@@ -126,14 +121,16 @@ export default function Home({ content }: Props) {
               alt={'Image of the product'}
               width={528}
               height={366}
-              className="block dark:hidden"
+              sizes="(max-width: 768px) 100vw, 528px"
+              className="block dark:hidden h-auto"
             />
             <Image
               src={c.hero_image_dark}
               alt={'Image of the product'}
               width={528}
               height={366}
-              className="hidden dark:block"
+              sizes="(max-width: 768px) 100vw, 528px"
+              className="hidden dark:block h-auto"
             />
           </div>
         </section>
@@ -430,6 +427,7 @@ export default function Home({ content }: Props) {
           <a
             href="https://github.com/pavsumin/editable-landing-panel"
             target="_blank"
+            rel="noopener noreferrer"
             className="inline-block bg-primary dark:bg-white text-primary-foreground px-8 py-4 rounded-xl shadow hover:opacity-90 transition"
           >
             {c.final_cta}
@@ -448,6 +446,7 @@ export default function Home({ content }: Props) {
           className="text-blue-400 hover:text-blue-500 transition duration-300 underline"
           href="https://pavelsumin.com/"
           target="_blank"
+          rel="noopener noreferrer"
         >
           Pavel Sumin
         </a>

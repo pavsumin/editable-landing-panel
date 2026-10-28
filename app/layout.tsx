@@ -1,15 +1,18 @@
 import { Toaster } from '@/components/ui/toaster'
 import PrivacyControls from '@/components/privacy-controls'
 import { Viewport } from 'next'
-import Script from 'next/script'
+import { siteOrigin } from '@/lib/seo'
 import './globals.css'
 
 export const viewport: Viewport = {
-  themeColor: 'var(--primary)',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#171717' },
+  ],
 }
 
 export const metadata = {
-  metadataBase: new URL(process.env.PANEL_SITE_URL || 'http://localhost:3000'),
+  metadataBase: new URL(siteOrigin),
 
   title: 'Next.js Admin Panel — Edit Website Content Without CMS',
   description:
@@ -56,20 +59,16 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full antialiased" suppressHydrationWarning>
       <head>
-        <Script
-          id="schema"
-          type="application/ld+json"
-          strategy="afterInteractive"
+        <link
+          rel="preload"
+          href="/fonts/geist-latin.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <script
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'SoftwareApplication',
-              name: 'Next.js Admin Panel',
-              description:
-                'Edit website content without CMS using Next.js and Supabase.',
-              applicationCategory: 'DeveloperTool',
-              operatingSystem: 'Web',
-            }),
+            __html: `try{var t=localStorage.getItem('edit-theme');var d=t==='dark'||(t!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light'}catch(e){var d=matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light'}`,
           }}
         />
       </head>
@@ -77,14 +76,6 @@ export default function RootLayout({
         {children}
         <Toaster />
         <PrivacyControls gaId={process.env.NEXT_PUBLIC_GA_ID} />
-        <Script id="theme-init">
-          {`
-						try {
-							const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-							if (isDark) document.documentElement.classList.add('dark');
-						} catch (e) {}
-					`}
-        </Script>
       </body>
     </html>
   )

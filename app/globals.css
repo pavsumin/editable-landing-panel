@@ -149,3 +149,19 @@
     @apply font-sans;
   }
 }
+
+html {
+  color-scheme: light;
+}
+html.dark {
+  color-scheme: dark;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

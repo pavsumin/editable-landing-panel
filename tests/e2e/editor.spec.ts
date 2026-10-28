@@ -218,3 +218,56 @@ test('image dialog retains validation errors and supports local image upload', a
     'Demo image updated locally',
   )
 })
+
+test('sidebar reaches the actual section, follows history and retains the theme', async ({
+  page,
+}) => {
+  await page.goto('/docs')
+  const sidebar = page.getByRole('complementary', {
+    name: 'Documentation sidebar',
+  })
+  await sidebar.getByRole('link', { name: 'HTTP API reference' }).click()
+  await expect(page).toHaveURL(/#api/)
+  await expect
+    .poll(async () => (await page.locator('#api h2').boundingBox())!.y)
+    .toBeGreaterThan(70)
+  await expect
+    .poll(async () => (await page.locator('#api h2').boundingBox())!.y)
+    .toBeLessThan(150)
+  await sidebar.getByRole('link', { name: 'Configuration reference' }).click()
+  await page.goBack()
+  await expect(page).toHaveURL(/#api/)
+  await expect(
+    sidebar.getByRole('link', { name: 'HTTP API reference' }),
+  ).toHaveAttribute('aria-current', 'location')
+  await page.getByRole('button', { name: 'Toggle theme' }).click()
+  await expect(page.locator('html')).toHaveClass(/dark/)
+  await page.reload()
+  await expect(page.locator('html')).toHaveClass(/dark/)
+  await page.getByRole('link', { name: 'Edit. Home' }).click()
+  await expect(page.locator('html')).toHaveClass(/dark/)
+  await page.getByRole('button', { name: 'Toggle theme' }).first().click()
+  await expect(page.locator('html')).not.toHaveClass(/dark/)
+})
+
+test('public metadata has distinct canonicals and preview is not indexed', async ({
+  page,
+}) => {
+  await page.goto('/about')
+  await expect(page).toHaveTitle(/About Edit/)
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'http://127.0.0.1:3100/about',
+  )
+  await page.goto('/contact')
+  await expect(page).toHaveTitle(/Contact/)
+  await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
+    'content',
+    'http://127.0.0.1:3100/contact',
+  )
+  await page.goto('/docs?preview=true')
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+    'content',
+    /noindex/,
+  )
+})

@@ -4,7 +4,7 @@ import { panelConfig } from './config'
 import { fieldsFor, mergeContent } from './schema.mjs'
 import { assertOrigin, HttpError, sessionFromRequest } from './security.mjs'
 
-export function database(admin = false) {
+export function database(admin = false, timeout = 10000) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = admin
     ? process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -17,7 +17,7 @@ export function database(admin = false) {
         fetch(url, {
           ...init,
           cache: 'no-store',
-          signal: AbortSignal.timeout(10000),
+          signal: AbortSignal.timeout(timeout),
         }),
     },
   })
@@ -60,19 +60,26 @@ export function failure(error: unknown) {
 export async function readContent(pageId?: string, strict = false) {
   const fields = fieldsFor(panelConfig, pageId)
   try {
-    const db = database()
-    const rows: { key: string; value: string }[] = []
-    for (let index = 0; index < fields.length; index += 100) {
-      const { data, error } = await db
-        .from('content')
-        .select('key,value')
-        .in(
-          'key',
-          fields.slice(index, index + 100).map((field) => field.key),
-        )
-      if (error) throw error
-      rows.push(...(data || []))
-    }
+    const db = database(false, strict ? 10000 : 3000)
+    const batches = Array.from(
+      { length: Math.ceil(fields.length / 100) },
+      (_, index) => fields.slice(index * 100, index * 100 + 100),
+    )
+    const rows = (
+      await Promise.all(
+        batches.map(async (batch) => {
+          const { data, error } = await db
+            .from('content')
+            .select('key,value')
+            .in(
+              'key',
+              batch.map((field) => field.key),
+            )
+          if (error) throw error
+          return data || []
+        }),
+      )
+    ).flat()
     return {
       values: mergeContent(panelConfig, rows, pageId),
       source: 'database' as const,
