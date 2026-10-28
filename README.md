@@ -1,4 +1,4 @@
-# Editable Landing Panel
+# Editable Landing Panel 
 
 A focused content editor for Next.js. Keep components in code, declare editable fields once, and let clients preview and publish text and images. Supabase stores overrides; your configuration provides defaults.
 
