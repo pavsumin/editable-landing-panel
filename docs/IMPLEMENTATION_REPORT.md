@@ -81,6 +81,18 @@ no site was deployed during this work.
 
 ## Verification
 
+- Deployment install regression: reproduced `ERR_PNPM_IGNORED_BUILDS` with the
+  committed lockfile and pnpm 11.25.0 in a separate directory without node_modules.
+  Replaced pnpm 10's ignoredBuiltDependencies with version-specific pnpm 11
+  allowBuilds decisions: sharp 0.34.5 and unrs-resolver 1.11.1 approved; unused msw
+  2.12.14 postinstall denied. A second fresh installation with frozen lockfile and
+  strict build checks enabled passed, followed by the full production build without
+  a Next.js cache. Package downloads reused the local content-addressable store;
+  registry supply-chain checks remained enabled. Both sharp versions encoded WebP
+  and unrs-resolver loaded its native module. Root Node is pinned to 24.x; the
+  standalone CLI retains its Node >=22.13 requirement. README and on-site
+  troubleshooting explain the policy. No migration or secret changes are needed
+  for this installation fix.
 - Final `npm run build`: CLI asset generation, downloadable tarball and Next.js
   production compilation/typechecking succeeded. The tarball has 28 whitelisted
   entries and is approximately 25 KB.

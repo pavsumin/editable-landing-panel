@@ -1,6 +1,10 @@
-ignoredBuiltDependencies:
-  - sharp
-  - unrs-resolver
+# pnpm 11 ignores the legacy ignoredBuiltDependencies setting.
+# Review these version-specific decisions when updating the lockfile.
+allowBuilds:
+  sharp@0.34.5: true
+  unrs-resolver@1.11.1: true
+  # Transitive CLI dependency; no browser worker setup is needed here.
+  msw@2.12.14: false
 
 packages:
   - packages/*

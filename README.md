@@ -1,4 +1,4 @@
-# Editable Landing Panel 
+# Editable Landing Panel
 
 A focused content editor for Next.js. Keep components in code, declare editable fields once, and let clients preview and publish text and images. Supabase stores overrides; your configuration provides defaults.
 
@@ -37,13 +37,15 @@ Saved content appears on new requests. Already open visitor pages do not have a 
 
 ## Run this repository
 
-Requires Node.js >=22.13; CI uses Node 24. Package manager: pnpm 11.25.0.
+This repository uses Node.js 24.x and pnpm 11.25.0. The standalone CLI supports Node.js >=22.13.
 
 ```sh
 pnpm install
 cp .env.example .env.local
 pnpm dev
 ```
+
+Vercel uses the same `pnpm install --frozen-lockfile` and `pnpm build` flow as CI. Keep `pnpm-workspace.yaml`: its pnpm 11 `allowBuilds` policy explicitly approves reviewed native dependency scripts and skips the unused `msw` postinstall. If a dependency update produces `ERR_PNPM_IGNORED_BUILDS`, review the reported package/version and update that policy; do not enable all dependency scripts.
 
 Without credentials, public pages render configured defaults and `/demo` works. The real editor requires Supabase, its migration and a strong password. Configure locally and in hosting:
 
