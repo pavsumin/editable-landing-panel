@@ -16,6 +16,8 @@ import { fileURLToPath } from 'node:url'
 import { createHash, randomUUID } from 'node:crypto'
 import { spawnSync } from 'node:child_process'
 import ts from 'typescript'
+import { createInterface } from 'node:readline/promises'
+import { planCodemod, REVIEW_NOTICE } from './codemod.mjs'
 import {
   validateConfig,
   validateValues,
@@ -30,7 +32,7 @@ import {
   DEFAULT_AI_URL,
 } from '../lib/assistance.mjs'
 
-const VERSION = '0.2.0'
+const VERSION = '0.3.0'
 const assets = fileURLToPath(new URL('../assets/', import.meta.url))
 const { values: flags, positionals: args } = parseArgs({
   allowPositionals: true,
@@ -46,6 +48,8 @@ const { values: flags, positionals: args } = parseArgs({
     out: { type: 'string' },
     page: { type: 'string' },
     preset: { type: 'string' },
+    content: { type: 'string' },
+    restore: { type: 'string' },
     cwd: { type: 'string' },
     help: { type: 'boolean' },
     version: { type: 'boolean' },
@@ -165,7 +169,191 @@ async function atomicFile(path, content) {
   }
 }
 
+async function contentMode() {
+  if (flags.content && !['manual', 'codemod'].includes(flags.content))
+    throw new Error('--content must be manual or codemod')
+  if (flags.content) return flags.content
+  if (
+    process.stdin.isTTY &&
+    process.stdout.isTTY &&
+    !flags.json &&
+    !flags['dry-run']
+  ) {
+    const prompt = createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    })
+    try {
+      const answer = (
+        await prompt.question(
+          'Connect existing text: [1] manually (default), [2] codemod (review required): ',
+        )
+      ).trim()
+      if (!['', '1', '2'].includes(answer))
+        throw new Error('Choose 1 or 2, or pass --content manual|codemod')
+      return answer === '2' ? 'codemod' : 'manual'
+    } finally {
+      prompt.close()
+    }
+  }
+  return 'manual'
+}
+
+async function migrationPlan(schema) {
+  const plan = await planCodemod(root, schema)
+  const path = 'editable-panel.config.json'
+  const before = await readFile(resolve(root, path), 'utf8').catch((error) => {
+    if (error.code === 'ENOENT') return null
+    throw error
+  })
+  if (plan.fields.length)
+    plan.changes.push({
+      path,
+      before,
+      after: JSON.stringify(plan.config, null, 2) + '\n',
+    })
+  return plan
+}
+
+async function applyMigration(changes) {
+  if (!changes.length) return null
+  // All paths and snapshots must pass before any source/config writes.
+  for (const change of changes) {
+    const current = await readFile(resolve(root, change.path), 'utf8').catch(
+      (error) => {
+        if (error.code === 'ENOENT') return null
+        throw error
+      },
+    )
+    if (current !== change.before)
+      throw new Error(`File changed since planning: ${change.path}`)
+    let parent = resolve(root, change.path)
+    while (parent !== root) {
+      if (!parent.startsWith(root + sep))
+        throw new Error('Codemod path outside project')
+      if (
+        await lstat(parent).then(
+          (info) => info.isSymbolicLink(),
+          (error) => {
+            if (error.code === 'ENOENT') return false
+            throw error
+          },
+        )
+      )
+        throw new Error(`Symlinked codemod destination: ${change.path}`)
+      parent = dirname(parent)
+    }
+  }
+  if (
+    await lstat(resolve(root, '.editable-panel-codemod')).then(
+      (info) => info.isSymbolicLink(),
+      (error) => {
+        if (error.code === 'ENOENT') return false
+        throw error
+      },
+    )
+  )
+    throw new Error('Symlinked backup directory')
+  await atomicFile('.editable-panel-codemod/.gitignore', '*\n')
+  const id = randomUUID()
+  const backup = `.editable-panel-codemod/${id}.json`
+  await atomicFile(
+    backup,
+    JSON.stringify({ version: 1, changes }, null, 2) + '\n',
+  )
+  const written = []
+  try {
+    for (const change of changes) {
+      if (change.after === null) await unlink(resolve(root, change.path))
+      else await atomicFile(change.path, change.after)
+      written.push(change)
+    }
+  } catch (error) {
+    for (const change of written.reverse()) {
+      if (change.before === null) await unlink(resolve(root, change.path))
+      else await atomicFile(change.path, change.before)
+    }
+    throw error
+  }
+  return backup
+}
+
+async function migrate() {
+  if (
+    args.length !== 1 ||
+    flags.page ||
+    flags.out ||
+    flags.remote ||
+    flags.defaults ||
+    flags.content ||
+    flags.ai
+  )
+    throw new Error(
+      'migrate scans supported page.tsx routes locally; paths, --page, remote/import and AI options are not supported',
+    )
+  if (flags.restore) {
+    if (!/^[0-9a-f-]{36}$/.test(flags.restore))
+      throw new Error('Use the backup UUID printed by migrate')
+    const backup = await readJSON(
+      resolve(root, `.editable-panel-codemod/${flags.restore}.json`),
+    )
+    if (backup.version !== 1 || !Array.isArray(backup.changes))
+      throw new Error('Invalid backup')
+    const changes = backup.changes.map((change) => ({
+      path: change.path,
+      before: change.after,
+      after: change.before,
+    }))
+    // Refuse restoring edited files; never discard subsequent work.
+    for (const change of changes) {
+      if (
+        typeof change.path !== 'string' ||
+        typeof change.before !== 'string' ||
+        (change.after !== null && typeof change.after !== 'string')
+      )
+        throw new Error('Invalid backup change')
+      if (
+        resolve(root, change.path) === root ||
+        !resolve(root, change.path).startsWith(root + sep)
+      )
+        throw new Error('Backup path outside project')
+    }
+    const result = {
+      command: 'migrate restore',
+      files: changes.map((c) => c.path),
+      applied: false,
+    }
+    if (flags['dry-run'] || !flags.yes) return output(result)
+    await applyMigration(changes)
+    return output({ ...result, applied: true })
+  }
+  const plan = await migrationPlan(await config())
+  const result = {
+    command: 'migrate',
+    warning: plan.warning,
+    reviewRequired: true,
+    fields: plan.fields,
+    skipped: plan.skipped,
+    changes: plan.changes,
+    applied: false,
+  }
+  if (!flags.yes || flags['dry-run']) return output(result)
+  const backup = await applyMigration(plan.changes)
+  output({
+    ...result,
+    applied: true,
+    backup,
+    next: [
+      'Review git diff and generated labels/defaults',
+      'Run your typecheck/build and verify each page and preview',
+      'Keep backup files private; they contain original source',
+      'Configure Supabase and run doctor before publishing',
+    ],
+  })
+}
+
 async function init() {
+  const mode = await contentMode()
   const manifestPath = resolve(root, '.editable-panel-install.json')
   const manifest = (await exists(manifestPath))
     ? await readJSON(manifestPath)
@@ -307,8 +495,29 @@ async function init() {
   const addDependencies = Object.fromEntries(
     Object.entries(runtimeDependencies).filter(([name]) => !dependencies[name]),
   )
+  const migration =
+    mode === 'codemod'
+      ? await migrationPlan(
+          (await exists(resolve(root, 'editable-panel.config.json')))
+            ? await config()
+            : preset,
+        )
+      : null
   const result = {
     command: 'init',
+    contentMode: mode,
+    ...(migration
+      ? {
+          codemod: {
+            warning: REVIEW_NOTICE,
+            reviewRequired: true,
+            fields: migration.fields,
+            skipped: migration.skipped,
+            changes: migration.changes,
+            applied: false,
+          },
+        }
+      : {}),
     version: VERSION,
     preset: flags.preset,
     files: plan.map((file) => file.path),
@@ -319,6 +528,7 @@ async function init() {
       'Copy .env.panel.example values into .env.local',
       'Apply the SQL migration in Supabase SQL Editor',
       'Run elp doctor --remote',
+      'Connect existing text manually or run elp migrate --dry-run, then elp migrate --yes',
       'Open /admin and /panel-example',
     ],
   }
@@ -389,7 +599,29 @@ async function init() {
       )
   }
   const installed = { ...result, applied: true }
-  if (flags.ai) {
+  if (migration) {
+    try {
+      // The installer may just have created the preset config: replan against that exact snapshot.
+      const planned = await migrationPlan(await config())
+      installed.codemod = {
+        warning: REVIEW_NOTICE,
+        reviewRequired: true,
+        fields: planned.fields,
+        skipped: planned.skipped,
+        changes: planned.changes,
+        backup: await applyMigration(planned.changes),
+        applied: true,
+      }
+    } catch (error) {
+      installed.codemod = {
+        error: error.message,
+        warning: REVIEW_NOTICE,
+        applied: false,
+      }
+      process.exitCode = 2
+    }
+  }
+  if (flags.ai && (!migration || installed.codemod.applied)) {
     try {
       installed.ai = await ai(
         flags.ai,
@@ -401,6 +633,11 @@ async function init() {
       process.exitCode = 2
     }
   }
+  if (flags.ai && migration && !installed.codemod.applied)
+    installed.ai = {
+      skipped: 'Resolve the codemod error before generating copy',
+      published: false,
+    }
   output(installed)
 }
 
@@ -649,9 +886,10 @@ try {
   if (flags.version) output(VERSION)
   else if (flags.help || !args.length)
     output(
-      'elp init [--preset minimal|multipage] [--ai brief.txt] [--dry-run] [--yes] [--no-install]\nelp doctor [--remote] [--json]\nelp pages list | schema\nelp content export [--remote] [--out file]\nelp content import file [--dry-run] [--remote|--defaults|--out file] [--yes]\nelp ai brief.txt [--page id] [--out proposal.json] [--yes]\nAll commands support --cwd and --json. AI never publishes.',
+      'elp init [--content manual|codemod] [--preset minimal|multipage] [--ai brief.txt] [--dry-run] [--yes] [--no-install]\nelp migrate [--dry-run|--yes] [--restore backup-uuid]\nelp doctor [--remote] [--json]\nelp pages list | schema\nelp content export [--remote] [--out file]\nelp content import file [--dry-run] [--remote|--defaults|--out file] [--yes]\nelp ai brief.txt [--page id] [--out proposal.json] [--yes]\nAll commands support --cwd and --json. AI never publishes.',
     )
   else if (args[0] === 'init') await init()
+  else if (args[0] === 'migrate') await migrate()
   else if (args[0] === 'doctor') await doctor()
   else if (args[0] === 'schema') output(await config())
   else if (args[0] === 'pages' && args[1] === 'list')

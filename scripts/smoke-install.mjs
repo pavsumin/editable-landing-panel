@@ -31,12 +31,29 @@ const run = (command, args) => {
     throw new Error(
       `${command} failed:\n${result.stdout}\n${result.stderr}\n${result.error?.message || ''}`,
     )
-  console.log(result.stdout)
+  try {
+    const data = JSON.parse(result.stdout)
+    console.log(
+      JSON.stringify({
+        command: data.command,
+        applied: data.applied,
+        version: data.version,
+        codemod: data.codemod
+          ? {
+              applied: data.codemod.applied,
+              fields: data.codemod.fields?.length,
+            }
+          : undefined,
+      }),
+    )
+  } catch {
+    console.log(result.stdout)
+  }
 }
 try {
   const archive = resolve(
     root,
-    'public/downloads/editable-landing-panel-0.2.0.tgz',
+    `public/downloads/editable-landing-panel-${JSON.parse(await readFile(resolve(root, 'packages/cli/package.json'), 'utf8')).version}.tgz`,
   )
   await readFile(archive)
   run('tar', ['-xzf', archive, '-C', packed])
@@ -81,6 +98,11 @@ try {
     resolve(fixture, 'src/app/page.tsx'),
     'export default function Page(){return <h1>Existing website</h1>}',
   )
+  await mkdir(resolve(fixture, 'src/app/contact'), { recursive: true })
+  await writeFile(
+    resolve(fixture, 'src/app/contact/page.tsx'),
+    `'use client'\nexport default function Contact(){return <main><h1>Contact us</h1><input placeholder="Your name" aria-label="Name" /></main>}`,
+  )
   await writeFile(
     resolve(fixture, 'next.config.ts'),
     `export default { outputFileTracingRoot: ${JSON.stringify(root)} }`,
@@ -91,6 +113,8 @@ try {
     'init',
     '--preset',
     'multipage',
+    '--content',
+    'codemod',
     '--yes',
     '--no-install',
     '--json',
@@ -101,7 +125,7 @@ try {
     '--webpack',
   ])
   console.log(
-    'Packed CLI installed a src/app multi-page preset that builds without allowJs, Tailwind or shadcn.',
+    'Packed CLI installed a src/app multi-page preset and migrated server/client pages that build without allowJs, Tailwind or shadcn.',
   )
 } finally {
   await rm(fixture, { recursive: true, force: true })

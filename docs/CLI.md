@@ -1,4 +1,4 @@
-# Editable Landing Panel CLI · 0.2.0
+# Editable Landing Panel CLI · 0.3.0
 
 The package is `editable-landing-panel`; the executable is `elp`. Requires Node >=22.13, TypeScript App Router, Next.js 15/16 and React 19. Independent installation builds are checked on Next 16.2.1. `@/*` must map to `./*` or `./src/*`. No Tailwind/shadcn or AI account is required for the editor.
 
@@ -7,34 +7,71 @@ The package is `editable-landing-panel`; the executable is `elp`. Requires Node 
 This repository's `pnpm build` runs `cli:build`, packages the CLI and builds Next.js. Vercel serves the generated tarball. Use the official project download:
 
 ```sh
-npx --package=https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.2.0.tgz elp init --preset multipage --dry-run --json
-npx --package=https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.2.0.tgz elp init --preset multipage --yes
+npx --package=https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.3.0.tgz elp init --preset multipage --dry-run --json
+npx --package=https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.3.0.tgz elp init --preset multipage --yes
 # Optional permanent installation:
-npm install --global https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.2.0.tgz
+npm install --global https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.3.0.tgz
 elp --help
 ```
 
-No npm account is needed for this download path. The shorter `npx editable-landing-panel@0.2.0 init` requires a separate successful npm publication; Vercel deployment does not perform one. To pack locally use `pnpm cli:pack`, then use the resulting local tarball with `npx --package=/absolute/path/file.tgz elp ...`.
+No npm account is needed for this download path. The shorter `npx editable-landing-panel@0.3.0 init` requires a separate successful npm publication; Vercel deployment does not perform one. To pack locally use `pnpm cli:pack`, then use the resulting local tarball with `npx --package=/absolute/path/file.tgz elp ...`.
 
-`init` adds `/admin`, `/api/editable-panel/{session,content,upload}`, scoped runtime files, config, an env example and migration 001. `minimal` adds `/panel-example`; `multipage` also adds `/panel-example/about` and `/panel-example/contact`. Your existing homepage is never replaced. Conflicting files, route groups and symlink destinations are refused before changes. Unchanged repeated installs are safe, edited config is preserved, and the selected preset is remembered. Use `--no-install` to skip package-manager execution; dependency declarations are still added. Automatic source upgrades are not implemented.
+`init` adds `/admin`, `/api/editable-panel/{session,content,upload}`, scoped runtime files, config, an env example and migration 001. `minimal` adds `/panel-example`; `multipage` also adds `/panel-example/about` and `/panel-example/contact`. In manual mode, your existing homepage is never changed. Codemod mode explicitly migrates supported existing pages. Conflicting files, route groups and symlink destinations are refused before changes. Unchanged repeated installs are safe, edited config is preserved, and the selected preset is remembered. Use `--no-install` to skip package-manager execution; dependency declarations are still added. Automatic source upgrades are not implemented.
 
-## What is automated, and what remains
+## Choose manual setup or a local codemod
 
-The CLI installs the editor/API/runtime, adds missing dependencies, generates the
-preset config, example routes, environment template and SQL migration. It checks
-conflicts and can diagnose the configured project. It does not provision Supabase,
-execute SQL through a Data API key, fill private environment values or deploy.
+Interactive `init` asks how to connect existing text: manually (default), or a
+codemod. Scripts and `--json` never prompt and default to manual. Choose explicitly:
 
-For an existing website, a developer still declares its fields and connects its
-components to the shared reader and optional preview hook. The installer preserves
-the existing homepage and does not infer arbitrary JSX layouts. A coding assistant
-can perform this integration using the documented API and config.
+```sh
+elp init --content manual --preset multipage --yes
+elp init --content codemod --preset multipage --dry-run --json
+elp init --content codemod --preset multipage --yes
+# Already installed? Preview, then apply:
+elp migrate --dry-run --json
+elp migrate --yes
+# Restore the backup UUID printed by the command:
+elp migrate --restore <backup-uuid> --dry-run
+elp migrate --restore <backup-uuid> --yes
+```
 
-Optional Gemini assistance takes a brief and declared text fields, then produces a
-validated JSON proposal. It does not integrate components, change database policies
-or publish content. Review the proposal and explicitly import it into config
-with `--defaults --yes` or publish it with `--remote --yes`. Use `--page` to generate
-copy for additional pages. The editor itself works without AI.
+**Review required:** the codemod builds a starting point and may handle a complete
+simple page, but you must check the diff, labels, defaults, layout, build and preview.
+It uses the bundled TypeScript parser locally; no AI key or network is needed for
+migration. `init` may still download dependencies as usual (`--no-install` skips that).
+`--dry-run` and commands without `--yes` do not change source/config or create backups.
+
+It scans existing `app/**/page.tsx` or `src/app/**/page.tsx` files. It extracts static
+JSX text/string expressions, alt/title/placeholder/aria-label and supported image/link
+URLs from default function declarations. It generates registered pages, sections
+(from existing section IDs where present), unique field keys, readable labels,
+types, limits and defaults in editable-panel.config.json, then connects the values.
+Markup and business logic stay in place. Existing config keys/values are preserved.
+
+Simple client pages with no page props or named exports become a server wrapper
+plus `page.editable-view.tsx`, with the preview hook. Server pages get the shared
+reader and published values; their unsaved live preview requires a client boundary
+or manual hook integration. Server-only markup does not become live-editable by magic.
+
+Dynamic/parallel/intercepted routes, nested function/loop text, imported components,
+unsupported default-export shapes and client pages with props/extra exports are
+reported for manual work. Code/pre/script/style/SVG/textarea/option contents remain
+unchanged. Dynamic expressions and unsupported URLs remain unchanged. This first
+codemod does not recursively rewrite shared components or infer data-driven content.
+
+Source/config snapshots are kept in `.editable-panel-codemod/<uuid>.json` with private
+file permissions and a directory-local gitignore. Keep these backups private: they
+contain original source. File snapshots and symlinks are checked before changes;
+a failed write rolls back completed writes. Restore refuses files edited since
+migration. Repeating migration leaves integrated pages unchanged. Review with Git,
+run your own checks and inspect skipped items before publishing.
+
+The CLI does not provision Supabase, execute SQL through a Data API key, fill
+private environment values or deploy. You still apply migration 001 and configure
+your database/environment. Optional Gemini runs after installation/codemod and can
+prepare new copy for the generated fields; it is a separate operation that never
+publishes automatically. `init` returns exit 2 if installation completed but an
+optional codemod or AI step failed; inspect its JSON output before continuing.
 
 ## Database and environment
 
@@ -61,7 +98,7 @@ elp ai brief.txt --page home --out proposal.json --yes
 
 Exports merge defaults and saved values; they are portable snapshots, not override-only backups. Import validates the entire batch and changes only supplied keys. Choose one target: `--remote --yes` publishes one atomic database upsert; `--defaults --yes` updates local config defaults; `--out file --yes` writes a proposal only. Updating defaults does not replace existing database overrides. No output file is silently overwritten.
 
-All commands support `--cwd` and `--json`. `--dry-run` prevents file/database writes. Explicit `ai --dry-run` still calls its provider and consumes quota; `init --dry-run --ai brief.txt` does not call AI. Exit 0 is success, 1 failure, 2 a successful installation with failed optional AI assistance. JSON results for init include the optional AI result in one document.
+All commands support `--cwd` and `--json`. `--dry-run` prevents file/database writes. Explicit `ai --dry-run` still calls its provider and consumes quota; `init --dry-run --ai brief.txt` does not call AI. Exit 0 is success, 1 failure, 2 a successful installation with failed optional codemod or AI assistance. JSON results for init include the optional AI result in one document.
 
 ## AI: shared service or your own key
 
