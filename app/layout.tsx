@@ -3,12 +3,11 @@ import PrivacyControls from '@/components/privacy-controls'
 import { Viewport } from 'next'
 import { siteOrigin } from '@/lib/seo'
 import './globals.css'
+import { themeBootstrapScript } from '@/panel/theme.mjs'
+import { DocumentTheme } from '@/lib/theme'
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#171717' },
-  ],
+  themeColor: '#ffffff',
 }
 
 export const metadata = {
@@ -68,11 +67,12 @@ export default function RootLayout({
         />
         <script
           dangerouslySetInnerHTML={{
-            __html: `try{var t=localStorage.getItem('edit-theme');var d=t==='dark'||(t!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light'}catch(e){var d=matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light'}`,
+            __html: themeBootstrapScript(),
           }}
         />
       </head>
       <body className="min-h-full flex flex-col">
+        <DocumentTheme />
         {children}
         <Toaster />
         <PrivacyControls gaId={process.env.NEXT_PUBLIC_GA_ID} />

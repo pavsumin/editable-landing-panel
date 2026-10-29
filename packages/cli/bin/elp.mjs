@@ -32,7 +32,7 @@ import {
   DEFAULT_AI_URL,
 } from '../lib/assistance.mjs'
 
-const VERSION = '0.3.0'
+const VERSION = '0.3.1'
 const assets = fileURLToPath(new URL('../assets/', import.meta.url))
 const { values: flags, positionals: args } = parseArgs({
   allowPositionals: true,

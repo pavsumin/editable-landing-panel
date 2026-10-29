@@ -1,4 +1,4 @@
-# Editable Landing Panel CLI · 0.3.0
+# Editable Landing Panel CLI · 0.3.1
 
 The package is `editable-landing-panel`; the executable is `elp`. Requires Node >=22.13, TypeScript App Router, Next.js 15/16 and React 19. Independent installation builds are checked on Next 16.2.1. `@/*` must map to `./*` or `./src/*`. No Tailwind/shadcn or AI account is required for the editor.
 
@@ -7,16 +7,22 @@ The package is `editable-landing-panel`; the executable is `elp`. Requires Node 
 This repository's `pnpm build` runs `cli:build`, packages the CLI and builds Next.js. Vercel serves the generated tarball. Use the official project download:
 
 ```sh
-npx --package=https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.3.0.tgz elp init --preset multipage --dry-run --json
-npx --package=https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.3.0.tgz elp init --preset multipage --yes
+npx --package=https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.3.1.tgz elp init --preset multipage --dry-run --json
+npx --package=https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.3.1.tgz elp init --preset multipage --yes
 # Optional permanent installation:
-npm install --global https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.3.0.tgz
+npm install --global https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.3.1.tgz
 elp --help
 ```
 
-No npm account is needed for this download path. The shorter `npx editable-landing-panel@0.3.0 init` requires a separate successful npm publication; Vercel deployment does not perform one. To pack locally use `pnpm cli:pack`, then use the resulting local tarball with `npx --package=/absolute/path/file.tgz elp ...`.
+No npm account is needed for this download path. The shorter `npx editable-landing-panel@0.3.1 init` requires a separate successful npm publication; Vercel deployment does not perform one. To pack locally use `pnpm cli:pack`, then use the resulting local tarball with `npx --package=/absolute/path/file.tgz elp ...`.
 
 `init` adds `/admin`, `/api/editable-panel/{session,content,upload}`, scoped runtime files, config, an env example and migration 001. `minimal` adds `/panel-example`; `multipage` also adds `/panel-example/about` and `/panel-example/contact`. In manual mode, your existing homepage is never changed. Codemod mode explicitly migrates supported existing pages. Conflicting files, route groups and symlink destinations are refused before changes. Unchanged repeated installs are safe, edited config is preserved, and the selected preset is remembered. Use `--no-install` to skip package-manager execution; dependency declarations are still added. Automatic source upgrades are not implemented.
+
+## Theme and runtime updates
+
+Version 0.3.1 synchronizes the full editor’s `html`, `body`, `color-scheme` and Safari `theme-color` with the selected theme. It follows system preferences until a light/dark preference is saved in `edit-theme`. The embedded demo only changes its own panel. Preview messages toggle the host’s dark class and signal `edit-theme-change`; the host retains its own palette.
+
+Updating the CLI alone does not upgrade files in an existing application. `init` refuses conflicting runtime files. Review and merge the current `panel/Editor.tsx`, `panel/PreviewBridge.tsx`, `panel/theme.mjs` and `panel/theme.d.mts` into the installed runtime (`src/panel` in a src project), then run that application’s checks. No new SQL migration or environment variable is needed for the theme fix. Keep custom runtime changes when merging.
 
 ## Choose manual setup or a local codemod
 

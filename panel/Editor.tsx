@@ -6,6 +6,14 @@ import Link from 'next/link'
 import type { Config, Field } from './schema.mjs'
 import { mergeContent, validateValues } from './schema.mjs'
 import styles from './editor.module.css'
+import {
+  captureThemeChrome,
+  EDITOR_PALETTE,
+  paintDocumentTheme,
+  savedTheme,
+  THEME_EVENT,
+  watchThemeChrome,
+} from './theme.mjs'
 
 type Values = Record<string, string>
 type Props = { config: Config; demo?: boolean }
@@ -51,18 +59,81 @@ export default function Editor({ config, demo = false }: Props) {
   const current = { ...values, ...drafts }
 
   useEffect(() => {
-    setDark(document.documentElement.classList.contains('dark'))
-    setThemeReady(true)
-    // Follow the host theme initialization without changing the host page.
-    const observer = new MutationObserver(() =>
-      setDark(document.documentElement.classList.contains('dark')),
-    )
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class'],
-    })
-    return () => observer.disconnect()
+    if (demo) {
+      const follow = () => {
+        setDark(document.documentElement.classList.contains('dark'))
+        setThemeReady(true)
+      }
+      follow()
+      const observer = new MutationObserver(follow)
+      observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class'],
+      })
+      return () => observer.disconnect()
+    }
+    const restore = captureThemeChrome()
+    const refresh = () => {
+      const chosen = document.documentElement.getAttribute(
+        'data-elp-editor-theme',
+      )
+      const next = chosen ? chosen === 'dark' : savedTheme()
+      document.documentElement.setAttribute(
+        'data-elp-editor-theme',
+        next ? 'dark' : 'light',
+      )
+      paintDocumentTheme(next, EDITOR_PALETTE)
+      setDark(next)
+      setThemeReady(true)
+    }
+    refresh()
+    const disconnect = watchThemeChrome(refresh)
+    const media = window.matchMedia('(prefers-color-scheme: dark)')
+    const system = () => {
+      let saved
+      try {
+        saved = localStorage.getItem('edit-theme')
+      } catch {}
+      if (saved !== 'dark' && saved !== 'light') {
+        document.documentElement.removeAttribute('data-elp-editor-theme')
+        refresh()
+      }
+    }
+    const storage = (event: StorageEvent) => {
+      if (event.key === 'edit-theme' || event.key === null) {
+        document.documentElement.removeAttribute('data-elp-editor-theme')
+        refresh()
+      }
+    }
+    media.addEventListener('change', system)
+    window.addEventListener('storage', storage)
+    return () => {
+      disconnect()
+      media.removeEventListener('change', system)
+      window.removeEventListener('storage', storage)
+      restore()
+    }
   }, [demo])
+
+  function toggleEditorTheme() {
+    const next = !dark
+    if (!demo) {
+      try {
+        localStorage.setItem('edit-theme', next ? 'dark' : 'light')
+      } catch {}
+      document.documentElement.setAttribute(
+        'data-elp-editor-theme',
+        next ? 'dark' : 'light',
+      )
+      document.documentElement.setAttribute(
+        'data-elp-page-theme',
+        next ? 'dark' : 'light',
+      )
+      paintDocumentTheme(next, EDITOR_PALETTE)
+      window.dispatchEvent(new Event(THEME_EVENT))
+    }
+    setDark(next)
+  }
 
   const sync = useCallback(() => {
     iframe.current?.contentWindow?.postMessage(
@@ -275,13 +346,19 @@ export default function Editor({ config, demo = false }: Props) {
 
   if (checking)
     return (
-      <div className={styles.panel}>
+      <div
+        className={styles.panel}
+        data-theme={themeReady ? (dark ? 'dark' : 'light') : undefined}
+      >
         <p role="status">Checking your session…</p>
       </div>
     )
   if (!authenticated)
     return (
-      <div className={styles.panel}>
+      <div
+        className={styles.panel}
+        data-theme={themeReady ? (dark ? 'dark' : 'light') : undefined}
+      >
         <form className={styles.login} onSubmit={login}>
           <h1>Admin</h1>
           <label className={styles.srOnly} htmlFor="panel-password">
@@ -319,10 +396,7 @@ export default function Editor({ config, demo = false }: Props) {
       <header className={styles.header}>
         <h1>{demo ? 'Demo' : 'Editor'}</h1>
         <div className={styles.actions}>
-          <button
-            onClick={() => setDark(!dark)}
-            aria-label="Toggle editor theme"
-          >
+          <button onClick={toggleEditorTheme} aria-label="Toggle editor theme">
             <svg
               aria-hidden="true"
               width="20"

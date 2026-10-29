@@ -30,3 +30,27 @@ test('rendered documentation defaults match the maintained guide and references 
     assert.match(source, new RegExp(`export async function ${method}\\(`))
   }
 })
+
+test('documentation entry links and installation archives resolve to current targets', async () => {
+  const guide = await readJSON('docs/guide.json')
+  const cli = await readJSON('packages/cli/package.json')
+  const ids = new Set(guide.map((section) => section.id))
+  assert.equal(ids.size, guide.length)
+  for (const section of guide)
+    for (const card of section.cards || [])
+      assert.ok(
+        ids.has(card.href.slice(1)),
+        `Missing guide target: ${card.href}`,
+      )
+  for (const path of ['docs/guide.json', 'docs/CLI.md', 'README.md']) {
+    const source = await readFile(
+      new URL('../' + path, import.meta.url),
+      'utf8',
+    )
+    const archives = [
+      ...source.matchAll(/downloads\/editable-landing-panel-([\d.]+)\.tgz/g),
+    ]
+    assert.ok(archives.length, `Missing installation archive in ${path}`)
+    for (const archive of archives) assert.equal(archive[1], cli.version, path)
+  }
+})

@@ -147,6 +147,11 @@ test('restored desktop layout and keyboard documentation search', async ({
   await expect(
     page.getByRole('complementary', { name: 'Documentation sidebar' }),
   ).toBeVisible()
+  // Wait for a real interaction before testing a global keyboard listener.
+  // App Router can stream this page's markup before hydration finishes.
+  await page.getByRole('button', { name: 'Search documentation' }).click()
+  await expect(page.getByRole('dialog')).toBeVisible()
+  await page.keyboard.press('Escape')
   await page.keyboard.press('Control+k')
   await page
     .getByRole('searchbox', { name: 'Search documentation' })
@@ -350,4 +355,36 @@ test('public footers retain author credit and privacy controls without product a
       footer.getByRole('link', { name: 'Privacy & cookies' }),
     ).toBeVisible()
   }
+})
+
+test('documentation task cards and checks stay readable in both themes', async ({
+  page,
+}, testInfo) => {
+  await page.goto('/docs')
+  await page.getByRole('link', { name: 'Add the editor to my website' }).click()
+  await expect(page).toHaveURL(/#installation/)
+  const installation = page.locator('#installation')
+  await installation.getByText('Check before continuing').click()
+  await expect(
+    installation.getByText('The plan targets the correct project', {
+      exact: false,
+    }),
+  ).toBeVisible()
+  await page.goto('/docs')
+  await expect(
+    page.getByRole('heading', { name: 'Next.js Admin Panel Documentation' }),
+  ).toBeVisible()
+  await page.screenshot({ path: testInfo.outputPath('docs-guide-light.png') })
+  await page.getByRole('button', { name: 'Toggle theme' }).click()
+  await expect(page.locator('html')).toHaveClass(/dark/)
+  await page.screenshot({ path: testInfo.outputPath('docs-guide-dark.png') })
+  await page.setViewportSize({ width: 320, height: 844 })
+  await page.screenshot({ path: testInfo.outputPath('docs-guide-mobile.png') })
+  await expect
+    .poll(() => page.evaluate(() => document.documentElement.scrollWidth))
+    .toBe(320)
+  await page.locator('#integration').scrollIntoViewIfNeeded()
+  await page.screenshot({
+    path: testInfo.outputPath('docs-integration-mobile.png'),
+  })
 })

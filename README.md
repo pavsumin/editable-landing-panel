@@ -11,18 +11,20 @@ Supported: TypeScript, Next.js 15/16 App Router, React 19, `app` or `src/app`, w
 **The public npm package is not published by this iteration. No npm account is required for the Vercel-hosted download.** `pnpm build` prepares the archive before compiling Next.js. After deploying this version, run from the target application:
 
 ```sh
-npx --package=https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.3.0.tgz elp init --preset multipage --dry-run --json
-npx --package=https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.3.0.tgz elp init --preset multipage --yes
+npx --package=https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.3.1.tgz elp init --preset multipage --dry-run --json
+npx --package=https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.3.1.tgz elp init --preset multipage --yes
 # Optional permanent installation:
-npm install --global https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.3.0.tgz
+npm install --global https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.3.1.tgz
 elp --help
 ```
 
-Use `pnpm cli:pack` for a local archive under public/downloads, then `npx --package=/absolute/path/file.tgz elp ...`. For the shorter `npx editable-landing-panel@0.3.0 init`, an authorized owner must separately publish packages/cli to npm. Vercel deployment does not publish packages.
+Use `pnpm cli:pack` for a local archive under public/downloads, then `npx --package=/absolute/path/file.tgz elp ...`. For the shorter `npx editable-landing-panel@0.3.1 init`, an authorized owner must separately publish packages/cli to npm. Vercel deployment does not publish packages.
 
 The installer adds /admin, /api/editable-panel/{session,content,upload}, scoped runtime files, config, an env example and migration 001. Example routes live under /panel-example. Manual mode preserves the existing homepage; codemod mode explicitly migrates supported pages. Conflicts are refused before writing; repeat runs preserve edited config. Use --no-install to manage dependencies yourself.
 
 Apply migration 001, set your own Supabase variables and run `elp doctor --remote`. This project's existing database also needs migration 001 before the upgraded admin is deployed. Migration 002 is only for hosting the optional shared AI endpoint. Integration does not automatically rewrite arbitrary JSX or move business logic.
+
+CLI 0.3.1 includes the editor’s Safari/background theme fix for new installations. Updating the CLI does not automatically upgrade an already installed runtime; see [runtime update instructions](docs/CLI.md#theme-and-runtime-updates). This theme update needs no new environment variables or SQL migrations.
 
 ## Included
 

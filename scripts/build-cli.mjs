@@ -29,6 +29,8 @@ const runtime = [
   'panel/config.ts',
   'panel/PreviewBridge.tsx',
   'panel/Editor.tsx',
+  'panel/theme.mjs',
+  'panel/theme.d.mts',
   'panel/editor.module.css',
   'app/admin/page.tsx',
   'app/api/editable-panel/session/route.ts',

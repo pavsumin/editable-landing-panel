@@ -1,6 +1,6 @@
 {
   "name": "editable-landing-panel",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Install and manage a focused Next.js content editor",
   "type": "module",
   "bin": {

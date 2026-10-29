@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { THEME_EVENT } from './theme.mjs'
 import { validateValues } from './schema.mjs'
 
 export function usePreviewContent(content: Record<string, string>) {
@@ -33,11 +34,21 @@ export function usePreviewContent(content: Record<string, string>) {
           document
             .getElementById(event.data.id)
             ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        if (event.data.type === 'theme')
+        if (event.data.type === 'theme') {
+          document.documentElement.setAttribute(
+            'data-elp-preview-theme',
+            event.data.dark === true ? 'dark' : 'light',
+          )
+          // The host owns its palette. Signal the theme without imposing this
+          // project's background colors on a website installed through the CLI.
           document.documentElement.classList.toggle(
             'dark',
             event.data.dark === true,
           )
+          document.documentElement.style.colorScheme =
+            event.data.dark === true ? 'dark' : 'light'
+          window.dispatchEvent(new Event(THEME_EVENT))
+        }
       }
       window.addEventListener('message', handler)
       window.parent.postMessage(

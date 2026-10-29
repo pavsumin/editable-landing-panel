@@ -1,36 +1,52 @@
 'use client'
-import { useSyncExternalStore } from 'react'
-const eventName = 'edit-theme-change'
-function apply(dark: boolean) {
-  document.documentElement.classList.toggle('dark', dark)
-  document.documentElement.style.colorScheme = dark ? 'dark' : 'light'
-  window.dispatchEvent(new Event(eventName))
-}
+import { useEffect, useSyncExternalStore } from 'react'
+import {
+  THEME_EVENT,
+  syncDocumentTheme,
+  watchThemeChrome,
+} from '@/panel/theme.mjs'
 function subscribe(update: () => void) {
-  const media = window.matchMedia('(prefers-color-scheme: dark)')
-  const system = () => {
-    let choice
-    try {
-      choice = localStorage.getItem('edit-theme')
-    } catch {}
-    if (!choice) apply(media.matches)
-  }
-  const storage = (event: StorageEvent) => {
-    if (event.key === 'edit-theme')
-      apply(event.newValue ? event.newValue === 'dark' : media.matches)
-  }
-  window.addEventListener(eventName, update)
-  window.addEventListener('storage', storage)
-  media.addEventListener('change', system)
+  window.addEventListener(THEME_EVENT, update)
+  return () => window.removeEventListener(THEME_EVENT, update)
+}
+export function DocumentTheme() {
+  useEffect(() => {
+    const refresh = () => {
+      syncDocumentTheme()
+      window.dispatchEvent(new Event('edit-theme-render'))
+    }
+    const media = window.matchMedia('(prefers-color-scheme: dark)')
+    const storage = (event: StorageEvent) => {
+      if (event.key === 'edit-theme' || event.key === null) {
+        document.documentElement.removeAttribute('data-elp-page-theme')
+        refresh()
+      }
+    }
+    refresh()
+    const disconnect = watchThemeChrome(refresh)
+    media.addEventListener('change', refresh)
+    window.addEventListener('storage', storage)
+    window.addEventListener(THEME_EVENT, refresh)
+    return () => {
+      disconnect()
+      media.removeEventListener('change', refresh)
+      window.removeEventListener('storage', storage)
+      window.removeEventListener(THEME_EVENT, refresh)
+    }
+  }, [])
+  return null
+}
+function subscribeTheme(update: () => void) {
+  const cleanup = subscribe(update)
+  window.addEventListener('edit-theme-render', update)
   return () => {
-    window.removeEventListener(eventName, update)
-    window.removeEventListener('storage', storage)
-    media.removeEventListener('change', system)
+    cleanup()
+    window.removeEventListener('edit-theme-render', update)
   }
 }
 export function useSiteTheme() {
   const dark = useSyncExternalStore(
-    subscribe,
+    subscribeTheme,
     () => document.documentElement.classList.contains('dark'),
     () => false,
   )
@@ -41,7 +57,13 @@ export function useSiteTheme() {
       try {
         localStorage.setItem('edit-theme', next ? 'dark' : 'light')
       } catch {}
-      apply(next)
+      // In blocked-storage browsers the current page still needs the explicit selection.
+      document.documentElement.setAttribute(
+        'data-elp-page-theme',
+        next ? 'dark' : 'light',
+      )
+      syncDocumentTheme()
+      window.dispatchEvent(new Event(THEME_EVENT))
     },
   }
 }

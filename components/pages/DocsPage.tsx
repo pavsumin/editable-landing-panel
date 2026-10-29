@@ -11,6 +11,11 @@ import {
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import guide from '@/docs/guide.json'
+import {
+  GuideDetails,
+  GuideChecklist,
+  InlineText,
+} from '@/components/docs/guide-details'
 import { usePreviewContent } from '@/panel/PreviewBridge'
 
 const groups = [...new Set(guide.map((section) => section.group))]
@@ -33,7 +38,7 @@ export default function DocsPage({
     () =>
       guide.map((section) => ({
         section,
-        text: `${c[`docs.${section.id}.title`]} ${c[`docs.${section.id}.body`]} ${section.code || ''} ${JSON.stringify(section.table || '')}`.toLowerCase(),
+        text: `${c[`docs.${section.id}.title`]} ${c[`docs.${section.id}.body`]} ${section.code || ''} ${JSON.stringify(section.table || '')} ${JSON.stringify({ summary: section.summary, cards: section.cards, flow: section.flow, callout: section.callout, checklist: section.checklist, extraCode: section.extraCode })}`.toLowerCase(),
       })),
     [c],
   )
@@ -307,9 +312,16 @@ const DocsArticle = memo(function DocsArticle({
             >
               {c[`docs.${section.id}.title`]}
             </h2>
-            <p className="text-muted-foreground leading-relaxed whitespace-pre-line max-w-3xl">
-              {c[`docs.${section.id}.body`]}
-            </p>
+            <GuideDetails section={section} />
+            <div className="space-y-4 text-muted-foreground leading-relaxed max-w-3xl">
+              {c[`docs.${section.id}.body`]
+                .split(/\n\n+/)
+                .map((paragraph, index) => (
+                  <p key={index}>
+                    <InlineText text={paragraph} />
+                  </p>
+                ))}
+            </div>
             {section.table && (
               <div className="min-w-0 max-w-full overflow-x-auto rounded-xl border">
                 <table className="w-full text-sm text-left">
@@ -338,7 +350,10 @@ const DocsArticle = memo(function DocsArticle({
             )}
             {section.code && (
               <div className="min-w-0 max-w-full rounded-xl bg-muted overflow-hidden">
-                <div className="flex justify-end p-2">
+                <div className="flex items-center justify-between gap-3 px-4 py-2 border-b border-border/50">
+                  <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                    {section.language || 'Terminal'}
+                  </span>
                   <button
                     className="text-xs border rounded-md px-3 py-1"
                     onClick={async () => {
@@ -355,7 +370,7 @@ const DocsArticle = memo(function DocsArticle({
                       }
                     }}
                   >
-                    {copied === section.id ? 'Copied' : 'Copy commands'}
+                    {copied === section.id ? 'Copied' : 'Copy'}
                   </button>
                 </div>
                 <pre className="max-w-full px-5 pb-5 overflow-x-auto text-xs leading-6">
@@ -365,6 +380,32 @@ const DocsArticle = memo(function DocsArticle({
                 </pre>
               </div>
             )}
+            {section.extraCode && (
+              <div className="min-w-0 max-w-full rounded-xl border bg-muted/30 overflow-hidden">
+                <div className="flex items-center justify-between gap-3 border-b px-4 py-2">
+                  <span className="text-[11px] uppercase tracking-wider font-medium text-muted-foreground">
+                    Terminal · optional codemod
+                  </span>
+                  <button
+                    className="text-xs border rounded-md px-3 py-1"
+                    onClick={async () => {
+                      try {
+                        await navigator.clipboard.writeText(section.extraCode!)
+                        setCopied(`${section.id}-extra`)
+                      } catch {
+                        setCopied('failed')
+                      }
+                    }}
+                  >
+                    {copied === `${section.id}-extra` ? 'Copied' : 'Copy'}
+                  </button>
+                </div>
+                <pre className="max-w-full overflow-x-auto p-4 text-xs leading-6">
+                  <code>{section.extraCode}</code>
+                </pre>
+              </div>
+            )}
+            <GuideChecklist items={section.checklist} />
             {section.links && (
               <div className="flex flex-wrap gap-4 text-sm">
                 {section.links.map((link) => (

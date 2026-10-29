@@ -3,34 +3,63 @@
     "id": "overview",
     "title": "Choose your starting point",
     "group": "Start here",
-    "body": "You are reading both the setup guide and the reference for version 0.3.0. To add the editor to an existing Next.js app, follow Install → Database → Environment → Integrate. To deploy this project's own website, follow Deploy on Vercel and the migration checklist. To distribute the CLI, read Distribution. The optional shared AI service has a separate operator guide; ordinary CLI users do not need to deploy it.\n\nThe editor changes only declared content fields. Your components and application logic remain in code. Defaults are in editable-panel.config.json and saved overrides are in Supabase. The public demo is a browser-only sandbox. No claim is made here that a hosted service or npm version is already live: deployment and npm publication are separate actions."
+    "body": "Choose the task that matches your goal. To add the editor to an existing Next.js website, start with the CLI installation, choose manual wiring or the codemod, then connect your database and environment. To host this project’s own website and shared AI endpoint, follow the separate Vercel and operator instructions.\n\nYour layout and application logic stay in code. Editable defaults live in `editable-panel.config.json`; published overrides live in your own Supabase project. The public demo stores changes in browser memory and resets on reload.",
+    "cards": [
+      {
+        "title": "Add the editor to my website",
+        "body": "Install the CLI, choose how to connect text, and configure your own Supabase project.",
+        "href": "#installation"
+      },
+      {
+        "title": "Host this project and shared AI",
+        "body": "Deploy the repository on Vercel. Shared AI is optional and has separate server settings.",
+        "href": "#vercel"
+      }
+    ]
   },
   {
     "id": "requirements",
     "title": "Requirements and supported scope",
     "group": "Start here",
-    "body": "Use Node.js 22.13 or newer (the checks run on Node 24). The installer accepts TypeScript App Router projects on Next.js 15/16 with React 19 and @/* mapped to ./* or ./src/*. It supports app and src/app. The independently compiled installation fixture uses Next.js 16.2.1; other versions should be verified in your project.\n\nThe installed editor has scoped CSS and requires neither Tailwind nor shadcn. It adds @supabase/supabase-js 2.x, sharp and server-only when missing. Manual mode preserves existing pages; --content codemod explicitly migrates supported page text. Pages Router, custom basePath, static export and JavaScript-only apps are outside the supported scope. The two app directories must not coexist."
+    "body": "The CLI needs Node.js 22.13 or newer; this repository uses Node 24.x. Supported targets are TypeScript App Router projects on Next.js 15/16 with React 19. The `@/*` alias must point to `./*` or `./src/*`. Use one App Router root: `app` or `src/app`. Installation builds are checked on Next.js 16.2.1; verify other supported versions in your project.\n\nThe installed editor uses scoped CSS and needs neither Tailwind nor shadcn. The installer adds missing Supabase, sharp and server-only dependencies. Pages Router, JavaScript-only projects, custom basePath and static export are outside the supported scope.",
+    "callout": {
+      "tone": "info",
+      "title": "Updating the CLI does not upgrade an installed editor",
+      "body": "A new CLI download contains runtime fixes for new installations. Existing generated files are not overwritten automatically: init reports conflicts. Review and merge updated panel files, including theme.mjs and theme.d.mts for this release, then run your build. Do not delete customised files just to bypass the conflict check."
+    }
   },
   {
     "id": "installation",
     "title": "Install with CLI (recommended)",
     "group": "Setup",
-    "body": "Recommended setup: run the CLI from the root of your existing Next.js project. The official download is hosted at https://editable-landing-panel.vercel.app. The archive becomes available after deploying this version; it does not require an npm account or a permanent CLI installation.\n\nFirst review --dry-run. Then --yes applies the plan and installs missing dependencies with the detected package manager. --preset multipage adds isolated routes /panel-example, /panel-example/about and /panel-example/contact; minimal adds only the first example. Manual mode preserves the existing homepage; codemod mode explicitly migrates supported pages. After installation, configure the database and environment before opening /admin. Until then, example routes display defaults but real admin login fails closed.\n\nChoose --content manual to connect fields yourself (the default for scripts), or --content codemod for local AST-based migration. Interactive init asks you to choose. The codemod builds keys, defaults, admin labels, sections and field types from supported static TSX page content, then connects the reader. It needs no AI key. Always review the diff, skipped items, labels, build and preview: it can prepare a base or a complete simple page, but cannot safely infer every component. Already installed? Run elp migrate --dry-run, then elp migrate --yes. Private backups are stored under .editable-panel-codemod; elp migrate --restore <uuid> --yes restores unchanged migrated files.",
-    "code": "# No npm publication is required for this website-hosted tarball:\nnpx --package=https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.3.0.tgz elp init --preset multipage --dry-run --json\nnpx --package=https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.3.0.tgz elp init --preset multipage --yes\n\n# Optional global installation from the same download:\nnpm install --global https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.3.0.tgz\nelp --help\n\n# Choose explicitly after installing the CLI globally:\nelp init --content manual --preset multipage --yes\nelp init --content codemod --preset multipage --dry-run --json\nelp init --content codemod --preset multipage --yes\nelp migrate --dry-run --json\nelp migrate --yes"
+    "body": "Run the following commands from the root of your existing Next.js project. The first command previews the installation; the second applies manual mode. This website-hosted archive does not need an npm account or permanent global installation. It is generated during this project’s Vercel build.\n\nManual mode preserves existing pages. Choose `--content codemod` instead if you want supported static TSX page text moved into config automatically. Interactive init asks which mode you want; scripts and JSON output default to manual unless you specify otherwise.\n\nThe multipage preset creates `/panel-example`, `/panel-example/about` and `/panel-example/contact`. The minimal preset creates only `/panel-example`. After installation, configure your own database and environment before using the real editor. No Supabase account, SQL execution or deployment is performed by init.",
+    "code": "# 1. Inspect the installation plan (no writes):\nnpx --package=https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.3.1.tgz elp init --content manual --preset multipage --dry-run --json\n# 2. Install in manual mode:\nnpx --package=https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.3.1.tgz elp init --content manual --preset multipage --yes\n\n# Optional: install the CLI globally for the shorter commands below:\nnpm install --global https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.3.1.tgz\nelp --help",
+    "summary": "Result: an editor at `/admin`, its API, example pages, config, an env template and migration 001.",
+    "checklist": [
+      "The plan targets the correct project and reports no conflicts.",
+      "The editor files, editable-panel.config.json, .env.panel.example and migration 001 are present.",
+      "Next: apply the database migration, fill .env.local, and choose how to connect your actual pages."
+    ]
   },
   {
     "id": "database",
     "title": "Create or upgrade the database",
     "group": "Setup",
-    "body": "Each installed website normally uses its own Supabase project. Create a project, open SQL Editor, paste the generated supabase/migrations/202610280001_panel_security.sql and run it. This creates or upgrades the content table, timestamp trigger and shared login-throttle function. It enables RLS, removes public mutation privileges and grants read-only public access to published content.\n\nIMPORTANT FOR THIS PROJECT: apply migration 001 to the existing Supabase database too before deploying the new admin. It is not only a template for future users. Existing key/value content is preserved; no content is seeded over it. Back up first and review the migration, because it replaces policies on the dedicated content table. An existing images bucket is not overwritten, so inspect its write policies separately. Migration 002 is needed only if you host shared AI.\n\nA service-role Data API key cannot execute SQL. Vercel environment variables do not apply migrations. Use Dashboard SQL Editor or your authorized SQL migration connection. Installation cannot silently create a new Supabase account/project.",
-    "code": "# After applying migration 001 and configuring environment:\nelp doctor --remote --json\n# Also run supabase/verify.sql from the repository in SQL Editor.\n# Expected content permissions: public SELECT only, no INSERT/UPDATE/DELETE/TRUNCATE."
+    "body": "Create or choose your own Supabase project. Back up existing data, open its SQL Editor, paste the generated `supabase/migrations/202610280001_panel_security.sql` and run it. Migration 001 creates or upgrades the content table, timestamp trigger and login-throttle function. It is also required when upgrading an older installation.\n\nThe migration preserves content values and takes ownership of policies on the dedicated content table. If another application uses that table, review the changes first. Existing image bucket settings and policies are preserved and need separate inspection.\n\nA service-role Data API key cannot execute SQL migrations. Setting env values or deploying on Vercel does not run SQL. Use the SQL Editor or an authorised database migration connection.",
+    "code": "# After applying migration 001 and configuring environment:\nelp doctor --remote --json\n# Also run supabase/verify.sql from the repository in SQL Editor.\n# Expected content permissions: public SELECT only, no INSERT/UPDATE/DELETE/TRUNCATE.",
+    "summary": "Result: public published-content reads, protected writes and a database-backed login throttle.",
+    "callout": {
+      "tone": "review",
+      "title": "Which migration do I need?",
+      "body": "Every installed website needs 001. Migration 002 is only for the operator hosting the optional shared AI service. CLI users do not need 002 or access to this website’s database."
+    }
   },
   {
     "id": "environment",
     "title": "Configure environment variables",
     "group": "Setup",
     "body": "In an installed application, copy values from .env.panel.example into .env.local. For this repository, use .env.example. Set the same server variables in Vercel before production deployment. Never commit the files containing real values. Shell variables take precedence over .env.local, which takes precedence over .env in the CLI.\n\nADMIN_PASSWORD must contain at least 16 characters; use a long random password. PANEL_SITE_URL must be your exact production origin, including https://. Locally use http://localhost:3000. Changing ADMIN_PASSWORD revokes all signed sessions. ADMIN_SESSION_SECRET is optional. NEXT_PUBLIC identifies browser-safe values; never add that prefix to a service-role key, password, session secret or Gemini key.",
-    "code": "NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co\nNEXT_PUBLIC_SUPABASE_ANON_KEY=your-public-key\nSUPABASE_SERVICE_ROLE_KEY=your-server-only-key\nADMIN_PASSWORD=at-least-16-random-characters\nPANEL_SITE_URL=https://editable-landing-panel.vercel.app\n# Optional: Gemini key belonging to THIS CLI user\nGEMINI_API_KEY=\nGEMINI_MODEL=gemini-3.5-flash-lite",
+    "code": "NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co\nNEXT_PUBLIC_SUPABASE_ANON_KEY=your-public-key\nSUPABASE_SERVICE_ROLE_KEY=your-server-only-key\nADMIN_PASSWORD=at-least-16-random-characters\nPANEL_SITE_URL=https://your-domain.com\n# Optional: Gemini key belonging to THIS CLI user\nGEMINI_API_KEY=\nGEMINI_MODEL=gemini-3.5-flash-lite",
     "table": {
       "headers": ["Variable", "Where / purpose"],
       "rows": [
@@ -55,14 +84,34 @@
           "Only the operator hosting the shared AI endpoint"
         ]
       ]
-    }
+    },
+    "callout": {
+      "tone": "review",
+      "title": "Use your own website origin",
+      "body": "Set PANEL_SITE_URL to the exact origin where your installed editor runs. Do not copy the operator’s domain. Use http://localhost:3000 locally and your own HTTPS domain in production; a mismatch causes rejected writes."
+    },
+    "language": "Environment"
   },
   {
     "id": "integration",
     "title": "Connect existing components",
     "group": "Setup",
-    "body": "Read values in your Server Component and pass them only to the sections needing them. Keep database queries, authentication and other server logic in their current server components. A small Client Component can use usePreviewContent for unsaved preview. You do not have to turn the whole website into a client component.\n\nUse section IDs matching the config so the editor can scroll preview to the relevant section. Normal visitors receive published values; the preview hook accepts validated messages only from a same-origin parent inside an explicit ?preview=true iframe. If using next/image, add your exact Supabase public-images host/path to your app's next.config; the installer does not rewrite that config. Plain img previews need no Next image-host setting.\n\nCodemod scope: app/**/page.tsx or src/app/**/page.tsx with a default function declaration. Static JSX text and supported alt/title/placeholder/aria-label/link/image attributes are registered automatically. Existing section IDs group fields. Simple client pages with no props/extra exports receive a server wrapper and a preview view. Server pages receive the shared reader for published values; add a client boundary for unsaved preview. Imported components, dynamic/parallel/intercepted routes, loop/callback content, unsupported exports and dynamic expressions require manual review. Source code is not sent to AI by the codemod. Automatic deployment, database provisioning and SQL execution are separate tasks.",
-    "code": "// app/page.tsx (server)\nimport { readContent } from '@/panel/server'\nimport Hero from './Hero'\nexport const revalidate = 0\nexport default async function Page() {\n  return <Hero content={(await readContent('home')).values} />\n}\n\n// app/Hero.tsx (client)\n'use client'\nimport { usePreviewContent } from '@/panel/PreviewBridge'\nexport default function Hero({ content }: { content: Record<string, string> }) {\n  const c = usePreviewContent(content)\n  return <section id=\"hero\"><h1>{c['home.title']}</h1></section>\n}"
+    "body": "Choose one way to connect content. In manual mode, register the page path, section IDs and fields in `editable-panel.config.json`, then read the values in a Server Component and pass them to the client sections that need preview. The code below shows the reader and preview hook. Keep authentication, database queries and other server logic on the server.\n\nThe preset’s home page initially points to `/panel-example`. If you connect your actual homepage manually, change its path to `/`, or register a separate page. Section IDs should match DOM IDs so the editor can scroll the preview. Run `elp pages list` to see the actual IDs: codemod-generated IDs can be home-2 or contact-2 to avoid existing preset IDs.\n\nFor automatic migration, use the codemod commands below. It scans default-function `page.tsx` files under app or src/app. Static text and supported alt/title/placeholder/aria-label/link/image attributes receive keys, labels, types and defaults. Existing section IDs group fields.\n\nSimple client pages without props or extra exports receive a server wrapper and preview view. Server pages receive published values through the reader; unsaved preview still needs a client boundary. Imported components, callbacks, dynamic routes, dynamic expressions and unsupported exports remain for manual work.\n\nIf you render Supabase uploads with next/image, allow your exact public-images host/path in your Next config. The installer does not rewrite that config. Plain image previews do not need the Next image allowlist.",
+    "code": "// app/page.tsx (server)\nimport { readContent } from '@/panel/server'\nimport Hero from './Hero'\nexport const revalidate = 0\nexport default async function Page() {\n  return <Hero content={(await readContent('home')).values} />\n}\n\n// app/Hero.tsx (client)\n'use client'\nimport { usePreviewContent } from '@/panel/PreviewBridge'\nexport default function Hero({ content }: { content: Record<string, string> }) {\n  const c = usePreviewContent(content)\n  return <section id=\"hero\"><h1>{c['home.title']}</h1></section>\n}",
+    "summary": "Result: your real pages render registered values; client sections can preview unsaved edits.",
+    "callout": {
+      "tone": "review",
+      "title": "The codemod is a reviewed starting point",
+      "body": "It may connect an entire simple page or only part of a site. Review labels, defaults, skipped items, layout and build before publishing. It runs locally without AI. Backups contain original source; keep them private. Restore refuses files edited since migration."
+    },
+    "extraCode": "# These short commands require the global CLI installation above.\n# During installation:\nelp init --content codemod --preset multipage --dry-run --json\nelp init --content codemod --preset multipage --yes\n# Already installed:\nelp migrate --dry-run --json\nelp migrate --yes\n# Restore the UUID printed by migrate:\nelp migrate --restore <backup-uuid> --dry-run\nelp migrate --restore <backup-uuid> --yes",
+    "language": "TSX · two separate files",
+    "checklist": [
+      "The page path and section IDs match your actual routes and markup.",
+      "Every extracted field has a useful label, correct type and intended default.",
+      "Run your project’s typecheck/build and inspect every skipped item.",
+      "Save one real edit and verify it appears on a fresh page request; check unsaved preview separately."
+    ]
   },
   {
     "id": "content",
@@ -84,7 +133,26 @@
           "Image upload; server emits WebP. SVG image URLs are rejected."
         ]
       ]
-    }
+    },
+    "language": "JSON · editable-panel.config.json",
+    "flow": [
+      {
+        "label": "Components",
+        "detail": "Your layout and logic"
+      },
+      {
+        "label": "Config",
+        "detail": "Registered fields + defaults"
+      },
+      {
+        "label": "Supabase",
+        "detail": "Published overrides"
+      },
+      {
+        "label": "Website",
+        "detail": "Valid override or default"
+      }
+    ]
   },
   {
     "id": "pages",
@@ -156,13 +224,18 @@
     "id": "cli-content",
     "title": "Imports, defaults and backups",
     "group": "Reference",
-    "body": "An import can contain {\"values\":{\"home.title\":\"New title\"}} or a plain key/value object. The entire batch is validated before changes. --defaults changes only the matching default strings in editable-panel.config.json. --remote makes one atomic upsert and does not delete unspecified keys. Choose exactly one target: --defaults, --remote or --out.\n\nDatabase overrides take precedence over local defaults. Updating a default does not replace a client’s saved value; reset that field in the editor or use an explicit remote import if you want to replace it. Export --remote merges defaults with stored values; it is a portable snapshot, not an exact override-only database backup. Make a database backup separately before changing permissions or migrations."
+    "body": "An import can contain {\"values\":{\"home.title\":\"New title\"}} or a plain key/value object. The entire batch is validated before changes. --defaults changes only the matching default strings in editable-panel.config.json. --remote makes one atomic upsert and does not delete unspecified keys. Choose exactly one target: --defaults, --remote or --out.\n\nDatabase overrides take precedence over local defaults. Updating a default does not replace a client’s saved value; reset that field in the editor or use an explicit remote import if you want to replace it. Export --remote merges defaults with stored values; it is a portable snapshot, not an exact override-only database backup. Make a database backup separately before changing permissions or migrations.",
+    "callout": {
+      "tone": "info",
+      "title": "Local defaults and published content are different",
+      "body": "An existing Supabase override wins over a changed default. Use an explicit remote import to publish, or Reset in the editor to remove an override. Codemod source backups, content exports and database backups serve different purposes."
+    }
   },
   {
     "id": "ai",
     "title": "AI-assisted setup: shared service or own key",
     "group": "AI workflows",
-    "body": "AI is optional. A normal init works without a model, key or shared endpoint. init --ai brief.txt uses Gemini to prepare copy for the declared fields after installing the deterministic preset. It writes panel-content.proposal.json, never arbitrary source-code edits or a database publication. Review the proposal, then apply it to local defaults or publish through a separate explicit import.\n\nWithout GEMINI_API_KEY, the CLI calls the shared server at the project’s published Vercel URL. Your common key stays on that server and is never shipped in the package. The service becomes available only after its operator enables it and applies migration 002. A local GEMINI_API_KEY takes precedence and is sent only to Google, never to the shared server. GEMINI_MODEL defaults to gemini-3.5-flash-lite in both modes. Use ELP_AI_URL or --ai-url to point to another trusted deployment.\n\nShared protection allows up to 3 requests per client-IP/day and 20 total/day (UTC). These are application budgets, not a promise of Google quota. Upstream 429 or unavailable service produces instructions for an own key; installation still works without AI. Never assume a free tier is unlimited or permanently available.\n\nWhen --page is omitted, AI uses the first configured page plus shared fields. Run it for other pages separately when needed.",
+    "body": "AI is optional and separate from the codemod. A normal installation and local text migration need no Gemini account or key. Gemini uses a brief plus the selected registered text fields to prepare new copy. Create a UTF-8 file such as brief.txt with your description, audience and tone, then run the command below.\n\nWithout a local GEMINI_API_KEY, the CLI uses the operator’s shared endpoint if enabled and available. Your own GEMINI_API_KEY takes precedence and is sent directly to Google, never to the shared operator. GEMINI_MODEL defaults to gemini-3.5-flash-lite. ELP_AI_URL or --ai-url can select another trusted shared deployment.\n\nWhen --page is omitted, AI uses the first configured page plus shared text fields. Run elp pages list before choosing an ID, especially after a codemod. Requests support 1–64 text fields; images are excluded. The CLI does not upload source files or database credentials.\n\nShared application budgets are 3 requests per client IP and 20 total per UTC day; provider limits can be lower. A shared-service failure prints own-key guidance. The CLI never silently switches to a paid account. Check Google’s current model availability, pricing and data-use terms before sending confidential material.",
     "code": "# Optional help while installing:\nelp init --preset multipage --ai brief.txt --yes\n# Review the generated file, then change local defaults:\nelp content import panel-content.proposal.json --defaults --dry-run\nelp content import panel-content.proposal.json --defaults --yes\n# Or generate a fresh proposal separately:\nelp ai brief.txt --page home --out proposal.json --yes",
     "links": [
       {
@@ -173,7 +246,13 @@
         "label": "Current API pricing and free-tier conditions",
         "url": "https://ai.google.dev/gemini-api/docs/pricing"
       }
-    ]
+    ],
+    "summary": "Result: a JSON copy proposal to review. No source rewrite or automatic publication.",
+    "callout": {
+      "tone": "ai",
+      "title": "Generate → review → apply",
+      "body": "The AI command is included in the CLI; the model runs remotely through an API. Review panel-content.proposal.json, then apply it with content import. --defaults changes local config; --remote publishes explicitly. A failed codemod prevents the optional AI step from running during init."
+    }
   },
   {
     "id": "own-key",
@@ -196,8 +275,15 @@
     "id": "vercel",
     "title": "Deploy this project on Vercel",
     "group": "Operate this project",
-    "body": "Import this repository into Vercel with its Next.js framework preset and Node 24. Keep the repository root as the project root. Use the package.json build command: pnpm build. It generates the CLI assets and public download tarball before building Next.js. Do not replace it with bare next build if you want the downloadable CLI.\n\nBefore using the new admin, back up the existing database and apply migration 001. To host shared AI too, apply migration 002. Then add the environment variables below, set your domain and redeploy. Vercel does not run SQL migrations just because an env key is present. No Gemini key is needed in this Codex environment to prepare the code; you provide it only in your Vercel settings.\n\nAfter deployment, open /docs, download the CLI, test /admin login/save/reset/upload, then test an AI proposal from a client without a local key and with its own key. Ordinary users install into their own project and configure their own Supabase; they do not receive access to this website’s database.",
-    "code": "# Required website/admin env in Vercel:\nNEXT_PUBLIC_SUPABASE_URL=...\nNEXT_PUBLIC_SUPABASE_ANON_KEY=...\nSUPABASE_SERVICE_ROLE_KEY=...\nADMIN_PASSWORD=...\nPANEL_SITE_URL=https://editable-landing-panel.vercel.app\n\n# Also enable shared AI (optional):\nGEMINI_API_KEY=your-server-key\nGEMINI_MODEL=gemini-3.5-flash-lite\nPANEL_AI_ENABLED=true\nPANEL_AI_RATE_SECRET=a-random-secret-of-at-least-32-characters\n# Generate that secret locally with:\n# node -e \"console.log(require('node:crypto').randomBytes(32).toString('hex'))\""
+    "body": "This section is for hosting this repository’s own website. Import it into Vercel with the Next.js preset and Node 24. Keep the repository root as the project root and use pnpm build. That command creates the public CLI archive before building the website; bare next build omits the packaging step.\n\nApply migration 001 to the chosen Supabase database before using the admin. If you enable shared AI, also apply migration 002 and add its server settings below. Set the env values in the relevant Vercel environment and redeploy. SQL is not run automatically.\n\nAfter deployment, test /admin login/save/reset/upload, /docs and the CLI download. If shared AI is enabled, test generation with and without a local user key. People installing the CLI use their own website/database; they do not gain editing access to this deployment.",
+    "code": "# Required website/admin env in Vercel:\nNEXT_PUBLIC_SUPABASE_URL=...\nNEXT_PUBLIC_SUPABASE_ANON_KEY=...\nSUPABASE_SERVICE_ROLE_KEY=...\nADMIN_PASSWORD=...\nPANEL_SITE_URL=https://editable-landing-panel.vercel.app\n\n# Also enable shared AI (optional):\nGEMINI_API_KEY=your-server-key\nGEMINI_MODEL=gemini-3.5-flash-lite\nPANEL_AI_ENABLED=true\nPANEL_AI_RATE_SECRET=a-random-secret-of-at-least-32-characters\n# Generate that secret locally with:\n# node -e \"console.log(require('node:crypto').randomBytes(32).toString('hex'))\"",
+    "checklist": [
+      "Node 24, repository root and pnpm build are selected.",
+      "Database migration 001 and permission verification are complete.",
+      "Env values use the exact deployed HTTPS origin.",
+      "Only if shared AI is enabled: migration 002, key, enable flag and random rate secret are configured.",
+      "After deployment: verify real admin edits, uploads and the downloadable CLI."
+    ]
   },
   {
     "id": "shared-ai",
@@ -210,8 +296,8 @@
     "id": "distribution",
     "title": "CLI distribution: Vercel download or npm",
     "group": "Operate this project",
-    "body": "You do not have to create an npm account for the website-hosted download path. pnpm build creates public/downloads/editable-landing-panel-0.3.0.tgz from a fixed list of runtime assets, code and documentation. Vercel serves it from your domain. npx --package=<HTTPS download> elp init is a real installation command, not an example of an already-published registry package.\n\nFor the shorter npx editable-landing-panel@0.3.0 init command, an owner must separately publish packages/cli to npm with a permitted package name and authenticated npm account. Deploying on Vercel does not publish to npm. The project executable is elp in either case. The build bakes your configured HTTPS PANEL_SITE_URL into the downloadable CLI’s shared endpoint. After changing domains, rebuild and re-download; already downloaded CLI copies can override the URL with ELP_AI_URL or --ai-url.",
-    "code": "# Prepare a downloadable CLI locally (no npm publication):\npnpm cli:pack\n# After Vercel deployment:\nnpx --package=https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.3.0.tgz elp --help\n\n# OPTIONAL registry distribution, by an authorized npm owner:\npnpm cli:build\ncd packages/cli\nnpm login\nnpm publish --access public\n# Only after successful publication:\nnpx editable-landing-panel@0.3.0 init --preset multipage --yes"
+    "body": "You do not have to create an npm account for the website-hosted download path. pnpm build creates public/downloads/editable-landing-panel-0.3.1.tgz from a fixed list of runtime assets, code and documentation. Vercel serves it from your domain. npx --package=<HTTPS download> elp init is a real installation command, not an example of an already-published registry package.\n\nFor the shorter npx editable-landing-panel@0.3.1 init command, an owner must separately publish packages/cli to npm with a permitted package name and authenticated npm account. Deploying on Vercel does not publish to npm. The project executable is elp in either case. The build bakes your configured HTTPS PANEL_SITE_URL into the downloadable CLI’s shared endpoint. After changing domains, rebuild and re-download; already downloaded CLI copies can override the URL with ELP_AI_URL or --ai-url.",
+    "code": "# Prepare a downloadable CLI locally (no npm publication):\npnpm cli:pack\n# After Vercel deployment:\nnpx --package=https://editable-landing-panel.vercel.app/downloads/editable-landing-panel-0.3.1.tgz elp --help\n\n# OPTIONAL registry distribution, by an authorized npm owner:\npnpm cli:build\ncd packages/cli\nnpm login\nnpm publish --access public\n# Only after successful publication:\nnpx editable-landing-panel@0.3.1 init --preset multipage --yes"
   },
   {
     "id": "api",
@@ -261,6 +347,11 @@
     "title": "Troubleshooting and verification",
     "group": "Operations",
     "body": "Run doctor after setting environment and applying SQL. Public pages log a warning and fall back to config on database read failures; the editor reports errors rather than pretending a failed read succeeded. Remote diagnostics inspect content and bucket metadata and make an empty anonymous upsert probe; no rows are inserted, but SQL inspection is still needed to prove every permission.\n\nLogin 503: check migration 001, database access and a password of at least 16 characters. Production Origin 403/503: check PANEL_SITE_URL against the exact scheme/host you use. Shared AI 503: check enable flag, key, rate secret, migration 002 and trusted platform IP. Shared AI 429: use your own key or retry after the daily window; increasing account limits is not automatically free. init conflicts: inspect the reported existing path/route rather than forcing an overwrite. Upload errors: check bucket permissions and supported JPEG/PNG/WebP/AVIF size ≤5 MB / 40 MP.\n\nConcurrent editors are last-write-wins. Export before bulk changes, inspect orphaned uploads manually, and do not remove files still referenced by backups.\n\nVercel install error ERR_PNPM_IGNORED_BUILDS: pnpm 11 uses allowBuilds in pnpm-workspace.yaml; legacy ignoredBuiltDependencies is no longer honored. Keep the committed policy, which approves reviewed native package versions and disables the unused msw postinstall. After dependency upgrades, review any newly reported package/version before updating that policy. Do not disable strict build checks or enable all dependency scripts. This install failure does not require reapplying SQL migrations or replacing environment keys. The repository pins Node 24.x; the standalone CLI supports Node >=22.13.",
-    "code": "elp doctor --remote --json\npnpm check\npnpm build\npnpm test:e2e\nnode scripts/smoke-install.mjs"
+    "code": "# In any website installed with the CLI:\nelp doctor --remote --json\n# Then run that website’s own typecheck/build scripts.\n\n# The commands below belong to THIS repository, not every installed website:\npnpm check\npnpm build\npnpm test:e2e\nnode scripts/smoke-install.mjs",
+    "callout": {
+      "tone": "info",
+      "title": "Check the step that actually failed",
+      "body": "Install/conflict errors concern local files. Login 503 usually concerns env, database access or migration 001. AI quota errors concern generation only. A successful CLI install does not prove your live database permissions or deployment."
+    }
   }
 ]
